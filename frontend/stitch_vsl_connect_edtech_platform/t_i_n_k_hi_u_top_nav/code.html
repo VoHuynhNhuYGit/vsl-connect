@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="vi"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>VSL Connect - Ngôn ngữ Ký hiệu VN</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-primary-fixed-variant":"#00504e","tertiary-container":"#6b7775","on-primary-fixed":"#00201f","primary":"#166664","inverse-on-surface":"#e6f2ff","inverse-primary":"#8cd3cf","on-background":"#091d2b","on-surface-variant":"#3f4948","outline":"#6f7978","surface-container-lowest":"#ffffff","on-tertiary":"#ffffff","surface-container-low":"#ecf5ff","surface-variant":"#d1e5f8","error":"#ba1a1a","secondary-container":"#acebe7","tertiary":"#535e5d","on-primary":"#ffffff","surface-container-high":"#d6ebfe","background":"#f6f9ff","tertiary-fixed-dim":"#bdc9c7","on-secondary-container":"#2c6c69","on-secondary":"#ffffff","on-secondary-fixed-variant":"#01504d","secondary-fixed":"#afeeea","outline-variant":"#bec9c7","primary-fixed-dim":"#8cd3cf","on-tertiary-fixed-variant":"#3e4948","inverse-surface":"#1f3241","on-secondary-fixed":"#00201f","secondary":"#276865","surface-bright":"#f6f9ff","surface-container-highest":"#d1e5f8","primary-fixed":"#a7efec","error-container":"#ffdad6","on-primary-container":"#f3fffd","surface-tint":"#1a6966","surface-container":"#e1f0ff","tertiary-fixed":"#d9e5e3","on-tertiary-fixed":"#131d1d","surface":"#f6f9ff","surface-dim":"#c8dcf0","secondary-fixed-dim":"#93d2ce","on-error":"#ffffff","on-tertiary-container":"#f3fffd","primary-container":"#36807d","on-surface":"#091d2b","on-error-container":"#93000a"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"margin-mobile":"1rem","space-sm":"0.5rem","space-md":"0.75rem","space-xl":"2rem","gutter-lg":"1.5rem","space-lg":"1.25rem","margin":"1.5rem","gutter":"1rem","space-xs":"0.25rem"},"fontFamily":{"label-md":["Plus Jakarta Sans"],"label-sm":["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"headline-xl-mobile":["Plus Jakarta Sans"],"headline-xl":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"headline-lg":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"code-sm":["Space Mono"]},"fontSize":{"label-md":["13px",{"lineHeight":"16px","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"14px","fontWeight":"600"}],"headline-md":["20px",{"lineHeight":"28px","fontWeight":"600"}],"headline-xl-mobile":["26px",{"lineHeight":"34px","fontWeight":"700"}],"headline-xl":["32px",{"lineHeight":"40px","fontWeight":"700"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"headline-sm":["16px",{"lineHeight":"24px","fontWeight":"600"}],"headline-lg":["24px",{"lineHeight":"32px","fontWeight":"700"}],"body-sm":["13px",{"lineHeight":"18px","fontWeight":"400"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"code-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}]}}}};</script></head><body class="min-h-full bg-background font-body-md text-body-md text-on-surface antialiased"><header class="fixed top-0 left-0 right-0 z-50 w-full h-[72px] bg-surface-container-lowest/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-[72px] max-w-7xl mx-auto px-8 flex items-center justify-between gap-6"><div class="flex items-center gap-3 shrink-0"><div class="w-10 h-10 rounded-xl bg-secondary-container flex items-center justify-center text-on-secondary-container shadow-sm"><span class="material-symbols-outlined text-[24px]">sign_language</span></div><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight leading-tight">VSL Connect</span><span class="font-label-sm text-label-sm text-on-surface-variant font-normal tracking-wide">Ngôn ngữ Ký hiệu VN</span></div></div><nav class="hidden xl:flex items-center gap-1 shrink-0" data-active-classes="bg-secondary-container text-on-secondary-container font-headline-sm text-headline-sm rounded-lg"><a class="px-3.5 py-2 rounded-lg font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" data-path="trang-chu" href="#">Trang chủ</a><a class="px-3.5 py-2 rounded-lg font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" data-path="lo-trinh-hoc-tap" href="#">Lộ trình học tập</a><a aria-current="page" class="px-3.5 py-2 transition-colors bg-secondary-container text-on-secondary-container font-headline-sm text-headline-sm rounded-lg" data-path="tu-dien-ky-hieu" href="#">Từ điển ký hiệu</a><a class="px-3.5 py-2 rounded-lg font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" data-path="luyen-tap" href="#">Luyện tập</a><a class="px-3.5 py-2 rounded-lg font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" data-path="on-tap" href="#">Ôn tập</a><a class="px-3.5 py-2 rounded-lg font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" data-path="giao-tiep" href="#">Giao tiếp</a></nav><div class="flex items-center gap-3 shrink-0"><button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant transition-colors" type="button"><span class="material-symbols-outlined text-[18px]">search</span><span class="font-code-sm text-code-sm bg-surface-container-lowest px-1.5 py-0.5 rounded text-on-surface shadow-[0_1px_4px_rgba(0,0,0,0.04)]">⌘K</span></button><div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-low"><span class="material-symbols-outlined text-[18px] text-error">local_fire_department</span><span class="font-label-md text-label-md text-on-surface">14 ngày</span></div><div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-container"><span class="material-symbols-outlined text-[18px] text-on-secondary-container">diamond</span><span class="font-label-md text-label-md text-on-secondary-container">1,280 EXP</span></div><button class="relative w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error ring-2 ring-surface-container-lowest"></span></button><div class="relative group"><button class="flex items-center gap-2 pl-1.5 pr-2 py-1 rounded-full hover:bg-surface-container-low transition-colors" type="button"><div class="relative"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-surface-container-lowest"></span></div><span class="font-label-md text-label-md text-on-surface hidden md:inline">Minh Anh</span><span class="material-symbols-outlined text-[18px] text-on-surface-variant">expand_more</span></button><div class="absolute right-0 top-full mt-2 w-56 py-2 rounded-xl bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.08)] invisible group-hover:visible group-focus-within:visible opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all z-50"><div class="px-4 py-2 border-b border-surface-container"><p class="font-label-md text-label-md text-on-surface">Minh Anh</p><p class="font-body-sm text-body-sm text-on-surface-variant">Học viên Cao cấp</p></div><div class="py-1"><a class="flex items-center gap-2.5 px-4 py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container-low" data-path="tong-quan-hoc-tap" href="#"><span class="material-symbols-outlined text-[18px] text-on-surface-variant">space_dashboard</span>Tổng quan học tập</a><a class="flex items-center gap-2.5 px-4 py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container-low" data-path="khoa-hoc-cua-toi" href="#"><span class="material-symbols-outlined text-[18px] text-on-surface-variant">school</span>Khóa học của tôi</a><a class="flex items-center gap-2.5 px-4 py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container-low" data-path="tien-do-hoc-tap" href="#"><span class="material-symbols-outlined text-[18px] text-on-surface-variant">trending_up</span>Tiến độ học tập</a><a class="flex items-center gap-2.5 px-4 py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container-low" data-path="thanh-tich" href="#"><span class="material-symbols-outlined text-[18px] text-on-surface-variant">military_tech</span>Thành tích</a><a class="flex items-center gap-2.5 px-4 py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container-low" data-path="ho-so-ca-nhan" href="#"><span class="material-symbols-outlined text-[18px] text-on-surface-variant">manage_accounts</span>Hồ sơ cá nhân</a><a class="flex items-center gap-2.5 px-4 py-2 font-body-sm text-body-sm text-on-surface hover:bg-surface-container-low" data-path="cai-dat" href="#"><span class="material-symbols-outlined text-[18px] text-on-surface-variant">settings</span>Cài đặt</a></div><div class="pt-1 border-t border-surface-container"><a class="flex items-center gap-2.5 px-4 py-2 font-body-sm text-body-sm text-error hover:bg-surface-container-low" data-path="dang-xuat" href="#"><span class="material-symbols-outlined text-[18px] text-error">logout</span>Đăng xuất</a></div></div></div></div></div></header><main class="w-full pt-[72px] bg-background min-h-[calc(100vh-72px)]"><div class="max-w-7xl mx-auto px-8 py-8"><div class="flex flex-col w-full">
+<div class="flex flex-col gap-8 pb-16">
+<!-- Top Header Banner & Stats Section -->
+<div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-surface-container-low via-surface-container to-surface-variant p-8 md:p-10 shadow-sm">
+<div class="absolute -right-16 -top-16 w-72 h-72 rounded-full bg-secondary-container/40 blur-3xl pointer-events-none"></div>
+<div class="absolute right-1/3 -bottom-20 w-80 h-80 rounded-full bg-primary-fixed/30 blur-3xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+<div class="flex flex-col gap-3 max-w-3xl">
+<div class="inline-flex items-center gap-2 self-start px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container shadow-xs">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span class="font-code-sm text-code-sm tracking-wider uppercase">THƯ VIỆN SỐ VSL CHUẨN QUỐC GIA v3.4.2</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight">
+            Từ điển Ký hiệu Ngôn ngữ Ký hiệu Việt Nam
+          </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+            Tra cứu hơn 3,520 ký hiệu chuẩn hóa theo 3 phương ngữ Bắc - Trung - Nam với video 60fps, khẩu hình chân thực và nhận diện tư thế tay AI.
+          </p>
+</div>
+<!-- Metric Counter Badges -->
+<div class="flex sm:flex-row lg:flex-col gap-3 shrink-0">
+<div class="flex items-center gap-3.5 px-4 py-3 rounded-xl bg-surface-container-lowest shadow-sm">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[24px]">videocam</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">3,520</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Video ký hiệu 60fps</span>
+</div>
+</div>
+<div class="flex items-center gap-3.5 px-4 py-3 rounded-xl bg-surface-container-lowest shadow-sm">
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-[24px]">public</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">3 Vùng miền</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Bắc • Trung • Nam</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Prominent Command Bar Search -->
+<div class="relative z-10 mt-8">
+<div class="flex items-center gap-3 bg-surface-container-lowest p-2 rounded-2xl shadow-md transition-shadow focus-within:shadow-lg">
+<div class="flex items-center justify-center pl-3 text-primary">
+<span class="material-symbols-outlined text-[26px]">search</span>
+</div>
+<input class="w-full bg-transparent font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none" placeholder="Tìm kiếm theo từ vựng, cử chỉ tay (nắm đấm, xòe ngón...), hoặc tình huống giao tiếp (chào hỏi, cấp cứu...)" type="text"/>
+<div class="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded bg-surface-container font-code-sm text-code-sm text-on-surface-variant">
+<span>⌘</span><span>K</span>
+</div>
+<button class="flex items-center gap-2 px-5 py-3 rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm hover:bg-primary-container transition-colors shadow-sm">
+<span>Tra cứu</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Filter Controls Toolbar -->
+<div class="flex flex-col gap-4">
+<div class="flex flex-wrap items-center justify-between gap-4">
+<!-- Regional dialect tabs -->
+<div class="flex flex-wrap items-center gap-2">
+<button class="px-4 py-2 rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm shadow-xs transition-colors">
+            Tất cả vùng miền
+          </button>
+<button class="px-4 py-2 rounded-xl bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-headline-sm text-headline-sm transition-colors">
+            Miền Bắc (Hà Nội)
+          </button>
+<button class="px-4 py-2 rounded-xl bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-headline-sm text-headline-sm transition-colors">
+            Miền Trung (Đà Nẵng)
+          </button>
+<button class="px-4 py-2 rounded-xl bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container font-headline-sm text-headline-sm transition-colors">
+            Miền Nam (TP.HCM)
+          </button>
+</div>
+<!-- Filter Dropdowns & View Mode -->
+<div class="flex items-center gap-3">
+<div class="relative">
+<button class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm shadow-xs">
+<span class="material-symbols-outlined text-[18px]">signal_cellular_alt</span>
+<span>Độ khó: Tất cả</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+</div>
+<div class="relative">
+<button class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm shadow-xs">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+<span>Trạng thái: Đã lọc</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+</div>
+<div class="flex items-center p-1 rounded-xl bg-surface-container-low shadow-xs">
+<button class="p-1.5 rounded-lg bg-surface-container-lowest text-primary shadow-xs" title="Lưới thẻ">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+</button>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface" title="Danh sách">
+<span class="material-symbols-outlined text-[20px]">view_list</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Category Chips Scroll -->
+<div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+<button class="px-3.5 py-1.5 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md whitespace-nowrap shadow-xs">
+          Tất cả (3,520)
+        </button>
+<button class="px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap shadow-xs">
+          Giao tiếp hàng ngày (240)
+        </button>
+<button class="px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap shadow-xs">
+          Gia đình &amp; Xã hội (185)
+        </button>
+<button class="px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap shadow-xs">
+          Chữ cái &amp; Số đếm (86)
+        </button>
+<button class="px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap shadow-xs">
+          Y tế &amp; Cứu trợ (120)
+        </button>
+<button class="px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap shadow-xs">
+          Giáo dục &amp; Công sở (210)
+        </button>
+</div>
+</div>
+<!-- 4-Column Grid of Desktop Sign Video Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Card 1: Xin chào -->
+<div class="group relative flex flex-col rounded-2xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+<div class="relative aspect-[16/10] bg-inverse-surface overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A cheerful Vietnamese instructor performing the Vietnamese Sign Language gesture for Xin chao hello, bright studio lighting, focused hands, teal modern educational backdrop, crisp 60fps quality capture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQicdXg47Jwf20TjS9TFw-vXreJZSZKO9FLPbp218pYPWOcbi_8oqKbINDFcAiUaGsll7ra5I9Hk4hAEId6Iv0Lta23Cdup-Z-EEjIaO8Dm2p7bTgNhEjE60wVjtwSHOSU2P-oBP7HHTrr6pPaLC4Y5ePqsF1uE9dsP1cApQyswVk1FiNN9f0c7TqyA3lqzCtH9f_HdCAnFbtCziwOBzH63X0I0JPkD-2T2Rf3j52x"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-background/80 via-transparent to-black/20"></div>
+<div class="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-inverse-surface/80 backdrop-blur-sm text-inverse-on-surface font-code-sm text-code-sm">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+<span>60 FPS</span>
+</div>
+<div class="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">rotate_90_degrees_ccw</span>
+<span>45°</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-inverse-on-surface">
+<span class="font-code-sm text-code-sm">00:03</span>
+<button class="w-8 h-8 rounded-full bg-primary/90 flex items-center justify-center text-on-primary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col p-4 gap-3 flex-1 justify-between">
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<span class="font-headline-md text-headline-md text-on-surface tracking-tight">Xin chào</span>
+<span class="px-2 py-0.5 rounded-md bg-secondary-container/60 text-on-secondary-container font-label-sm text-label-sm">Toàn quốc</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Tay phải giơ ngang thái dương, vẫy nhẹ mỉm cười</p>
+</div>
+<div class="pt-3 flex flex-col gap-2">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[15px]">check_circle</span> Đã học
+              </span>
+<span class="text-on-surface-variant">Độ khó: Cơ bản</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-2 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors text-center">
+                Cử chỉ chi tiết
+              </button>
+<button class="p-2 rounded-lg bg-primary-fixed text-on-primary-fixed hover:bg-secondary-container transition-colors" title="Luyện với AI">
+<span class="material-symbols-outlined text-[18px]">smart_toy</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2: Cảm ơn -->
+<div class="group relative flex flex-col rounded-2xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+<div class="relative aspect-[16/10] bg-inverse-surface overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Instructor demonstrating the gesture for thank you in Vietnamese Sign Language, pressing hand towards lips then outward, warm welcoming expression, high resolution studio, subtle cyan rim light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBO5u2tiAXhnms2uC5A_QcAsyMj-ef7CWxdI8xWbRkk0VrLIpVLnSaXekfDOltJk5Fu7BmNXUrGj5ghFUS7x_X9lv22fQZ0TcriqFiMCXn0DLlhwz3YBNzPOvV2jrO9J9rS5dP49JvI5BzMBUUagsN8o-VA_a4igGD6L4DezqH4zzxWuSYmZmEZPOmv3lVU500yH-Yd8_FKnyYFmdAnRL31uVNjhCpovJKnFQ2Pz0Ft"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-background/80 via-transparent to-black/20"></div>
+<div class="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-inverse-surface/80 backdrop-blur-sm text-inverse-on-surface font-code-sm text-code-sm">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+<span>60 FPS</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-inverse-on-surface">
+<span class="font-code-sm text-code-sm">00:04</span>
+<button class="w-8 h-8 rounded-full bg-primary/90 flex items-center justify-center text-on-primary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col p-4 gap-3 flex-1 justify-between">
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<span class="font-headline-md text-headline-md text-on-surface tracking-tight">Cảm ơn</span>
+<span class="px-2 py-0.5 rounded-md bg-secondary-container/60 text-on-secondary-container font-label-sm text-label-sm">Toàn quốc</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Tay phải mở ngón chạm cằm, đưa thẳng về phía trước</p>
+</div>
+<div class="pt-3 flex flex-col gap-2">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[15px]">check_circle</span> Đã học
+              </span>
+<span class="text-on-surface-variant">Độ khó: Cơ bản</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-2 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors text-center">
+                Cử chỉ chi tiết
+              </button>
+<button class="p-2 rounded-lg bg-primary-fixed text-on-primary-fixed hover:bg-secondary-container transition-colors" title="Luyện với AI">
+<span class="material-symbols-outlined text-[18px]">smart_toy</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3: Xin lỗi -->
+<div class="group relative flex flex-col rounded-2xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+<div class="relative aspect-[16/10] bg-inverse-surface overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Vietnamese Sign Language tutor demonstrating apology gesture, hand placed over chest with polite gentle nodding, soft studio light, clean aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXaHFNYEoSwAAWAxAp1k74-p853DDfOmEEUPTk0d8wMm-5wQW16-CT2VnGD9UiVjakAG6lp7lEpWa6wk6rsJlFty-ljSkiZtiMbL7eTaF1gQxoT4PRShv0OuIgw4U5qn0R1gQDNbDD949fDOJ_7jeHTzgbW-bbbLLI2G5oO0S6PoYiKwpA6JNA6alcgVWooKr0kBjpz1Q8CxX8NfL2dE8OIdlHuuNcwcxOqO0C0hwQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-background/80 via-transparent to-black/20"></div>
+<div class="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-inverse-surface/80 backdrop-blur-sm text-inverse-on-surface font-code-sm text-code-sm">
+<span>60 FPS</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-inverse-on-surface">
+<span class="font-code-sm text-code-sm">00:03</span>
+<button class="w-8 h-8 rounded-full bg-primary/90 flex items-center justify-center text-on-primary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col p-4 gap-3 flex-1 justify-between">
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<span class="font-headline-md text-headline-md text-on-surface tracking-tight">Xin lỗi</span>
+<span class="px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface font-label-sm text-label-sm">Miền Bắc</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Nắm tay xoay tròn nhẹ trên ngực, cúi nhẹ đầu</p>
+</div>
+<div class="pt-3 flex flex-col gap-2">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="flex items-center gap-1 text-primary-container">
+<span class="material-symbols-outlined text-[15px]">timelapse</span> Đang học
+              </span>
+<span class="text-on-surface-variant">Độ khó: Cơ bản</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-2 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors text-center">
+                Cử chỉ chi tiết
+              </button>
+<button class="p-2 rounded-lg bg-primary-fixed text-on-primary-fixed hover:bg-secondary-container transition-colors" title="Luyện với AI">
+<span class="material-symbols-outlined text-[18px]">smart_toy</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 4: Gia đình -->
+<div class="group relative flex flex-col rounded-2xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+<div class="relative aspect-[16/10] bg-inverse-surface overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Young teacher in educational setting showing the two-handed sign for Family in Vietnamese Sign Language, circular gesture connecting thumbs and index fingers, vibrant soft teal lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPcdMfA-NH397M10fln6-5PykzCBgXispXlCagrJ3rl3pAYeRcTtDi-x1amflAOTYEwwuDSGPahorPoiXx5THu4jLODsp8XcRdGYbJ7RHI7iOQPLj_-bFdR3JUNAoQacjQAID-yLrhuHUXcTaMCE2hoUwoJ0y15zHMxggYCou9R015WRb1Tj7vnUlotT_YfNl5dTd_Wk2Sz8PteP31rqFyLlumcM1rmdllbDmcUTwV"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-background/80 via-transparent to-black/20"></div>
+<div class="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-inverse-surface/80 backdrop-blur-sm text-inverse-on-surface font-code-sm text-code-sm">
+<span>60 FPS</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-inverse-on-surface">
+<span class="font-code-sm text-code-sm">00:05</span>
+<button class="w-8 h-8 rounded-full bg-primary/90 flex items-center justify-center text-on-primary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col p-4 gap-3 flex-1 justify-between">
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<span class="font-headline-md text-headline-md text-on-surface tracking-tight">Gia đình</span>
+<span class="px-2 py-0.5 rounded-md bg-secondary-container/60 text-on-secondary-container font-label-sm text-label-sm">Toàn quốc</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Hai bàn tay chữ F tạo vòng tròn khép kín phía trước</p>
+</div>
+<div class="pt-3 flex flex-col gap-2">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[15px]">radio_button_unchecked</span> Chưa học
+              </span>
+<span class="text-on-surface-variant">Độ khó: Trung bình</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-2 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors text-center">
+                Cử chỉ chi tiết
+              </button>
+<button class="p-2 rounded-lg bg-primary-fixed text-on-primary-fixed hover:bg-secondary-container transition-colors" title="Luyện với AI">
+<span class="material-symbols-outlined text-[18px]">smart_toy</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 5: Bác sĩ -->
+<div class="group relative flex flex-col rounded-2xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+<div class="relative aspect-[16/10] bg-inverse-surface overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Instructor demonstrating Doctor sign in Southern dialect of Vietnamese Sign Language, tapping pulse on wrist with two fingers, clinical blue and clean teal backdrop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmsTYkj9mDAu6qVol7Y8KMQecapoqzarpu95mvdXsz1tbnPnmzrx_JUUGwrmjeOFl5e2jmumXFkvHEznB7HsuX8uNgOU2D9qyIzV1niYipp1zvOqJlEYVvr0j0qLMJiC7RIESgiv66l9mfW5J2xN9qiOlePfUJVzZXxbwVMhiPvwmadfbh39-6V_qQDmyF_n_ywXywXJy_OSl4uHHtoXnzld06BzQcEZrVkihuStXS"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-background/80 via-transparent to-black/20"></div>
+<div class="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-inverse-surface/80 backdrop-blur-sm text-inverse-on-surface font-code-sm text-code-sm">
+<span>60 FPS</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-inverse-on-surface">
+<span class="font-code-sm text-code-sm">00:04</span>
+<button class="w-8 h-8 rounded-full bg-primary/90 flex items-center justify-center text-on-primary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col p-4 gap-3 flex-1 justify-between">
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<span class="font-headline-md text-headline-md text-on-surface tracking-tight">Bác sĩ</span>
+<span class="px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface font-label-sm text-label-sm">Miền Nam</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Ngón trỏ và ngón giữa gõ nhẹ vào cổ tay trái (bắt mạch)</p>
+</div>
+<div class="pt-3 flex flex-col gap-2">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[15px]">radio_button_unchecked</span> Chưa học
+              </span>
+<span class="text-on-surface-variant">Độ khó: Cơ bản</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-2 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors text-center">
+                Cử chỉ chi tiết
+              </button>
+<button class="p-2 rounded-lg bg-primary-fixed text-on-primary-fixed hover:bg-secondary-container transition-colors" title="Luyện với AI">
+<span class="material-symbols-outlined text-[18px]">smart_toy</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 6: Bệnh viện -->
+<div class="group relative flex flex-col rounded-2xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+<div class="relative aspect-[16/10] bg-inverse-surface overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Vietnamese Sign Language demonstration for Hospital, showing cross symbol on upper arm with finger trace, clear posture, studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjBMWC8lnxgJd2-eVg6xtKIl9vyMlmudcDLLegYo20JO1LLlo3pxHlMgmFdOh8djSlQfl2MRX_6Abm6yMNxZN6Ry28yaeKAtn5wbX1Wi_FiBhIF1SJyaEOx9WPl5nDQKSiCqpRnXOxSPhUT1zwV9zmJX3BU4RG9sop2oVlrs1wi1e56ilzneq52uWAUaBPNqwKzpdKyJx7NZw992tdy7c_7NsrwlAY1_GWWHzNmPlw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-background/80 via-transparent to-black/20"></div>
+<div class="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-inverse-surface/80 backdrop-blur-sm text-inverse-on-surface font-code-sm text-code-sm">
+<span>60 FPS</span>
+</div>
+<div class="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary-container text-on-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">alt_route</span>
+<span>3 Kiểu</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-inverse-on-surface">
+<span class="font-code-sm text-code-sm">00:06</span>
+<button class="w-8 h-8 rounded-full bg-primary/90 flex items-center justify-center text-on-primary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col p-4 gap-3 flex-1 justify-between">
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<span class="font-headline-md text-headline-md text-on-surface tracking-tight">Bệnh viện</span>
+<span class="px-2 py-0.5 rounded-md bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm">Biến thể 3 miền</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Ký hiệu kết hợp: Nhà + Dấu chữ thập đỏ ở cánh tay</p>
+</div>
+<div class="pt-3 flex flex-col gap-2">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-[15px]">compare_arrows</span> So sánh phương ngữ
+              </span>
+<span class="text-on-surface-variant">Độ khó: Nâng cao</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-2 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors text-center">
+                Xem 3 biến thể
+              </button>
+<button class="p-2 rounded-lg bg-primary-fixed text-on-primary-fixed hover:bg-secondary-container transition-colors" title="Luyện với AI">
+<span class="material-symbols-outlined text-[18px]">smart_toy</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 7: Hạnh phúc -->
+<div class="group relative flex flex-col rounded-2xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+<div class="relative aspect-[16/10] bg-inverse-surface overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Instructor with smiling radiant facial expression demonstrating gesture for Happiness in Vietnamese Sign Language, circular upward strokes on chest, bright daylight ambiance" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbYRZJDPyvMVX1qaZeJz3kh2FXvB3lNofoBpZGe10Irix-Z-wccbMrn9K6sOWF9So4kOs8zKHovfeZTnwgLP1aGoq8Qt7hhpjIZ0yHtdi8C6x4eiLDVCNd-FiO-bEiNAdmcJDKQV_QBvtVh3xgvqLvEGhb902xi-ZdK1jLXPChEI5ef4LJorO0_9zjCjlOLcahZ_MDDF9Sj_jCVXcxtYubDVS_LVFMCgjCOO0HXsq5"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-background/80 via-transparent to-black/20"></div>
+<div class="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-inverse-surface/80 backdrop-blur-sm text-inverse-on-surface font-code-sm text-code-sm">
+<span>60 FPS</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-inverse-on-surface">
+<span class="font-code-sm text-code-sm">00:04</span>
+<button class="w-8 h-8 rounded-full bg-primary/90 flex items-center justify-center text-on-primary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col p-4 gap-3 flex-1 justify-between">
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<span class="font-headline-md text-headline-md text-on-surface tracking-tight">Hạnh phúc</span>
+<span class="px-2 py-0.5 rounded-md bg-secondary-container/60 text-on-secondary-container font-label-sm text-label-sm">Toàn quốc</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Hai lòng bàn tay vỗ nhẹ hướng lên ngực kết hợp nét mặt cười</p>
+</div>
+<div class="pt-3 flex flex-col gap-2">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[15px]">check_circle</span> Đã học
+              </span>
+<span class="text-on-surface-variant">Độ khó: Trung bình</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-2 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors text-center">
+                Cử chỉ chi tiết
+              </button>
+<button class="p-2 rounded-lg bg-primary-fixed text-on-primary-fixed hover:bg-secondary-container transition-colors" title="Luyện với AI">
+<span class="material-symbols-outlined text-[18px]">smart_toy</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 8: Học tập -->
+<div class="group relative flex flex-col rounded-2xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+<div class="relative aspect-[16/10] bg-inverse-surface overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Young Vietnamese educator demonstrating sign for Study or Learn in Vietnamese Sign Language, moving fingertips from flat palm to forehead, engaging educational environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCULS32nhCBQUBQd-LiKBb4p2zEVcRYisa79HemfecEu7AEdQgdtVic7xZDoBbAYsv_d3Nquc2xauF7-FAo60ke_ucB4MYDSAygAdS6Vh-LqZOW6wZ7y10myM71H1YuW798AgQ_FrIzL1KHVPojo5_xZebyS3zQP_OpG5nMzbTtCzOeFyHpVruMMyJYI0X23kpSAZRiUbIzpATHwPErTDoN9JsSjVt-J5ss1kef3T1k"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-background/80 via-transparent to-black/20"></div>
+<div class="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-inverse-surface/80 backdrop-blur-sm text-inverse-on-surface font-code-sm text-code-sm">
+<span>60 FPS</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-inverse-on-surface">
+<span class="font-code-sm text-code-sm">00:04</span>
+<button class="w-8 h-8 rounded-full bg-primary/90 flex items-center justify-center text-on-primary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col p-4 gap-3 flex-1 justify-between">
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<span class="font-headline-md text-headline-md text-on-surface tracking-tight">Học tập</span>
+<span class="px-2 py-0.5 rounded-md bg-secondary-container/60 text-on-secondary-container font-label-sm text-label-sm">Toàn quốc</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Các ngón tay phải khép lại đưa từ lòng bàn tay trái lên trán</p>
+</div>
+<div class="pt-3 flex flex-col gap-2">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[15px]">check_circle</span> Đã học
+              </span>
+<span class="text-on-surface-variant">Độ khó: Cơ bản</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex-1 py-2 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors text-center">
+                Cử chỉ chi tiết
+              </button>
+<button class="p-2 rounded-lg bg-primary-fixed text-on-primary-fixed hover:bg-secondary-container transition-colors" title="Luyện với AI">
+<span class="material-symbols-outlined text-[18px]">smart_toy</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination & Results Counter -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 pb-2">
+<span class="font-body-md text-body-md text-on-surface-variant">
+        Đang xem <strong class="text-on-surface font-headline-sm">1 - 24</strong> trên tổng số <strong class="text-on-surface font-headline-sm">3,520</strong> ký hiệu
+      </span>
+<div class="flex items-center gap-1.5">
+<button class="w-10 h-10 rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm flex items-center justify-center shadow-xs">
+          1
+        </button>
+<button class="w-10 h-10 rounded-xl bg-surface-container-lowest text-on-surface hover:bg-surface-container font-body-md text-body-md flex items-center justify-center transition-colors shadow-xs">
+          2
+        </button>
+<button class="w-10 h-10 rounded-xl bg-surface-container-lowest text-on-surface hover:bg-surface-container font-body-md text-body-md flex items-center justify-center transition-colors shadow-xs">
+          3
+        </button>
+<span class="px-2 text-on-surface-variant font-code-sm text-code-sm">...</span>
+<button class="w-10 h-10 rounded-xl bg-surface-container-lowest text-on-surface hover:bg-surface-container font-body-md text-body-md flex items-center justify-center transition-colors shadow-xs">
+          147
+        </button>
+<button class="flex items-center gap-1.5 px-4 h-10 rounded-xl bg-surface-container-lowest text-on-surface hover:bg-surface-container font-headline-sm text-headline-sm transition-colors shadow-xs ml-1">
+<span>Trang kế tiếp</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Bottom Support Bento Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+<!-- Card Suggest New Word -->
+<div class="relative overflow-hidden rounded-2xl bg-surface-container-lowest p-6 sm:p-8 flex flex-col justify-between gap-6 shadow-sm">
+<div class="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-secondary-container/30 pointer-events-none"></div>
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-secondary-container flex items-center justify-center text-on-secondary-container shrink-0">
+<span class="material-symbols-outlined text-[28px]">post_add</span>
+</div>
+<div class="flex flex-col gap-1.5">
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Bạn không tìm thấy ký hiệu cần tra cứu?</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+              Cộng đồng VSL và hội đồng chuyên môn luôn sẵn sàng ghi nhận đóng góp từ vựng mới và biến thể địa phương từ bạn.
+            </p>
+</div>
+</div>
+<div class="flex items-center gap-3 pt-2">
+<button class="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-headline-sm text-headline-sm hover:bg-primary-container transition-colors shadow-xs flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span>Đề xuất từ mới ngay</span>
+</button>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Duyệt trong 24h</span>
+</div>
+</div>
+<!-- Card AI Gesture Search -->
+<div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary-container text-on-primary p-6 sm:p-8 flex flex-col justify-between gap-6 shadow-sm">
+<div class="absolute -right-12 -bottom-12 w-48 h-48 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-on-primary shrink-0">
+<span class="material-symbols-outlined text-[28px]">videocam</span>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-on-primary font-code-sm text-code-sm self-start">
+<span>VSL AI Vision v2.1</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg text-on-primary">Tra cứu bằng Cử chỉ (AI)</h3>
+<p class="font-body-md text-body-md text-on-primary-container">
+              Thực hiện cử chỉ trước webcam của máy tính. Mạng nơ-ron nhận dạng 21 khớp bàn tay sẽ khớp ngay lập tức từ điển tương ứng.
+            </p>
+</div>
+</div>
+<div class="flex items-center gap-3 pt-2">
+<button class="px-5 py-2.5 rounded-xl bg-surface-container-lowest text-primary font-headline-sm text-headline-sm hover:bg-surface-container-low transition-colors shadow-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">camera_alt</span>
+<span>Bật camera để AI nhận diện</span>
+</button>
+<span class="font-label-sm text-label-sm text-on-primary-container">Bảo mật trên máy</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple micro-interaction for category chip toggling
+  document.querySelectorAll('button[class*="rounded-full"]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (this.textContent.includes('(')) {
+        document.querySelectorAll('button[class*="rounded-full"]').forEach(el => {
+          if (el.textContent.includes('(')) {
+            el.className = 'px-3.5 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap shadow-xs';
+          }
+        });
+        this.className = 'px-3.5 py-1.5 rounded-full bg-secondary-container text-on-secondary-container font-label-md text-label-md whitespace-nowrap shadow-xs';
+      }
+    });
+  });
+</script></div></main><footer class="w-full bg-surface-container-lowest py-8 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row items-center justify-between gap-4"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">sign_language</span><span class="font-label-md text-label-md text-on-surface">VSL Connect</span><span class="font-body-sm text-body-sm text-on-surface-variant">© 2024 Nền tảng học Ngôn ngữ Ký hiệu Việt Nam.</span></div><div class="flex items-center gap-6"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Điều khoản</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Quyền riêng tư</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Hỗ trợ cộng đồng</a></div></div></footer></body></html>
