@@ -8,16 +8,17 @@
   :root {
     font-family: 'Plus Jakarta Sans', sans-serif;
     color: #091d2b;
-    background: #f6f9ff;
+    background: #f3f7f8;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
   }
 
   * { box-sizing: border-box; }
-  body { margin: 0; min-width: 320px; min-height: 100vh; background: #f6f9ff; }
-  button, a, input { font: inherit; }
-  button:focus-visible, a:focus-visible, input:focus-visible {
-    outline: 3px solid rgba(22, 102, 100, 0.35);
+  body { margin: 0; min-width: 320px; min-height: 100vh; background: #f3f7f8; }
+  button, a, input, select, textarea { font: inherit; }
+  input::placeholder { color: #52696d; opacity: 1; }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 3px solid #166664;
     outline-offset: 2px;
   }
 }
@@ -46,8 +47,8 @@
   .text-headline-sm { font-size: 16px; line-height: 24px; font-weight: 600; }
   .text-body-lg { font-size: 16px; line-height: 24px; }
   .text-body-md { font-size: 14px; line-height: 20px; }
-  .text-body-sm { font-size: 13px; line-height: 18px; }
-  .text-label-md { font-size: 13px; line-height: 16px; font-weight: 600; }
-  .text-label-sm { font-size: 11px; line-height: 14px; font-weight: 600; }
+  .text-body-sm { font-size: 14px; line-height: 20px; }
+  .text-label-md { font-size: 13px; line-height: 18px; font-weight: 600; }
+  .text-label-sm { font-size: 12px; line-height: 16px; font-weight: 600; }
   .text-code-sm { font-family: 'Space Mono', monospace; font-size: 12px; line-height: 16px; }
 }

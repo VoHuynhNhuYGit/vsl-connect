@@ -120,7 +120,7 @@ Font tham chiếu: **Be Vietnam Pro**. Có thể điều chỉnh token thiết k
 | Dữ liệu phía client | TanStack Query |
 | Biểu mẫu | React Hook Form, Zod |
 | Backend | Python, FastAPI, Pydantic |
-| Cơ sở dữ liệu | PostgreSQL, SQLAlchemy, Alembic |
+| Cơ sở dữ liệu | MySQL, SQLAlchemy, Alembic |
 | AI (sau) | MediaPipe, OpenCV, PyTorch; cân nhắc ONNX Runtime Web |
 | Gọi video (sau) | WebRTC, WebSocket signaling, STUN/TURN |
 | Triển khai | Docker Compose, Nginx, HTTPS, VPS |
@@ -164,19 +164,56 @@ vsl-connect/
 3. Lưu bản xuất vào `designs/stitch/`; **không ghi đè** trực tiếp `frontend/src/`.
 4. Đối chiếu bản thiết kế với cấu trúc React hiện tại.
 5. Chuyển HTML/CSS thành component React + TypeScript + Tailwind CSS có thể tái sử dụng.
-6. Kết nối các trang bằng React Router; sử dụng mock data riêng trong giai đoạn dựng UI.
-7. Thay mock data bằng API FastAPI sau khi backend tương ứng hoàn thiện.
+6. Kết nối các trang bằng React Router.
+7. Kết nối các trang với API FastAPI khi backend tương ứng hoàn thiện.
 8. Kiểm tra giao diện desktop, responsive, tiếng Việt, khả năng truy cập và build.
 
 **Thứ tự dựng UI khuyến nghị:** Design system → Layout chung → Trang chủ → Khóa học → Trang học video → Từ điển → Dashboard → Luyện tập → Admin → AI/video call.
 
 ## 8. Thiết lập môi trường phát triển
 
+Backend và migration cơ sở dữ liệu ban đầu: xem [hướng dẫn backend](backend/README.md). Các trang khóa học, bài học của khóa học và từ điển sử dụng API công khai.
+
+### Chạy bằng Docker Compose
+
+Cài và khởi động Docker Desktop, sau đó mở PowerShell tại thư mục gốc dự án. Nếu chưa có tệp `.env`, tạo từ mẫu:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Mở tệp `.env` và đặt `MYSQL_PASSWORD` và `MYSQL_ROOT_PASSWORD` bằng hai mật khẩu riêng. Không ghi đè tệp `.env` đang dùng cho database đã khởi tạo. Sau đó chạy:
+
+```powershell
+docker compose up --build -d
+docker compose ps
+```
+
+Truy cập giao diện tại `http://localhost:8080` và tài liệu API tại `http://localhost:8000/docs`. Có thể kiểm tra kết nối database tại `http://localhost:8000/health/ready`. Compose đợi MySQL sẵn sàng và chạy Alembic trước khi khởi động backend. Cơ sở dữ liệu ban đầu trống; khóa học và từ điển sẽ hiển thị nội dung đã xuất bản khi được thêm vào database.
+
+### Xem database bằng giao diện
+
+Truy cập phpMyAdmin tại `http://localhost:8081` sau khi chạy Docker Compose và đăng nhập với:
+
+- Tên người dùng: `vsl_connect`
+- Mật khẩu: giá trị `MYSQL_PASSWORD` trong tệp `.env` ở thư mục gốc
+
+Chọn cơ sở dữ liệu `vsl_connect` ở bên trái, rồi chọn tên bảng và **Browse/Duyệt** để xem dữ liệu. phpMyAdmin chỉ được mở trên máy cục bộ và có quyền thay đổi dữ liệu; cẩn thận khi chỉnh sửa hoặc xóa.
+
+Để xem log hoặc dừng ứng dụng:
+
+```powershell
+docker compose logs -f
+docker compose down
+```
+
+Dữ liệu MySQL nằm trong Docker volume và được giữ khi dùng `docker compose down`. Thay mật khẩu trong `.env` sau khi database đã khởi tạo **không** tự đổi mật khẩu trong MySQL; cần đổi mật khẩu trong database tương ứng. Volume PostgreSQL cũ được giữ riêng, không được tự động nhập vào MySQL. Sao lưu trước khi thao tác với volume; `docker compose down -v` sẽ xóa volume MySQL và dữ liệu. Cấu hình này dành cho phát triển cục bộ, chưa thiết lập HTTPS, sao lưu hay triển khai production.
+
 ### Yêu cầu dự kiến
 - Git
 - Node.js LTS và npm
 - Python phiên bản tương thích với backend khi được khởi tạo
-- PostgreSQL hoặc Docker Desktop
+- MySQL hoặc Docker Desktop
 
 ### Clone repository
 
@@ -193,18 +230,9 @@ npm install
 npm run dev
 ```
 
-### Backend (sau khi đã tạo cấu hình Python và dependency)
+### Backend không dùng Docker
 
-```bash
-cd backend
-python -m venv .venv
-# Windows PowerShell:
-.venv\Scripts\Activate.ps1
-# Cài dependency theo pyproject.toml/requirements thực tế của backend.
-# Khởi chạy FastAPI theo entrypoint được định nghĩa trong project.
-```
-
-> **Chưa có lệnh chạy backend hoặc Docker Compose được xác minh.** Cập nhật mục này sau khi tạo project thực tế; không tự giả định tên module, cổng hoặc biến môi trường.
+Xem các bước cài dependency, cấu hình database và chạy FastAPI trong [hướng dẫn backend](backend/README.md).
 
 ### Biến môi trường
 
@@ -217,7 +245,7 @@ Trình duyệt (React + TypeScript)
           |
           | HTTPS / REST API
           v
-      FastAPI Backend --------> PostgreSQL
+      FastAPI Backend --------> MySQL
           |
           +-------------------> Lưu trữ video / media
 
