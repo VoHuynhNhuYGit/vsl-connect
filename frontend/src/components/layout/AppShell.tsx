@@ -4,9 +4,9 @@ import { TopNav } from './TopNav';
 
 export function AppShell() {
   return (
-    <div className="min-h-screen bg-background text-body-md text-on-surface">
+    <div className="flex min-h-screen flex-col bg-background text-body-md text-on-surface">
       <TopNav />
-      <main className="min-h-[calc(100vh-72px)] pt-[72px]">
+      <main className="flex-1">
         <Outlet />
       </main>
       <Footer />

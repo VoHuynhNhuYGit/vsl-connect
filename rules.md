@@ -23,7 +23,7 @@ Do not claim to translate all VSL or support unrestricted continuous sign-langua
 | UI | Tailwind CSS, shadcn/ui |
 | Routing | React Router (unless repository already has an established equivalent) |
 | Backend | Python, FastAPI, Pydantic |
-| Persistence | PostgreSQL, SQLAlchemy, Alembic |
+| Persistence | MySQL, SQLAlchemy, Alembic |
 | Authentication | Secure cookie/session or short-lived JWT with refresh-token strategy, chosen deliberately |
 | Future AI training | Python, PyTorch, MediaPipe, OpenCV |
 | Future browser inference | MediaPipe Web, ONNX Runtime Web, **only after compatibility and performance validation** |
@@ -116,11 +116,11 @@ After changes:
 
 ## 7. Database rules
 
-- PostgreSQL is the source of truth for users, courses, lessons, sign entries, quizzes, enrollments, learning progress, and practice results.
+- MySQL is the source of truth for users, courses, lessons, sign entries, quizzes, enrollments, learning progress, and practice results.
 - All schema changes require reviewed Alembic migrations. Do not rely on runtime `create_all()` as a production migration strategy.
 - Enforce foreign keys, uniqueness, nullability, indexes, and appropriate constraints.
 - Never drop columns/tables or erase data without approval and a recovery plan.
-- Store large sign demonstration videos in object storage or suitable media storage; store references and metadata in PostgreSQL.
+- Store large sign demonstration videos in object storage or suitable media storage; store references and metadata in MySQL.
 - Use UTC for stored timestamps and convert for display.
 - Seed development/demo data separately; never overwrite real user data.
 
@@ -177,10 +177,10 @@ Example **illustrative** result (not a mandatory endpoint):
 
 ## 12. Performance and deployment
 
-- Prefer a simple modular monolith (React + FastAPI + PostgreSQL) for Phase 1. Do not add Kubernetes, message queues, Redis, microservices, or GPUs without measured need.
+- Prefer a simple modular monolith (React + FastAPI + MySQL) for Phase 1. Do not add Kubernetes, message queues, Redis, microservices, or GPUs without measured need.
 - Build a production frontend bundle; serve it behind Nginx with HTTPS.
 - Containerize services using Docker Compose, non-root containers where practical, environment-based configuration, health checks, and persistent database volumes.
-- Do not expose PostgreSQL publicly unless explicitly required and secured.
+- Do not expose MySQL publicly unless explicitly required and secured.
 - Add automated database backups and a tested restore procedure before storing important user data.
 - Use sensible image sizes, lazy-loaded routes, compressed media, caching, and pagination.
 - Benchmark browser AI on representative desktop and mobile devices before setting latency targets.
