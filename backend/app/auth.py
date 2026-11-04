@@ -8,11 +8,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
 from app.dependencies import Db
 from app.models import User
-from app.schemas import AuthSessionOut, LoginInput
-from app.security import create_session, credential_version, read_session, verify_password
+from app.schemas import AuthSessionOut, LoginInput, RegistrationInput
+from app.security import create_session, credential_version, hash_password, read_session, verify_password
 
 
 router = APIRouter(prefix='/api/v1/auth', tags=['authentication'])
@@ -20,6 +21,7 @@ SESSION_COOKIE = 'vsl_session'
 MAX_LOGIN_ATTEMPTS = 5
 LOGIN_WINDOW_SECONDS = 5 * 60
 _login_attempts: dict[str, list[float]] = defaultdict(list)
+_registration_attempts: dict[str, list[float]] = defaultdict(list)
 
 
 def get_current_user(request: Request, db: Db) -> User:
@@ -57,6 +59,29 @@ def require_admin_write(request: Request, user: AdminUser) -> User:
 
 
 AdminWriter = Annotated[User, Depends(require_admin_write)]
+
+
+@router.post('/register', status_code=202)
+def register(payload: RegistrationInput, request: Request, db: Db):
+    client_key = request.client.host if request.client else 'unknown'
+    now = time.monotonic()
+    attempts = [attempt for attempt in _registration_attempts[client_key] if now - attempt < LOGIN_WINDOW_SECONDS]
+    if len(attempts) >= MAX_LOGIN_ATTEMPTS:
+        _registration_attempts[client_key] = attempts
+        raise HTTPException(status_code=429, detail='Thử lại sau vài phút.')
+    attempts.append(now)
+    _registration_attempts[client_key] = attempts
+
+    password_hash = hash_password(payload.password)
+    if not db.scalar(select(User.id).where(User.email == payload.email)):
+        db.add(User(email=payload.email, display_name=payload.display_name, password_hash=password_hash, role='learner'))
+        try:
+            db.commit()
+        except IntegrityError:
+            db.rollback()
+            if not db.scalar(select(User.id).where(User.email == payload.email)):
+                raise
+    return {'detail': 'Nếu email có thể đăng ký, tài khoản đã được tạo. Hãy thử đăng nhập.'}
 
 
 @router.post('/login', response_model=AuthSessionOut)

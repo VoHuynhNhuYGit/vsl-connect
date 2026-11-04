@@ -146,6 +146,39 @@ def test_learner_cannot_access_admin_api(client):
     assert client.get('/api/v1/admin/users').status_code == 403
 
 
+def test_registration_creates_learner_and_preserves_existing_account(client, monkeypatch):
+    payload = {'email': ' New@Example.com ', 'display_name': '  New learner  ', 'password': 'a-strong-password'}
+    from collections import defaultdict
+    monkeypatch.setattr('app.auth._registration_attempts', defaultdict(list))
+    response = client.post('/api/v1/auth/register', json=payload)
+    assert response.status_code == 202
+    assert client.get('/api/v1/auth/me').status_code == 401
+    duplicate = client.post('/api/v1/auth/register', json={**payload, 'password': 'different-password'})
+    assert duplicate.status_code == response.status_code
+    assert duplicate.json() == response.json()
+    with Session(get_engine()) as session:
+        from sqlalchemy import select
+        user = session.scalar(select(User).where(User.email == 'new@example.com'))
+        assert user.display_name == 'New learner'
+        assert user.role == 'learner'
+        assert user.password_hash != payload['password']
+    login = client.post('/api/v1/auth/login', json={'email': 'new@example.com', 'password': payload['password']})
+    assert login.status_code == 200
+    assert login.json()['user']['role'] == 'learner'
+    assert client.get('/api/v1/admin/overview').status_code == 403
+
+
+def test_registration_validation_and_rate_limit(client, monkeypatch):
+    from collections import defaultdict
+    monkeypatch.setattr('app.auth._registration_attempts', defaultdict(list))
+    payload = {'email': 'new@example.com', 'display_name': 'Learner', 'password': 'a-strong-password'}
+    for invalid in ({'email': 'bad-email'}, {'display_name': '   '}, {'password': 'short'}, {'role': 'admin'}):
+        assert client.post('/api/v1/auth/register', json={**payload, **invalid}).status_code == 422
+    for _ in range(5):
+        assert client.post('/api/v1/auth/register', json=payload).status_code == 202
+    assert client.post('/api/v1/auth/register', json=payload).status_code == 429
+
+
 def test_password_change_invalidates_existing_session(client):
     login = client.post('/api/v1/auth/login', json={'email': 'admin@example.com', 'password': 'correct-horse-battery-staple'})
     csrf_headers = {'X-CSRF-Token': login.json()['csrf_token']}
@@ -192,15 +225,31 @@ def test_google_existing_email_requires_explicit_link(client, google_config, mon
     assert 'google_error=conflict' in response.headers['location']
     assert client.get('/api/v1/auth/me').status_code == 401
     login = client.post('/api/v1/auth/login', json={'email': 'admin@example.com', 'password': 'correct-horse-battery-staple'})
+    assert login.json()['user']['is_google_linked'] is False
     csrf = {'X-CSRF-Token': login.json()['csrf_token']}
     assert client.post('/api/v1/auth/google/link').status_code == 403
     state = start_google(client, '/api/v1/auth/google/link', csrf)
     response = client.get('/api/v1/auth/google/callback', params={'state': state, 'code': 'test-code'}, follow_redirects=False)
     assert 'google_success=1' in response.headers['location']
+    assert client.get('/api/v1/auth/me').json()['user']['is_google_linked'] is True
     assert client.post('/api/v1/auth/logout', headers={'X-CSRF-Token': client.get('/api/v1/auth/me').json()['csrf_token']}).status_code == 204
     state = start_google(client, '/api/v1/auth/google/start?return_to=admin')
     client.get('/api/v1/auth/google/callback', params={'state': state, 'code': 'test-code'}, follow_redirects=False)
     assert client.get('/api/v1/admin/overview').status_code == 200
+
+
+def test_google_unlink(client, google_config):
+    with Session(get_engine()) as session:
+        session.get(User, 1).google_sub = 'google-admin'
+        session.commit()
+    login = client.post('/api/v1/auth/login', json={'email': 'admin@example.com', 'password': 'correct-horse-battery-staple'})
+    csrf = {'X-CSRF-Token': login.json()['csrf_token']}
+    assert login.json()['user']['is_google_linked'] is True
+    assert client.post('/api/v1/auth/google/unlink').status_code == 403
+    res = client.post('/api/v1/auth/google/unlink', headers=csrf)
+    assert res.status_code == 200
+    assert client.get('/api/v1/auth/me').json()['user']['is_google_linked'] is False
+    assert client.post('/api/v1/auth/google/unlink', headers=csrf).status_code == 400
 
 
 def test_google_link_rejects_different_email_and_missing_session(client, google_config, monkeypatch):

@@ -24,6 +24,7 @@ from app.security import create_session, hash_password, read_oauth_state, sign_o
 
 router = APIRouter(prefix='/api/v1/auth/google', tags=['authentication'])
 STATE_COOKIE = 'vsl_google_oauth'
+DEFAULT_REDIRECT_URI = 'http://localhost:8080/api/v1/auth/google/callback'
 DEFAULT_ADMIN_REDIRECT_URI = 'http://admin.localhost:8080/api/v1/auth/google/callback'
 
 
@@ -35,7 +36,7 @@ def is_admin_host(request: Request) -> bool:
 def configuration(admin_origin: bool = False):
     client_id = os.getenv('GOOGLE_CLIENT_ID', '').strip()
     client_secret = os.getenv('GOOGLE_CLIENT_SECRET', '').strip()
-    redirect_uri = os.getenv('GOOGLE_ADMIN_REDIRECT_URI', DEFAULT_ADMIN_REDIRECT_URI).strip() if admin_origin else os.getenv('GOOGLE_REDIRECT_URI', '').strip()
+    redirect_uri = os.getenv('GOOGLE_ADMIN_REDIRECT_URI', DEFAULT_ADMIN_REDIRECT_URI).strip() if admin_origin else os.getenv('GOOGLE_REDIRECT_URI', DEFAULT_REDIRECT_URI).strip()
     uri = urlparse(redirect_uri)
     if not client_id or not client_secret or not uri.netloc or uri.path != '/api/v1/auth/google/callback' or uri.query or uri.fragment:
         raise HTTPException(status_code=503, detail='Đăng nhập Google chưa được cấu hình.')
@@ -83,6 +84,18 @@ def link(request: Request, user: CurrentUser):
     if not hmac.compare_digest(request.headers.get('X-CSRF-Token', ''), request.state.session_claims['csrf']):
         raise HTTPException(status_code=403, detail='Yêu cầu xác thực CSRF không hợp lệ.')
     return start_flow('link', user.id, is_admin_host(request))
+
+
+@router.post('/unlink')
+def unlink(request: Request, user: CurrentUser, db: Db):
+    if not hmac.compare_digest(request.headers.get('X-CSRF-Token', ''), request.state.session_claims['csrf']):
+        raise HTTPException(status_code=403, detail='Yêu cầu xác thực CSRF không hợp lệ.')
+    if not user.google_sub:
+        raise HTTPException(status_code=400, detail='Tài khoản chưa liên kết Google.')
+    user.google_sub = None
+    db.commit()
+    db.refresh(user)
+    return {'detail': 'Đã huỷ liên kết tài khoản Google thành công.'}
 
 
 def verify_google_code(code: str, verifier: str, nonce: str, admin_origin: bool = False):

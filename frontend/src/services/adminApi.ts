@@ -7,6 +7,7 @@ export type AdminUser = {
   email: string;
   display_name: string;
   role: Role;
+  is_google_linked?: boolean;
   created_at: string;
 };
 
@@ -71,7 +72,9 @@ export async function apiRequest<T>(path: string, { method = 'GET', body, csrfTo
 
 export const getSession = () => apiRequest<AuthSession>('/auth/me');
 export const login = (email: string, password: string) => apiRequest<AuthSession>('/auth/login', { method: 'POST', body: { email, password } });
+export const register = (display_name: string, email: string, password: string) => apiRequest<{ detail: string }>('/auth/register', { method: 'POST', body: { display_name, email, password } });
 export const logout = (csrfToken: string) => apiRequest<void>('/auth/logout', { method: 'POST', csrfToken });
+export const unlinkGoogle = (csrfToken: string) => apiRequest<{ detail: string }>('/auth/google/unlink', { method: 'POST', csrfToken });
 
 type ResourceState<T> = { data: T | null; loading: boolean; error: string | null; refresh: () => void };
 

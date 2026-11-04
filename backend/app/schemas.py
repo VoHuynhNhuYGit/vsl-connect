@@ -102,6 +102,7 @@ class UserOut(BaseModel):
     email: str
     display_name: str
     role: Literal['learner', 'admin']
+    is_google_linked: bool = False
     created_at: datetime
 
 
@@ -130,6 +131,30 @@ class UserUpdate(BaseModel):
 class LoginInput(BaseModel):
     email: str = Field(min_length=3, max_length=320)
     password: str = Field(min_length=1, max_length=128)
+
+
+class RegistrationInput(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    email: str = Field(min_length=3, max_length=320)
+    display_name: str = Field(min_length=1, max_length=120)
+    password: str = Field(min_length=12, max_length=128)
+
+    @field_validator('email')
+    @classmethod
+    def normalize_email(cls, value: str) -> str:
+        normalized = value.strip().lower()
+        local, separator, domain = normalized.partition('@')
+        if not separator or not local or not domain or '.' not in domain or '@' in domain or any(c.isspace() for c in normalized):
+            raise ValueError('Enter a valid email address.')
+        return normalized
+
+    @field_validator('display_name')
+    @classmethod
+    def normalize_name(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError('Enter a display name.')
+        return value
 
 
 class AuthSessionOut(BaseModel):
