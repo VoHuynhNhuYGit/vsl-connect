@@ -7,6 +7,7 @@ import { UserManager } from '../components/admin/UserManager';
 import { MediaManager } from '../components/admin/MediaUpload';
 import { Icon } from '../components/ui/Icon';
 import { StatCard } from '../components/ui/StatCard';
+import { GoogleAction, GoogleError, GoogleIcon, GoogleSuccess } from '../components/auth/GoogleActions';
 import { ApiError, type AdminOverview, type AuthSession, getSession, logout, useAdminResource } from '../services/adminApi';
 
 type Tab = 'overview' | 'courses' | 'lessons' | 'signs' | 'media' | 'users';
@@ -40,7 +41,65 @@ export function AdminPage() {
   if (!session) return <AdminSignIn onSuccess={setSession} />;
   if (session.user.role !== 'admin') return <div className="mx-auto max-w-xl px-4 py-14 sm:px-6"><section className="rounded-3xl border border-surface-container bg-surface-container-lowest p-8 text-center shadow-card"><span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-error-container text-error"><Icon name="lock" className="text-[28px]" /></span><h1 className="mt-5 text-headline-lg">Chưa có quyền quản trị</h1><p className="mt-2 text-body-sm text-on-surface-variant">Tài khoản này đã đăng nhập nhưng chưa được cấp quyền quản trị viên.</p><button type="button" onClick={() => signOut(session.csrf_token)} className="mt-6 rounded-lg bg-primary px-4 py-2.5 text-label-md text-on-primary">Đăng xuất</button></section></div>;
 
-  return <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"><div className="mb-7 flex flex-wrap items-end justify-between gap-4"><div><p className="text-label-sm uppercase tracking-[0.16em] text-primary">Không gian quản trị</p><h1 className="mt-2 text-headline-xl">Quản lý VSL Connect</h1><p className="mt-2 text-body-sm text-on-surface-variant">Xin chào, {session.user.display_name}. Thay đổi nội dung sẽ hiển thị theo trạng thái xuất bản.</p></div><button type="button" onClick={() => signOut(session.csrf_token)} className="inline-flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-label-md text-on-surface"><Icon name="logout" className="text-[18px]" />Đăng xuất</button></div>{message && <p role="alert" className="mb-6 rounded-xl bg-error-container px-4 py-3 text-body-sm text-error">{message}</p>}<div className="grid gap-6 lg:grid-cols-[13rem_minmax(0,1fr)]"><nav className="h-fit rounded-2xl border border-surface-container bg-surface-container-lowest p-2 shadow-card" aria-label="Điều hướng quản trị"><div className="flex gap-1 overflow-x-auto lg:block">{tabs.map((item) => <button key={item.id} type="button" onClick={() => setTab(item.id)} className={`flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-left text-label-md lg:mb-1 lg:w-full ${tab === item.id ? 'bg-secondary-container text-on-secondary-container' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface'}`}><Icon name={item.icon} className="text-[20px]" />{item.label}</button>)}</div></nav><div className="min-w-0">{tab === 'overview' && <Overview />}{tab === 'courses' && <CourseManager csrfToken={session.csrf_token} />}{tab === 'lessons' && <LessonManager csrfToken={session.csrf_token} />}{tab === 'signs' && <SignManager csrfToken={session.csrf_token} />}{tab === 'media' && <MediaManager csrfToken={session.csrf_token} />}{tab === 'users' && <UserManager csrfToken={session.csrf_token} currentUserId={session.user.id} />}</div></div></div>;
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-label-sm uppercase tracking-[0.16em] text-primary">Không gian quản trị</p>
+          <h1 className="mt-2 text-headline-xl">Quản lý VSL Connect</h1>
+          <p className="mt-2 text-body-sm text-on-surface-variant">
+            Xin chào, {session.user.display_name}. Thay đổi nội dung sẽ hiển thị theo trạng thái xuất bản.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          {session.user.is_google_linked ? (
+            <span className="inline-flex items-center gap-2 rounded-xl border border-secondary/30 bg-secondary-container/20 px-3 py-2 text-label-sm text-primary">
+              <GoogleIcon className="h-4 w-4" />
+              <span>Google đã liên kết</span>
+            </span>
+          ) : (
+            <GoogleAction mode="link" csrfToken={session.csrf_token} className="!mt-0" />
+          )}
+          <button
+            type="button"
+            onClick={() => signOut(session.csrf_token)}
+            className="inline-flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-label-md text-on-surface hover:bg-surface-container-low transition-colors"
+          >
+            <Icon name="logout" className="text-[18px]" />
+            Đăng xuất
+          </button>
+        </div>
+      </div>
+      <GoogleSuccess />
+      <GoogleError />
+      {message && <p role="alert" className="mb-6 rounded-xl bg-error-container px-4 py-3 text-body-sm text-error">{message}</p>}
+      <div className="grid gap-6 lg:grid-cols-[13rem_minmax(0,1fr)]">
+        <nav className="h-fit rounded-2xl border border-surface-container bg-surface-container-lowest p-2 shadow-card" aria-label="Điều hướng quản trị">
+          <div className="flex gap-1 overflow-x-auto lg:block">
+            {tabs.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setTab(item.id)}
+                className={`flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-left text-label-md lg:mb-1 lg:w-full ${tab === item.id ? 'bg-secondary-container text-on-secondary-container' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface'}`}
+              >
+                <Icon name={item.icon} className="text-[20px]" />
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </nav>
+        <div className="min-w-0">
+          {tab === 'overview' && <Overview />}
+          {tab === 'courses' && <CourseManager csrfToken={session.csrf_token} />}
+          {tab === 'lessons' && <LessonManager csrfToken={session.csrf_token} />}
+          {tab === 'signs' && <SignManager csrfToken={session.csrf_token} />}
+          {tab === 'media' && <MediaManager csrfToken={session.csrf_token} />}
+          {tab === 'users' && <UserManager csrfToken={session.csrf_token} currentUserId={session.user.id} />}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function Overview() {

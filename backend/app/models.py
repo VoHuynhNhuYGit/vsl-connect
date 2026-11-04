@@ -17,6 +17,10 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     __table_args__ = (CheckConstraint("role IN ('learner', 'admin')", name='ck_users_role'),)
 
+    @property
+    def is_google_linked(self) -> bool:
+        return bool(self.google_sub)
+
 
 class Course(Base):
     __tablename__ = 'courses'
