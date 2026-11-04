@@ -4,9 +4,10 @@ import { TopNav } from './TopNav';
 
 export function AppShell() {
   return (
-    <div className="min-h-screen bg-background text-body-md text-on-surface">
+    <div className="flex min-h-screen flex-col bg-surface-app text-body-md text-on-surface">
+      <a href="#main-content" className="sr-only z-[70] rounded-lg bg-brand-500 px-4 py-2 font-semibold text-surface-app focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Bỏ qua điều hướng, đến nội dung</a>
       <TopNav />
-      <main className="min-h-[calc(100vh-72px)] pt-[72px]">
+      <main id="main-content" className="flex-1">
         <Outlet />
       </main>
       <Footer />
