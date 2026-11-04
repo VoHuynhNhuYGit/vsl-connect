@@ -5,8 +5,6 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import select, text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
-from fastapi.middleware.cors import CORSMiddleware
-
 
 from app.admin import router as admin_router
 from app.auth import router as auth_router
@@ -15,29 +13,14 @@ from app.media import router as media_router
 from app.db import get_db, get_engine
 from app.models import Course, Lesson, Sign
 from app.schemas import CourseOut, LessonOut, SignOut
-from app.gesture import router as gesture_router
-
 
 app = FastAPI(title='VSL Connect API', version='0.1.0')
 app.include_router(auth_router)
 app.include_router(google_auth_router)
 app.include_router(admin_router)
 app.include_router(media_router)
-app.include_router(gesture_router, prefix='/api/v1')
 
-# Thêm ngay sau khi khởi tạo app = FastAPI(...)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",  # Cổng mặc định của Vite
-        "http://localhost:3000",  # Cổng mặc định của Create-React-App
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
 def database_session():
     try:
         yield from get_db()

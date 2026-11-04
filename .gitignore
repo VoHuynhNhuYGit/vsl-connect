@@ -1,20 +1,8 @@
-.env
-.env.*
-!.env.example
-
-# Dependencies
-node_modules/
-frontend/node_modules/
-
-# Python & Build cache
-__pycache__/
-*.pyc
 .venv/
-venv/
-dist/
-build/
-.vite/
-
-# Database data & logs
-mysql_data/
-*.log
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env
+.env.rar
+backend/*.db
+frontend/node_modules/

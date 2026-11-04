@@ -1,70 +1,209 @@
-# VSL Connect - Application Design System & UI Specification
-
-## 1. Triết lý Thiết kế & Khả năng Tiếp cận (Core Philosophy & Accessibility)
-- **Đối tượng người dùng chính:** Người khiếm thính, khiếm ngôn, học viên ngôn ngữ ký hiệu và quản trị viên.
-- **Visual-First (Ưu tiên phản hồi thị giác):** Mọi trạng thái hệ thống (tải dữ liệu, thao tác thành công, cảnh báo lỗi, kết nối WebRTC) phải hiển thị rõ ràng bằng tín hiệu hình ảnh trực quan; tuyệt đối không dựa vào âm thanh hoặc chuyển màu quá mờ nhạt.
-- **Tiêu chuẩn tương phản (WCAG 2.1 AA):** Mọi văn bản, biểu tượng và đường viền tương tác phải đảm bảo tỷ lệ tương phản tối thiểu 4.5:1 trên nền tối.
-
+---
+name: Teal Precision EdTech
+colors:
+  surface: '#f6f9ff'
+  surface-dim: '#c8dcf0'
+  surface-bright: '#f6f9ff'
+  surface-container-lowest: '#ffffff'
+  surface-container-low: '#ecf5ff'
+  surface-container: '#e1f0ff'
+  surface-container-high: '#d6ebfe'
+  surface-container-highest: '#d1e5f8'
+  on-surface: '#091d2b'
+  on-surface-variant: '#3f4948'
+  inverse-surface: '#1f3241'
+  inverse-on-surface: '#e6f2ff'
+  outline: '#6f7978'
+  outline-variant: '#bec9c7'
+  surface-tint: '#1a6966'
+  primary: '#166664'
+  on-primary: '#ffffff'
+  primary-container: '#36807d'
+  on-primary-container: '#f3fffd'
+  inverse-primary: '#8cd3cf'
+  secondary: '#276865'
+  on-secondary: '#ffffff'
+  secondary-container: '#acebe7'
+  on-secondary-container: '#2c6c69'
+  tertiary: '#535e5d'
+  on-tertiary: '#ffffff'
+  tertiary-container: '#6b7775'
+  on-tertiary-container: '#f3fffd'
+  error: '#ba1a1a'
+  on-error: '#ffffff'
+  error-container: '#ffdad6'
+  on-error-container: '#93000a'
+  primary-fixed: '#a7efec'
+  primary-fixed-dim: '#8cd3cf'
+  on-primary-fixed: '#00201f'
+  on-primary-fixed-variant: '#00504e'
+  secondary-fixed: '#afeeea'
+  secondary-fixed-dim: '#93d2ce'
+  on-secondary-fixed: '#00201f'
+  on-secondary-fixed-variant: '#01504d'
+  tertiary-fixed: '#d9e5e3'
+  tertiary-fixed-dim: '#bdc9c7'
+  on-tertiary-fixed: '#131d1d'
+  on-tertiary-fixed-variant: '#3e4948'
+  background: '#f6f9ff'
+  on-background: '#091d2b'
+  surface-variant: '#d1e5f8'
+typography:
+  headline-xl:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 32px
+    fontWeight: '700'
+    lineHeight: 40px
+  headline-xl-mobile:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 26px
+    fontWeight: '700'
+    lineHeight: 34px
+  headline-lg:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 24px
+    fontWeight: '700'
+    lineHeight: 32px
+  headline-md:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 20px
+    fontWeight: '600'
+    lineHeight: 28px
+  headline-sm:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 16px
+    fontWeight: '600'
+    lineHeight: 24px
+  body-lg:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 16px
+    fontWeight: '400'
+    lineHeight: 24px
+  body-md:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 14px
+    fontWeight: '400'
+    lineHeight: 20px
+  body-sm:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 13px
+    fontWeight: '400'
+    lineHeight: 18px
+  label-md:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 13px
+    fontWeight: '600'
+    lineHeight: 16px
+  label-sm:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 11px
+    fontWeight: '600'
+    lineHeight: 14px
+  code-sm:
+    fontFamily: Space Mono
+    fontSize: 12px
+    fontWeight: '400'
+    lineHeight: 16px
+rounded:
+  sm: 0.25rem
+  DEFAULT: 0.5rem
+  md: 0.75rem
+  lg: 1rem
+  xl: 1.5rem
+  full: 9999px
+spacing:
+  gutter: 1rem
+  gutter-lg: 1.5rem
+  margin: 1.5rem
+  margin-mobile: 1rem
+  space-xs: 0.25rem
+  space-sm: 0.5rem
+  space-md: 0.75rem
+  space-lg: 1.25rem
+  space-xl: 2rem
 ---
 
-## 2. Bố cục Khung Ứng dụng Toàn cục (Global App Shell Structure)
-- **Cấu trúc Shell cố định:**
-  - **Sidebar điều hướng bên trái:** 
-    - Chiều rộng khi mở rộng: `260px` (`w-64`).
-    - Chiều rộng khi thu gọn: `72px` (`w-18`).
-    - Gồm Logo ứng dụng, thanh chuyển đổi trạng thái thu gọn, danh sách mục điều hướng kèm biểu tượng SVG rõ nét và vệt chỉ báo trang đang chọn (Active Pill).
-  - **Top Header:** Chiều cao cố định `64px` (`h-16`), dính trên cùng (`sticky top-0 z-30`), viền dưới ngăn cách nhẹ nhàng. Chứa Breadcrumb điều hướng, nút chuông thông báo và Dropdown thông tin tài khoản (`display_name`, badge vai trò).
-  - **Vùng Canvas Nội dung Chính (`<main>`):** Chiều rộng tối đa `1440px`, căn giữa màn hình, đệm lề chuẩn `p-6` hoặc `p-8`, thanh cuộn dọc mượt mà (`scrollbar-thin`).
-  - **Phân lớp Z-Index:** Nội dung cơ sở (`z-0`), Sidebar & Header (`z-20` đến `z-30`), Modal & Popup Drawer (`z-50`), Toast cảnh báo (`z-60`).
+## Brand & Style
 
----
+Hệ thống giao diện được định hình theo trường phái **Linear-inspired Utilitarianism kết hợp EdTech Gamification tinh giản**. Phong cách này loại bỏ hoàn toàn các yếu tố đồ họa rườm rà dạng bài báo hay blog thông thường, chuyển dịch toàn bộ trải nghiệm sang chuẩn **Web Application chuyên sâu** dành cho việc học tương tác (đặc biệt tối ưu hóa cho học ngôn ngữ ký hiệu và phản xạ thị giác).
 
-## 3. Hệ thống Token Giao diện (Tailwind CSS Tokens)
-- **Bảng màu chủ đạo (Color Palette):**
-  - **Màu thương hiệu / Nhấn chính (Emerald & Teal):** Tượng trưng cho sự rõ ràng, hỗ trợ và giao tiếp mượt mà.
-    - `primary-50`: `#ECFDF5`
-    - `primary-500`: `#10B981` (Nút bấm chính, trạng thái kích hoạt)
-    - `primary-600`: `#059669` (Trạng thái rê chuột hover)
-    - `primary-focus`: `rgba(16, 185, 129, 0.25)` (Vòng sáng focus ring)
-  - **Màu nền tối (Dark Surface Base - Slate & Zinc):**
-    - `surface-app`: `#090D16` (Nền bao phủ toàn ứng dụng)
-    - `surface-card`: `#111827` (Nền thẻ card, panel bảng điều khiển)
-    - `surface-elevated`: `#1F2937` (Nền dropdown, modal nổi, popover)
-    - `surface-border`: `#1F2937` hoặc `#374151` (Đường viền ngăn cách tinh tế)
-    - `text-primary`: `#F9FAFB` (Chữ tiêu đề, nội dung quan trọng)
-    - `text-secondary`: `#9CA3AF` (Chữ phụ, mô tả, nhãn meta)
-    - `text-muted`: `#6B7280` (Gợi ý, placeholder, caption)
-  - **Chỉ báo Vai trò Người dùng (Role Badges):**
-    - `learner`: Khung Indigo (`bg-indigo-500/10 text-indigo-400 border border-indigo-500/20`)
-    - `admin`: Khung Hổ phách/Vàng cam (`bg-amber-500/10 text-amber-400 border border-amber-500/20`)
+- **Tính cách thương hiệu:** Tập trung, chuẩn xác, hiện đại, khích lệ và tối ưu năng suất học tập.
+- **Đối tượng người dùng:** Học viên EdTech thế hệ mới, đòi hỏi công cụ học tập có nhịp độ nhanh, phản hồi tức thời, giao diện có trật tự cao và không gây mỏi mắt trong các phiên học kéo dài.
+- **Ngôn ngữ thẩm mỹ:** Mặt phẳng tinh gọn (Flat Precision), phân tầng bề mặt bằng viền cấu trúc vi mô (hairline borders 1px) và đổ bóng khuếch tán siêu nhẹ. Các yếu tố gamification (node bài học, chuỗi streak, huy hiệu) được thiết kế tinh tế, sắc sảo thay vì phong cách hoạt hình trẻ con.
 
-- **Kiểu chữ (Typography):**
-  - Phông chữ mặc định: `Inter`, `Be Vietnam Pro`, hoặc hệ thống `sans-serif`.
-  - Phân cấp kích thước:
-    - Page Title (H1): `text-2xl font-bold tracking-tight text-white`
-    - Section Title (H2): `text-xl font-semibold text-white`
-    - Card Title (H3): `text-base font-medium text-gray-100`
-    - Body Text: `text-sm font-normal text-gray-300 leading-relaxed`
-    - Caption / Meta: `text-xs text-gray-400`
+## Colors
 
-- **Bo góc & Đường viền (Borders & Radii):**
-  - Container / Card chính: `rounded-xl` (`12px`) với đường viền `border border-gray-800`
-  - Nút bấm (Button) & Khung nhập liệu (Input): `rounded-lg` (`8px`)
-  - Tag / Badge / Pill: `rounded-full` (`px-3 py-1 text-xs`)
+Hệ màu được xây dựng dựa trên sự cân bằng giữa sắc thái Teal trầm tĩnh và nền không gian làm việc sạch sẽ, tạo cảm giác chuyên nghiệp của một công cụ SaaS hàng đầu:
 
----
+- **Primary Teal (`#438B88`):** Màu nhận diện cốt lõi, áp dụng cho các điểm tương tác chính, nút hành động chính (Primary Action), node đang kích hoạt và chỉ số tiến độ quan trọng.
+- **Primary Hover (`#367572`):** Trạng thái tương tác nhấn/hover, củng cố tính vững chắc của giao diện ứng dụng.
+- **Primary Light / Surface Tint (`#E8F4F2`):** Nền phụ trợ cho các huy hiệu trạng thái, khối chọn flashcard chủ động và nền active của danh mục Sidebar.
+- **Nền Web App Canvas (`#F8FAFA`):** Nền tổng thể mát dịu, giảm độ chói lóa so với màu trắng tuyệt đối, giúp phân biệt rõ các khối thẻ nội dung.
+- **Mặt thẻ Card Surface (`#FFFFFF`):** Trắng tinh khiết, mang lại độ tương phản cao cho các vùng bài tập, video player và flashcard.
+- **Đường viền SaaS Hairline (`#E4ECEB`):** Phân chia không gian có tổ chức mà không gây nhiễu thị giác.
+- **Văn bản chính (`#243746`):** Xanh than đậm, mang lại độ tương phản chuẩn WCAG AAA trên nền trắng và nền teal nhạt.
+- **Văn bản phụ (`#64748B`):** Slate gray trung tính, dùng cho nhãn phụ, metadata, breadcrumb và phím tắt bàn phím.
 
-## 4. Tiêu chuẩn Thành phần Giao diện (Component Standards)
-1. **Trạng thái Tương tác (Interactive States):** Mọi nút bấm và liên kết bắt buộc phải có đầy đủ 5 trạng thái: `default`, `hover`, `active` (`active:scale-95`), `focus-visible` (`outline-none ring-2 ring-emerald-500`), và `disabled` (`opacity-50 cursor-not-allowed`).
-2. **Khung tải trước (Skeleton Loaders):** Không dùng vòng xoay spinner đơn độc giữa trang. Dùng khung nhấp nháy (`animate-pulse bg-gray-800 rounded-lg`) khớp với tỷ lệ hình học thực tế của thẻ video hoặc hàng dữ liệu.
-3. **Màn hình Trống (Empty States):** Khi danh sách từ vựng hoặc khóa học trống, luôn hiển thị biểu tượng minh họa dạng phẳng, thông báo ngắn gọn và 1 nút thao tác (ví dụ: "Tải lại trang" hoặc "Xóa bộ lọc").
-4. **Khung xem trước Video & Camera:** Luôn giữ cố định tỷ lệ khung hình `16:9` hoặc `4:3`, nền mặc định màu `bg-gray-900` khi video chưa sẵn sàng, góc trên hoặc dưới có nhãn trạng thái kết nối WebRTC.
-5. **Thanh điều khiển Nổi (Floating Bar):** Dành cho màn hình luyện tập cử chỉ và phòng gọi video; các nút thao tác (Mic, Camera, Nhận diện AI, Thoát) gom gọn trong thanh dock nổi bo tròn phía đáy màn hình.
+## Typography
 
----
+Sử dụng phông chữ **Plus Jakarta Sans** xuyên suốt hệ thống nhằm mang lại tính thân thiện nhưng vẫn giữ được nét sắc sảo, cấu trúc hình học hiện đại của các SaaS thế hệ mới.
 
-## 5. Phân tầng Các Tuyến Đường Chính (Application Routes)
-- `/dashboard`: Bảng điều khiển tiến trình học tập, bài học gần nhất và lối tắt luyện tập.
-- `/dictionary`: Danh mục từ điển ký hiệu, thanh tìm kiếm từ khóa, bộ lọc chủ đề và lưới video mẫu.
-- `/practice`: Màn hình luyện tập chia đôi: Khung video mẫu bên trái, khung camera nhận diện MediaPipe/AI bên phải kèm thanh độ chính xác (Accuracy Bar).
-- `/call`: Phòng đàm thoại video WebRTC hỗ trợ phụ đề chuyển ngữ trực tiếp theo thời gian thực.
+- **Headline:** Khẳng định cấu trúc rõ ràng của từng phiên học, tiêu đề bảng điều khiển và các mốc kỹ năng. Sử dụng trọng số Semibold (600) và Bold (700) kết hợp khoảng cách chữ nhẹ (`letter-spacing: -0.02em`).
+- **Body:** Tối ưu hóa cho ngữ cảnh tiếng Việt có dấu, khoảng cách dòng thoáng (1.4 - 1.5) đảm bảo đọc nhanh không mỏi mắt trong các bài giải nghĩa cử chỉ và câu hỏi trắc nghiệm.
+- **Label & Shortcut Token:** Font có kích thước nhỏ gọn kết hợp phông đệm monospaced phụ trợ (`Space Mono`) cho các phím tắt bàn phím (`[Space]`, `[1]`, `[2]`, `[Enter]`) phục vụ chế độ luyện flashcard siêu tốc.
+
+## Layout & Spacing
+
+Bố cục vận hành theo cấu trúc **Application Shell 2 tầng (Fixed Sidebar + Top Command Bar)**:
+
+- **Left Sidebar:** Cố định bên trái với độ rộng `260px` trên desktop (thu gọn thành icon bar `64px` ở tablet landscape và drawer ẩn trên mobile). Chứa 7 phân hệ chính: *Tổng quan, Học tập, Từ điển ký hiệu, Luyện tập, Ôn tập, Thành tích, Giao tiếp*.
+- **Top Bar:** Độ cao cố định `60px`, nền `#FFFFFF` với border dưới `#E4ECEB`. Tích hợp Breadcrumb vị trí động, thanh tìm kiếm nhanh (kích hoạt bằng `Cmd+K` / `Ctrl+K`), bộ đếm Streak ngọn lửa, chuông thông báo trạng thái và Profile học viên.
+- **Workspace Canvas (`#F8FAFA`):** Khu vực cuộn độc lập (independent scroll). Lưới hiển thị 12 cột linh hoạt với gutter `1.5rem`:
+  - Màn hình Video-First: Player tỷ lệ 16:9 chiếm 8 cột bên trái, 4 cột bên phải dành cho danh sách thao tác ký hiệu thời gian thực và bài kiểm tra phản xạ.
+  - Màn hình Learning Path: Đường dẫn node trung tâm dạng zigzag tinh chỉnh, biên cạnh dành cho widget tiến độ ngày và mục tiêu hàng tuần.
+
+## Elevation & Depth
+
+Hệ sinh thái từ chối phong cách đổ bóng đậm của web truyền thống và áp dụng **Elevation vi mô (Micro-depth)** chuẩn SaaS:
+
+1. **Level 0 (Flat Ground):** Nền Canvas chính (`#F8FAFA`).
+2. **Level 1 (Structural Cards & Sidebar):** Nền `#FFFFFF` kết hợp đường viền đơn sắc vi mô `1px solid #E4ECEB`. Không đổ bóng ở trạng thái tĩnh.
+3. **Level 2 (Interactive Hover & Active Cards):** Đổ bóng siêu khuếch tán: `0 4px 16px -2px rgba(36, 55, 70, 0.05), 0 1px 2px rgba(36, 55, 70, 0.03)`, viền đổi sang tông `#438B88` với độ mờ 40%.
+4. **Level 3 (Modals, Flashcard Flip & Command Palette):** Đổ bóng nổi khối: `0 20px 32px -8px rgba(36, 55, 70, 0.12), 0 4px 8px -2px rgba(36, 55, 70, 0.04)`.
+5. **Node Path Glow:** Các node học tập đang mở khóa sử dụng quầng sáng phát xạ tinh tế: `0 0 0 4px #E8F4F2, 0 4px 12px rgba(67, 139, 136, 0.25)`.
+
+## Shapes
+
+Ngôn ngữ hình khối theo cấp độ **Rounded (Cấp 2)**, tạo sự cân bằng tuyệt đối giữa vẻ trang nhã của công cụ điều hành và sự thân thiện trong giáo dục tương tác:
+
+- **Thẻ Card & Video Container:** `rounded-lg` (16px / 1rem) tạo cảm giác module khép kín, chuẩn chỉnh.
+- **Nút bấm, Ô tìm kiếm & Input:** `rounded-md` (8px / 0.5rem) đảm bảo tính công năng cao, dễ nhận biết tương tác.
+- **Huy hiệu (Badges), Phím tắt (Kbd) & Tag:** `rounded-full` (pill shape) cho trạng thái tiến độ hoặc `rounded-sm` (4px) cho các nút bấm phím tắt kỹ thuật.
+- **Gamified Path Nodes:** Các điểm trạm học tập là hình tròn hoàn hảo (56px - 64px) lồng viền kép để kích thích hành vi chạm và bấm.
+
+## Components
+
+### 1. Fixed Left Navigation
+- **Mục chọn (Nav Item):** Chiều cao 40px, padding ngang 12px, border-radius 8px.
+- **Trạng thái Active:** Nền `#E8F4F2`, chữ `#438B88` (Semibold), có vạch chỉ báo bên trái dày 3px màu `#438B88`.
+- **Trạng thái Hover:** Nền rgba(67, 139, 136, 0.06), chữ `#243746`.
+
+### 2. Video-First Player Module
+- **Khung phát:** Nền tối kỹ thuật `#1A2630` chống mỏi mắt, tỉ lệ 16:9, viền `1px solid #E4ECEB`.
+- **Thanh điều khiển tốc độ cử chỉ:** Cho phép làm chậm (0.5x, 0.75x, 1x) phục vụ quan sát khẩu hình và ký hiệu tay.
+- **Dấu mốc bài tập (Interactive Bookmarks):** Tích hợp điểm nhảy trực tiếp trên timeline video, tự động kích hoạt câu đố khi tua tới mốc.
+
+### 3. Gamified Interactive Learning Node
+- **Trạng thái Hoàn thành:** Nền `#438B88`, icon check trắng, viền ngoài `#E8F4F2`.
+- **Trạng thái Đang học (Current Active):** Nền `#438B88` với hiệu ứng vòng sóng xung nhịp vi mô (pulse ring), kèm tooltip gợi ý bài học nổi bên trên.
+- **Trạng thái Khóa:** Nền `#FFFFFF`, viền `#E4ECEB`, icon ổ khóa xám nhạt `#64748B`.
+
+### 4. Flashcard Phản Xạ Nhanh
+- **Mặt thẻ:** Tỉ lệ tương tác 4:3 hoặc 3:2, nền `#FFFFFF`, viền `1px solid #E4ECEB`.
+- **Tương tác:** Lật thẻ mượt mà không quá 250ms (`ease-out`). Tích hợp phím nóng `[Space]` để lật mặt, `[1]` Chưa nhớ (đỏ nhạt), `[2]` Nhớ tốt (xanh teal `#438B88`).
+
+### 5. Buttons & Input Fields
+- **Primary Button:** Nền `#438B88`, chữ `#FFFFFF`, hover chuyển sang `#367572`.
+- **Secondary Button:** Nền `#FFFFFF`, viền `1px solid #E4ECEB`, chữ `#243746`, hover nền `#F8FAFA`.
+- **Ghost/Tertiary Button:** Nền trong suốt, chữ `#64748B`, hover nền `#E8F4F2` và chữ `#438B88`.
+- **Search Bar (Top Bar):** Nền `#F8FAFA`, border `1px solid #E4ECEB`, tích hợp icon kính lúp và badge phím tắt `⌘K`. Khi focus chuyển viền sang `#438B88` và nền `#FFFFFF`.

@@ -15,14 +15,6 @@ export function EmptyState({ icon, title, description, children }: EmptyStatePro
 }
 
 export function LoadState({ loading, retry }: { loading: boolean; retry: () => void }) {
-  if (loading) return (
-    <div role="status" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="Đang tải nội dung">
-      <span className="sr-only">Đang tải nội dung...</span>
-      {[0, 1, 2].map((item) => <div key={item} aria-hidden="true" className="animate-pulse rounded-2xl border border-surface-border bg-surface-card p-5">
-        <div className="flex items-center gap-3"><div className="h-11 w-11 rounded-xl bg-surface-elevated" /><div className="h-4 flex-1 rounded bg-surface-elevated" /></div>
-        <div className="mt-5 h-4 w-3/4 rounded bg-surface-elevated" /><div className="mt-3 h-3 w-full rounded bg-surface-elevated" /><div className="mt-2 h-3 w-2/3 rounded bg-surface-elevated" />
-      </div>)}
-    </div>
-  );
-  return <EmptyState icon="wifi_off" title="Không thể tải dữ liệu" description="Kiểm tra kết nối rồi thử lại."><button type="button" onClick={retry} className="min-h-11 rounded-lg bg-primary px-4 py-2 text-label-md text-on-primary transition hover:bg-primary-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 active:scale-95">Thử lại</button></EmptyState>;
+  if (loading) return <p role="status" className="rounded-2xl bg-surface-container-lowest p-8 text-center text-on-surface-variant">Đang tải...</p>;
+  return <EmptyState icon="wifi_off" title="Không thể tải dữ liệu" description="Kiểm tra kết nối rồi thử lại."><button type="button" onClick={retry} className="rounded-lg bg-primary px-4 py-2 text-label-md text-on-primary">Thử lại</button></EmptyState>;
 }

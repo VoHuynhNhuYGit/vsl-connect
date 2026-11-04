@@ -1,0 +1,36 @@
+import { FormEvent, useState } from 'react';
+import { Icon } from '../ui/Icon';
+import { AdminPagination } from './AdminPagination';
+import { apiRequest, type AdminUser, type Role, usePagedAdminResource } from '../../services/adminApi';
+
+type UserForm = { email: string; display_name: string; role: Role; password: string };
+const blankForm: UserForm = { email: '', display_name: '', role: 'learner', password: '' };
+const inputClass = 'mt-1.5 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body-sm';
+
+export function UserManager({ csrfToken, currentUserId }: { csrfToken: string; currentUserId: number }) {
+  const { data: users, loading, error, refresh, offset, setOffset, pageSize } = usePagedAdminResource<AdminUser>('/admin/users');
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [form, setForm] = useState<UserForm>(blankForm);
+  const [message, setMessage] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  function reset() { setEditingId(null); setForm(blankForm); setMessage(''); }
+  function edit(user: AdminUser) { setEditingId(user.id); setForm({ email: user.email, display_name: user.display_name, role: user.role, password: '' }); setMessage(''); }
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setSaving(true); setMessage('');
+    try {
+      const body = editingId ? { display_name: form.display_name, role: form.role, password: form.password || null } : form;
+      await apiRequest(`/admin/users${editingId ? `/${editingId}` : ''}`, { method: editingId ? 'PUT' : 'POST', body, csrfToken });
+      reset(); refresh();
+    } catch (requestError) { setMessage(requestError instanceof Error ? requestError.message : 'Không thể lưu người dùng.'); }
+    finally { setSaving(false); }
+  }
+  async function remove(user: AdminUser) {
+    if (!window.confirm(`Xóa người dùng “${user.display_name}”? Thao tác này không thể hoàn tác.`)) return;
+    setMessage('');
+    try { await apiRequest(`/admin/users/${user.id}`, { method: 'DELETE', csrfToken }); if (editingId === user.id) reset(); refresh(); }
+    catch (requestError) { setMessage(requestError instanceof Error ? requestError.message : 'Không thể xóa người dùng.'); }
+  }
+
+  return <section aria-labelledby="users-title"><div className="mb-6 flex flex-wrap items-center justify-between gap-3"><div><h2 id="users-title" className="text-headline-lg">Người dùng</h2><p className="mt-1 text-body-sm text-on-surface-variant">Cấp tài khoản, phân quyền và đặt lại mật khẩu.</p></div><button type="button" onClick={reset} className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-label-md text-on-primary"><Icon name="person_add" className="text-[18px]" />Người dùng mới</button></div><div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]"><div className="overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-card">{loading ? <p role="status" className="p-6 text-body-sm text-on-surface-variant">Đang tải người dùng...</p> : error ? <div className="p-6"><p role="alert" className="text-body-sm text-error">{error}</p><button type="button" onClick={refresh} className="mt-3 rounded-lg bg-surface-container px-3 py-2 text-label-md">Thử lại</button></div> : users?.length ? <div className="overflow-x-auto"><table className="w-full min-w-[42rem] text-left"><thead className="bg-surface-container-low text-label-sm text-on-surface-variant"><tr><th className="px-5 py-3">Người dùng</th><th className="px-4 py-3">Vai trò</th><th className="px-4 py-3">Ngày tạo</th><th className="px-5 py-3 text-right">Thao tác</th></tr></thead><tbody>{users.map((user) => <tr key={user.id} className="border-t border-surface-container"><td className="px-5 py-4"><p className="text-label-md">{user.display_name}{user.id === currentUserId && <span className="ml-2 text-label-sm font-normal text-primary">(Bạn)</span>}</p><p className="mt-1 text-body-sm text-on-surface-variant">{user.email}</p></td><td className="px-4 py-4"><span className={`rounded-full px-2.5 py-1 text-label-sm ${user.role === 'admin' ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container text-on-surface-variant'}`}>{user.role === 'admin' ? 'Quản trị viên' : 'Học viên'}</span></td><td className="px-4 py-4 text-body-sm">{new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short' }).format(new Date(user.created_at))}</td><td className="px-5 py-4"><div className="flex justify-end gap-2"><button type="button" onClick={() => edit(user)} className="rounded-lg px-2.5 py-2 text-primary hover:bg-surface-container" aria-label={`Sửa ${user.display_name}`}><Icon name="edit" /></button><button type="button" onClick={() => remove(user)} disabled={user.id === currentUserId} className="rounded-lg px-2.5 py-2 text-error hover:bg-error-container disabled:cursor-not-allowed disabled:opacity-40" aria-label={`Xóa ${user.display_name}`}><Icon name="delete" /></button></div></td></tr>)}</tbody></table></div> : <p className="p-6 text-body-sm text-on-surface-variant">Chưa có người dùng nào.</p>}</div><div className="xl:col-start-1">{!loading && !error && <AdminPagination offset={offset} pageSize={pageSize} count={users?.length ?? 0} onChange={setOffset} />}</div><form onSubmit={submit} className="h-fit rounded-2xl border border-surface-container bg-surface-container-lowest p-5 shadow-card xl:col-start-2 xl:row-start-1 xl:row-span-2"><div className="flex items-center justify-between gap-3"><h3 className="text-headline-sm">{editingId ? 'Chỉnh sửa người dùng' : 'Người dùng mới'}</h3>{editingId && <button type="button" onClick={reset} className="text-label-sm text-primary">Hủy</button>}</div>{message && <p role="alert" className="mt-4 rounded-lg bg-error-container p-3 text-body-sm text-error">{message}</p>}<label className="mt-5 block text-label-md">Họ và tên<input required maxLength={120} value={form.display_name} onChange={(event) => setForm({ ...form, display_name: event.target.value })} className={inputClass} /></label><label className="mt-4 block text-label-md">Email<input required type="email" maxLength={320} disabled={Boolean(editingId)} value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} className={`${inputClass} disabled:cursor-not-allowed disabled:bg-surface-container`} /></label><label className="mt-4 block text-label-md">Vai trò<select value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value as Role })} className={inputClass}><option value="learner">Học viên</option><option value="admin">Quản trị viên</option></select></label><label className="mt-4 block text-label-md">{editingId ? 'Mật khẩu mới (để trống nếu không đổi)' : 'Mật khẩu'}<input required={!editingId} type="password" minLength={12} maxLength={128} autoComplete="new-password" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} className={inputClass} /></label><p className="mt-1 text-label-sm font-normal text-on-surface-variant">Tối thiểu 12 ký tự.</p><button disabled={saving} type="submit" className="mt-5 w-full rounded-lg bg-primary px-4 py-2.5 text-label-md text-on-primary disabled:opacity-60">{saving ? 'Đang lưu...' : editingId ? 'Lưu thay đổi' : 'Tạo người dùng'}</button></form></div></section>;
+}

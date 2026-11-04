@@ -31,10 +31,10 @@ export default function App() {
     mainUrl.hash = '';
     return (
       <>
-        <header className="border-b border-surface-border bg-surface-card text-on-surface">
+        <header className="border-b border-surface-container bg-surface-container-lowest">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
             <span className="text-headline-sm">VSL Connect · Quản trị</span>
-            <a className="text-label-md text-emerald-700 hover:text-emerald-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:text-emerald-300 dark:hover:text-emerald-200" href={mainUrl.href}>Về trang chính</a>
+            <a className="text-label-md text-primary hover:underline" href={mainUrl.href}>Về trang chính</a>
           </div>
         </header>
         <Routes>
@@ -54,10 +54,10 @@ export default function App() {
         <Route path="luyen-tap" element={<LessonPage />} />
         <Route path="on-tap" element={<ReviewPage />} />
         <Route path="giao-tiep" element={<CommunicationPage />} />
+        <Route path="admin" element={hostname === 'localhost' || hostname === '127.0.0.1' ? <AdminRedirect /> : <AdminPage />} />
+        <Route path="dang-nhap" element={<LoginPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
-      <Route path="dang-nhap" element={<LoginPage />} />
-      <Route path="admin" element={hostname === 'localhost' || hostname === '127.0.0.1' ? <AdminRedirect /> : <AdminPage />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
