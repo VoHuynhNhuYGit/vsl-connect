@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.admin import router as admin_router
 from app.auth import router as auth_router
 from app.google_auth import router as google_auth_router
+from app.gesture import router as gesture_router
 from app.media import router as media_router
 from app.db import get_db, get_engine
 from app.models import Course, Lesson, Sign
@@ -19,6 +20,7 @@ app.include_router(auth_router)
 app.include_router(google_auth_router)
 app.include_router(admin_router)
 app.include_router(media_router)
+app.include_router(gesture_router)
 
 
 def database_session():
