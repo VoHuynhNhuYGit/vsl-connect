@@ -3,7 +3,9 @@ import { Icon } from '../ui/Icon';
 
 const quickPhrases = ['Xin chào', 'Cảm ơn', 'Tôi cần giúp đỡ', 'Hẹn gặp lại'];
 
-export function TextToSpeechPanel() {
+type TextToSpeechPanelProps = { suggestedText?: string };
+
+export function TextToSpeechPanel({ suggestedText = '' }: TextToSpeechPanelProps) {
   const [text, setText] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [message, setMessage] = useState('');
@@ -24,6 +26,12 @@ export function TextToSpeechPanel() {
       window.speechSynthesis.cancel();
     }
   }, []);
+
+  useEffect(() => {
+    if (!suggestedText) return;
+    setText(suggestedText);
+    setMessage('Đã chọn từ vựng từ chủ đề giao tiếp.');
+  }, [suggestedText]);
 
   function stopSpeech(announce = true) {
     const utterance = utteranceRef.current;
