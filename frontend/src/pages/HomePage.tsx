@@ -54,14 +54,14 @@ export function HomePage() {
           <div className="absolute -bottom-44 right-[-5rem] h-80 w-[44rem] rounded-[50%] bg-gradient-to-r from-emerald-100/70 via-teal-100/50 to-transparent blur-2xl dark:from-emerald-500/5 dark:via-teal-400/5" />
         </div>
 
-        <div className="mx-auto grid min-h-[470px] max-w-[1440px] items-center gap-8 px-5 py-12 sm:px-8 sm:py-14 lg:grid-cols-[minmax(0,1.02fr)_minmax(31rem,0.98fr)] lg:gap-2 lg:px-12 lg:py-10 xl:px-16">
-          <div className="relative z-10 max-w-[39rem] lg:py-8">
+        <div className="mx-auto grid min-h-[470px] max-w-[1440px] items-center gap-8 px-5 py-12 sm:px-8 sm:py-14 lg:grid-cols-[minmax(0,1.12fr)_minmax(29rem,0.88fr)] lg:gap-2 lg:px-12 lg:py-10 xl:px-16">
+          <div className="relative z-10 max-w-[46rem] lg:py-8">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-white/75 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.08em] text-emerald-800 shadow-sm dark:border-emerald-500/30 dark:bg-slate-900/70 dark:text-emerald-300">
               <Icon name="play_arrow" className="text-[16px]" /> VSL Connect
             </span>
-            <h1 className="mt-5 max-w-[720px] text-[clamp(2.3rem,4vw,4rem)] font-bold leading-[1.16] tracking-[0.005em] text-slate-950 dark:text-white">
+            <h1 className="mt-5 max-w-[780px] text-[clamp(2.1rem,3.4vw,3.5rem)] font-semibold leading-[1.26] tracking-[0.028em] text-slate-950 dark:text-white">
               <span className="block">Học ký hiệu,</span>
-              <span className="block text-emerald-600 dark:text-emerald-400">Kết nối dễ dàng hơn.</span>
+              <span className="block whitespace-nowrap text-emerald-600 max-sm:whitespace-normal dark:text-emerald-400">Kết nối dễ dàng hơn.</span>
             </h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-slate-600 dark:text-slate-300 sm:text-lg sm:leading-8">
               Nền tảng học và giao tiếp bằng ngôn ngữ ký hiệu Việt Nam trực quan, linh hoạt và dành cho mọi người.
