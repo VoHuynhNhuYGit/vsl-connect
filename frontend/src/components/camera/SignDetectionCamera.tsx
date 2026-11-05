@@ -1,12 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { Icon } from '../ui/Icon';
 import { useGestureDetection } from '../../hooks/useGestureDetection';
+import { Icon } from '../ui/Icon';
 
-type CameraElements = {
-  video: HTMLVideoElement;
-  canvas: HTMLCanvasElement;
-  stream: MediaStream;
-};
+type CameraElements = { video: HTMLVideoElement; canvas: HTMLCanvasElement; stream: MediaStream };
 
 type SignDetectionCameraProps = {
   detectedSign?: string | null;
@@ -26,29 +22,26 @@ function getCameraError(error: unknown) {
   return 'Không thể mở máy ảnh. Hãy kiểm tra kết nối và quyền truy cập rồi thử lại.';
 }
 
-export function SignDetectionCamera({
-  detectedSign = null,
-  confidence = null,
-  onCameraReady,
-  onCameraStop,
-  onDetectionPauseChange,
-}: SignDetectionCameraProps) {
+export function SignDetectionCamera({ detectedSign = null, confidence = null, onCameraReady, onCameraStop, onDetectionPauseChange }: SignDetectionCameraProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const { prediction, isModelReady, isDetecting, startDetection, stopDetection } = useGestureDetection(videoRef);
   const mountedRef = useRef(true);
+  const { prediction, isModelReady, isDetecting, startDetection, stopDetection } = useGestureDetection(videoRef);
   const [cameraActive, setCameraActive] = useState(false);
   const [starting, setStarting] = useState(false);
   const [detectionPaused, setDetectionPaused] = useState(false);
   const [cameraDevices, setCameraDevices] = useState<MediaDeviceInfo[]>([]);
   const [activeDeviceId, setActiveDeviceId] = useState('');
   const [error, setError] = useState('');
-  const hasCameraSupport = typeof navigator !== 'undefined'
-    && Boolean(navigator.mediaDevices?.getUserMedia);
-  const safeConfidence = confidence === null || confidence === undefined || !Number.isFinite(confidence)
+  const hasCameraSupport = typeof navigator !== 'undefined' && Boolean(navigator.mediaDevices?.getUserMedia);
+  const fallbackConfidence = confidence === null || confidence === undefined || !Number.isFinite(confidence)
     ? null
     : Math.max(0, Math.min(100, Math.round(confidence)));
+  const confidencePercent = prediction
+    ? Math.round(Math.max(0, Math.min(1, prediction.confidence)) * 100)
+    : fallbackConfidence;
+  const signLabel = prediction?.label_name ?? detectedSign;
 
   useEffect(() => {
     mountedRef.current = true;
@@ -62,10 +55,9 @@ export function SignDetectionCamera({
 
   async function refreshCameraDevices() {
     if (!navigator.mediaDevices?.enumerateDevices) return [];
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const videos = devices.filter((device) => device.kind === 'videoinput');
-    if (mountedRef.current) setCameraDevices(videos);
-    return videos;
+    const devices = (await navigator.mediaDevices.enumerateDevices()).filter((device) => device.kind === 'videoinput');
+    if (mountedRef.current) setCameraDevices(devices);
+    return devices;
   }
 
   async function enableCamera(deviceId?: string) {
@@ -81,7 +73,9 @@ export function SignDetectionCamera({
       try {
         nextStream = await navigator.mediaDevices.getUserMedia({
           audio: false,
-          video: deviceId ? { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } } : { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+          video: deviceId
+            ? { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+            : { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
         });
       } catch (deviceError) {
         if (!deviceId || !(deviceError instanceof DOMException) || deviceError.name !== 'OverconstrainedError') throw deviceError;
@@ -129,21 +123,22 @@ export function SignDetectionCamera({
         video.addEventListener('loadedmetadata', fitCanvasToVideo, { once: true });
         fitCanvasToVideo();
         onCameraReady?.({ video, canvas, stream: nextStream });
-        void video.play().then(() => startDetection()).catch((detectionError: unknown) => {
-          if (mountedRef.current) {
+        void video.play()
+          .then(() => startDetection())
+          .catch((playError: unknown) => {
+            if (!mountedRef.current) return;
             setDetectionPaused(true);
             onDetectionPauseChange?.(true);
-            setError(detectionError instanceof Error && detectionError.name !== 'NotAllowedError'
+            setError(playError instanceof Error && playError.name !== 'NotAllowedError'
               ? 'Không thể khởi tạo nhận diện cử chỉ. Hãy tải lại trang rồi thử lại.'
               : 'Máy ảnh đã kết nối. Hãy cho phép phát video rồi thử lại.');
-          }
-        });
+          });
       }
 
       try {
         await refreshCameraDevices();
       } catch {
-        // The active camera remains usable if device enumeration is unavailable.
+        // Camera remains usable if device enumeration is unavailable.
       }
     } catch (cameraError) {
       if (mountedRef.current) setError(getCameraError(cameraError));
@@ -192,10 +187,7 @@ export function SignDetectionCamera({
     }
   }
 
-  const resultLabel = prediction?.label_name ?? detectedSign;
-  const resultConfidencePercent = prediction
-    ? Math.round(Math.max(0, Math.min(1, prediction.confidence)) * 100)
-    : safeConfidence;
+  const shownConfidence = prediction ? confidencePercent : fallbackConfidence;
 
   return (
     <section aria-labelledby="sign-camera-title" className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
@@ -205,8 +197,7 @@ export function SignDetectionCamera({
           <div><h2 id="sign-camera-title" className="text-sm font-semibold text-gray-900 dark:text-white">Nhận diện ký hiệu</h2><p className="text-xs text-gray-500 dark:text-gray-400">Khung camera trực tiếp</p></div>
         </div>
         <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${cameraActive ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-200' : 'border-gray-200 bg-gray-100 text-gray-700 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-300'}`}>
-          <span aria-hidden="true" className={`h-2 w-2 rounded-full ${cameraActive ? 'animate-pulse bg-emerald-500' : 'bg-gray-400 dark:bg-slate-500'}`} />
-          {cameraActive ? 'Đang hoạt động' : 'Đã tắt'}
+          <span aria-hidden="true" className={`h-2 w-2 rounded-full ${cameraActive ? 'animate-pulse bg-emerald-500' : 'bg-gray-400 dark:bg-slate-500'}`} />{cameraActive ? 'Đang hoạt động' : 'Đã tắt'}
         </span>
       </div>
 
@@ -221,20 +212,18 @@ export function SignDetectionCamera({
               <span className="mt-2 rounded-lg bg-black/45 px-3 py-1.5 text-xs font-medium leading-relaxed text-white/95 sm:text-sm">Đặt tay vào trong khung hình để nhận diện tốt nhất</span>
             </div>
           </div>
-
           <div className="absolute left-3 right-3 top-3 flex items-start justify-between gap-3 sm:left-4 sm:right-4 sm:top-4">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-slate-950/65 px-3 py-1.5 text-xs font-semibold text-white shadow-lg backdrop-blur-md"><span aria-hidden="true" className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />Camera trực tiếp</span>
             <div aria-live="polite" className="min-w-36 max-w-[65%] rounded-xl border border-white/15 bg-slate-950/75 px-3 py-2 text-white shadow-lg backdrop-blur-md sm:min-w-44">
-              <p className="truncate text-sm font-bold">{resultLabel ? `Ký hiệu: ${resultLabel}` : isModelReady ? 'Đang chờ ký hiệu...' : 'Đang tải mô hình...'}</p>
-              <div className="mt-1.5 flex items-center justify-between gap-2 text-[11px] font-medium"><span>Độ tin cậy</span><span className="font-bold text-emerald-300">{resultConfidencePercent === null ? '—' : `${resultConfidencePercent}%`}</span></div>
-              <div role="progressbar" aria-label="Độ tin cậy nhận diện" aria-valuemin={0} aria-valuemax={100} aria-valuenow={resultConfidencePercent ?? 0} aria-valuetext={resultConfidencePercent === null ? 'Chưa có kết quả nhận diện' : `${resultConfidencePercent}%`} className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-emerald-400 transition-[width] duration-300" style={{ width: `${resultConfidencePercent ?? 0}%` }} /></div>
+              <p className="truncate text-sm font-bold">{signLabel ? `Ký hiệu: ${signLabel}` : isModelReady ? 'Đang chờ ký hiệu...' : 'Đang tải mô hình...'}</p>
+              <div className="mt-1.5 flex items-center justify-between gap-2 text-[11px] font-medium"><span>Độ tin cậy</span><span className="font-bold text-emerald-300">{shownConfidence === null ? '—' : `${shownConfidence}%`}</span></div>
+              <div role="progressbar" aria-label="Độ tin cậy nhận diện" aria-valuemin={0} aria-valuemax={100} aria-valuenow={shownConfidence ?? 0} aria-valuetext={shownConfidence === null ? 'Chưa có kết quả nhận diện' : `${shownConfidence}%`} className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-emerald-400 transition-[width] duration-300" style={{ width: `${shownConfidence ?? 0}%` }} /></div>
             </div>
           </div>
-
           <div className="absolute inset-x-3 bottom-3 flex items-end justify-between gap-3 sm:inset-x-4 sm:bottom-4">
             <div aria-live="polite" className="max-w-[82%] rounded-xl border border-white/15 bg-slate-950/75 px-4 py-3 text-white shadow-lg backdrop-blur-md sm:px-5">
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-300">Kết quả nhận diện</p>
-              <p className="mt-1 truncate text-lg font-bold sm:text-xl">{detectionPaused ? 'Đang tạm dừng' : resultLabel ? `Ký hiệu: ${resultLabel}` : isDetecting ? 'Đang nhận diện...' : 'Đang chờ ký hiệu...'}</p>
+              <p className="mt-1 truncate text-lg font-bold sm:text-xl">{detectionPaused ? 'Đang tạm dừng' : signLabel ? `Ký hiệu: ${signLabel}` : isDetecting ? 'Đang nhận diện...' : 'Đang chờ ký hiệu...'}</p>
             </div>
             {detectionPaused && <span className="shrink-0 rounded-full border border-amber-300/30 bg-amber-400/15 px-3 py-1.5 text-xs font-semibold text-amber-100">Nhận diện tạm dừng</span>}
           </div>
@@ -244,18 +233,14 @@ export function SignDetectionCamera({
           <p className="mt-1 max-w-sm text-sm leading-relaxed text-gray-300">Cho phép truy cập camera để xem hình ảnh trực tiếp và nhận diện ký hiệu.</p>
           {!hasCameraSupport && <p role="alert" className="mt-3 text-sm text-amber-200">Trình duyệt này không hỗ trợ Camera API hoặc trang chưa được mở qua HTTPS.</p>}
           {error && <p role="alert" className="mt-3 max-w-md text-sm leading-relaxed text-rose-200">{error}</p>}
-          <button type="button" onClick={() => void enableCamera()} disabled={!hasCameraSupport || starting} className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-950/25 transition hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100">
-            {starting ? <><Icon name="progress_activity" className="animate-spin text-[19px]" />Đang kết nối...</> : <><Icon name="photo_camera" className="text-[19px]" />Cho phép truy cập máy ảnh</>}
-          </button>
+          <button type="button" onClick={() => void enableCamera()} disabled={!hasCameraSupport || starting} className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-950/25 transition hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100">{starting ? <><Icon name="progress_activity" className="animate-spin text-[19px]" />Đang kết nối...</> : <><Icon name="photo_camera" className="text-[19px]" />Cho phép truy cập máy ảnh</>}</button>
         </div>}
       </div>
 
       {error && cameraActive && <p role="status" className="border-t border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-100 sm:px-5">{error}</p>}
 
       <div className="flex flex-wrap items-center justify-center gap-2 border-t border-gray-100 bg-gray-50/80 p-3 dark:border-slate-800 dark:bg-slate-950/40 sm:gap-3 sm:p-4">
-        <button type="button" onClick={() => cameraActive ? disableCamera() : void enableCamera()} disabled={starting || (!cameraActive && !hasCameraSupport)} aria-pressed={cameraActive} className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 ${cameraActive ? 'border border-red-200 bg-red-50 text-red-800 hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20' : 'bg-emerald-500 text-white shadow-sm hover:bg-emerald-600'}`}>
-          <Icon name={cameraActive ? 'videocam_off' : 'videocam'} className="text-[19px]" />{cameraActive ? 'Tắt webcam' : starting ? 'Đang kết nối...' : 'Bật webcam'}
-        </button>
+        <button type="button" onClick={() => cameraActive ? disableCamera() : void enableCamera()} disabled={starting || (!cameraActive && !hasCameraSupport)} aria-pressed={cameraActive} className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 ${cameraActive ? 'border border-red-200 bg-red-50 text-red-800 hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20' : 'bg-emerald-500 text-white shadow-sm hover:bg-emerald-600'}`}><Icon name={cameraActive ? 'videocam_off' : 'videocam'} className="text-[19px]" />{cameraActive ? 'Tắt webcam' : starting ? 'Đang kết nối...' : 'Bật webcam'}</button>
         <button type="button" onClick={switchCamera} disabled={!cameraActive || starting || cameraDevices.length < 2} aria-label="Chuyển đổi camera" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-200 dark:hover:bg-slate-800"><Icon name="flip_camera_android" className="text-[19px]" /><span className="hidden sm:inline">Đổi camera</span><span className="sm:hidden">Đổi</span></button>
         <button type="button" onClick={() => void toggleDetection()} disabled={!cameraActive} aria-pressed={detectionPaused} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-200 dark:hover:bg-slate-800"><Icon name={detectionPaused ? 'play_arrow' : 'pause'} className="text-[19px]" />{detectionPaused ? 'Tiếp tục nhận diện' : 'Tạm dừng nhận diện'}</button>
       </div>

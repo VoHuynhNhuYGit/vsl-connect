@@ -1,6 +1,14 @@
-import { Link } from 'react-router-dom';
-import { EmptyState } from '../components/ui/EmptyState';
+import { SignDetectionCamera } from '../components/camera/SignDetectionCamera';
 
 export function LessonPage() {
-  return <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12"><h1 className="mb-7 text-headline-xl">Luyện tập</h1><EmptyState icon="play_lesson" title="Chọn một bài học" description="Bài học có trong các khóa học đã xuất bản."><Link to="/lo-trinh-hoc-tap" className="inline-flex rounded-lg bg-primary px-4 py-2.5 text-label-md text-on-primary">Xem khóa học</Link></EmptyState></div>;
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
+      <header className="mb-6">
+        <p className="text-label-sm uppercase tracking-[0.14em] text-emerald-700 dark:text-emerald-300">Luyện tập trực quan</p>
+        <h1 className="mt-2 text-headline-xl text-on-surface">Luyện tập ký hiệu</h1>
+        <p className="mt-2 max-w-2xl text-body-md leading-relaxed text-on-surface-variant">Bật camera, đặt tay vào khung hướng dẫn và luyện biểu đạt ký hiệu. Khu vực nhận diện sẵn sàng để kết nối với mô hình AI.</p>
+      </header>
+      <SignDetectionCamera />
+    </div>
+  );
 }
