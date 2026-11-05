@@ -50,10 +50,17 @@ export function TopNav() {
 
         <div className="flex shrink-0 items-center gap-2">
           <ThemeToggle />
+          {user ? (
           <Link to="/dang-nhap" aria-label={`Tài khoản ${displayName}, vai trò ${isAdmin ? 'quản trị viên' : 'học viên'}`} className="group inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/70 py-1.5 pl-1.5 pr-3 transition hover:border-emerald-500/40 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-surface-border dark:bg-white/[0.04] dark:hover:bg-white/[0.08]">
             <span className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${isAdmin ? 'bg-amber-100 text-amber-800 ring-1 ring-inset ring-amber-300 dark:bg-amber-500/15 dark:text-amber-200 dark:ring-amber-400/25' : 'bg-indigo-100 text-indigo-800 ring-1 ring-inset ring-indigo-300 dark:bg-indigo-500/20 dark:text-indigo-200 dark:ring-indigo-400/25'}`}>{initials || 'HV'}</span>
             <span className="hidden max-w-28 text-left sm:block"><span className="block truncate text-xs font-semibold text-gray-900 dark:text-gray-100">{displayName}</span><span className={`mt-0.5 inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none ${isAdmin ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/10 dark:text-amber-200' : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-500/10 dark:text-indigo-200'}`}>{isAdmin ? 'Admin' : 'Learner'}</span></span>
           </Link>
+          ) : (
+            <Link to="/dang-nhap" className="inline-flex min-h-10 items-center justify-center gap-2 rounded-full bg-emerald-700 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:bg-emerald-600 dark:hover:bg-emerald-500 dark:focus-visible:ring-offset-slate-900">
+              <Icon name="login" className="text-[18px]" />
+              Đăng nhập
+            </Link>
+          )}
           <button type="button" aria-label={menuOpen ? 'Đóng điều hướng' : 'Mở điều hướng'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-surface-border text-gray-700 transition hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:text-gray-200 dark:hover:bg-white/[0.08] lg:hidden"><Icon name={menuOpen ? 'close' : 'menu'} /></button>
         </div>
       </div>
