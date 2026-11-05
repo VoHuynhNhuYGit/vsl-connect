@@ -9,8 +9,9 @@ from sqlalchemy.exc import IntegrityError
 
 from app.auth import AdminUser, AdminWriter
 from app.dependencies import Db, Limit, Offset
-from app.models import Course, Enrollment, Lesson, LessonProgress, LessonSign, Quiz, QuizAttempt, ReviewSchedule, Sign, User
+from app.models import AdminAuditLog, Course, Enrollment, Lesson, LessonProgress, LessonSign, Quiz, QuizAttempt, ReviewSchedule, Sign, User
 from app.schemas import (
+    AdminAuditLogOut,
     AdminCourseOut,
     AdminLessonOut,
     AdminOverviewOut,
@@ -36,8 +37,17 @@ def get_or_404(db: Db, model_type: type[Model], item_id: int, label: str) -> Mod
     return item
 
 
-def commit_or_conflict(db: Db, detail: str):
+def commit_change_or_conflict(db: Db, actor: User, action: str, resource_type: str, resource: Model, resource_label: str, detail: str):
     try:
+        db.flush()
+        db.add(AdminAuditLog(
+            actor_id=actor.id,
+            actor_name=actor.display_name,
+            action=action,
+            resource_type=resource_type,
+            resource_id=resource.id,
+            resource_label=resource_label[:200],
+        ))
         db.commit()
     except IntegrityError as exc:
         db.rollback()
@@ -54,6 +64,12 @@ def overview(db: Db, _admin: AdminUser):
     )
 
 
+@router.get('/audit-logs', response_model=list[AdminAuditLogOut])
+def list_audit_logs(db: Db, _admin: AdminUser, limit: Limit = 50, offset: Offset = 0):
+    statement = select(AdminAuditLog).order_by(AdminAuditLog.id.desc()).offset(offset).limit(limit)
+    return db.scalars(statement).all()
+
+
 @router.get('/courses', response_model=list[AdminCourseOut])
 def list_courses(db: Db, _admin: AdminUser, limit: Limit = 50, offset: Offset = 0):
     return db.scalars(select(Course).order_by(Course.id.desc()).offset(offset).limit(limit)).all()
@@ -68,7 +84,7 @@ def get_course(course_id: int, db: Db, _admin: AdminUser):
 def create_course(payload: CourseInput, db: Db, _admin: AdminWriter):
     course = Course(**payload.model_dump())
     db.add(course)
-    commit_or_conflict(db, 'Slug khóa học đã tồn tại.')
+    commit_change_or_conflict(db, _admin, 'created', 'course', course, course.title, 'Slug khóa học đã tồn tại.')
     db.refresh(course)
     return course
 
@@ -78,7 +94,7 @@ def update_course(course_id: int, payload: CourseInput, db: Db, _admin: AdminWri
     course = get_or_404(db, Course, course_id, 'khóa học')
     for field, value in payload.model_dump().items():
         setattr(course, field, value)
-    commit_or_conflict(db, 'Slug khóa học đã tồn tại.')
+    commit_change_or_conflict(db, _admin, 'updated', 'course', course, course.title, 'Slug khóa học đã tồn tại.')
     db.refresh(course)
     return course
 
@@ -90,8 +106,9 @@ def delete_course(course_id: int, db: Db, _admin: AdminWriter):
         raise HTTPException(status_code=409, detail='Không thể xóa khóa học còn bài học.')
     if db.scalar(select(Enrollment.user_id).where(Enrollment.course_id == course.id).limit(1)):
         raise HTTPException(status_code=409, detail='Không thể xóa khóa học còn người học ghi danh.')
+    resource_label = course.title
     db.delete(course)
-    commit_or_conflict(db, 'Không thể xóa khóa học.')
+    commit_change_or_conflict(db, _admin, 'deleted', 'course', course, resource_label, 'Không thể xóa khóa học.')
     return Response(status_code=204)
 
 
@@ -113,7 +130,7 @@ def create_lesson(payload: LessonInput, db: Db, _admin: AdminWriter):
     get_or_404(db, Course, payload.course_id, 'khóa học')
     lesson = Lesson(**payload.model_dump())
     db.add(lesson)
-    commit_or_conflict(db, 'Thứ tự bài học đã tồn tại trong khóa học này.')
+    commit_change_or_conflict(db, _admin, 'created', 'lesson', lesson, lesson.title, 'Thứ tự bài học đã tồn tại trong khóa học này.')
     db.refresh(lesson)
     return lesson
 
@@ -124,7 +141,7 @@ def update_lesson(lesson_id: int, payload: LessonInput, db: Db, _admin: AdminWri
     lesson = get_or_404(db, Lesson, lesson_id, 'bài học')
     for field, value in payload.model_dump().items():
         setattr(lesson, field, value)
-    commit_or_conflict(db, 'Thứ tự bài học đã tồn tại trong khóa học này.')
+    commit_change_or_conflict(db, _admin, 'updated', 'lesson', lesson, lesson.title, 'Thứ tự bài học đã tồn tại trong khóa học này.')
     db.refresh(lesson)
     return lesson
 
@@ -139,8 +156,9 @@ def delete_lesson(lesson_id: int, db: Db, _admin: AdminWriter):
     )
     if blockers:
         raise HTTPException(status_code=409, detail='Không thể xóa bài học đang có dữ liệu liên quan.')
+    resource_label = lesson.title
     db.delete(lesson)
-    commit_or_conflict(db, 'Không thể xóa bài học.')
+    commit_change_or_conflict(db, _admin, 'deleted', 'lesson', lesson, resource_label, 'Không thể xóa bài học.')
     return Response(status_code=204)
 
 
@@ -158,7 +176,7 @@ def get_sign(sign_id: int, db: Db, _admin: AdminUser):
 def create_sign(payload: SignInput, db: Db, _admin: AdminWriter):
     sign = Sign(**payload.model_dump())
     db.add(sign)
-    commit_or_conflict(db, 'Không thể tạo ký hiệu.')
+    commit_change_or_conflict(db, _admin, 'created', 'sign', sign, sign.label, 'Không thể tạo ký hiệu.')
     db.refresh(sign)
     return sign
 
@@ -168,7 +186,7 @@ def update_sign(sign_id: int, payload: SignInput, db: Db, _admin: AdminWriter):
     sign = get_or_404(db, Sign, sign_id, 'ký hiệu')
     for field, value in payload.model_dump().items():
         setattr(sign, field, value)
-    commit_or_conflict(db, 'Không thể cập nhật ký hiệu.')
+    commit_change_or_conflict(db, _admin, 'updated', 'sign', sign, sign.label, 'Không thể cập nhật ký hiệu.')
     db.refresh(sign)
     return sign
 
@@ -178,8 +196,9 @@ def delete_sign(sign_id: int, db: Db, _admin: AdminWriter):
     sign = get_or_404(db, Sign, sign_id, 'ký hiệu')
     if db.scalar(select(LessonSign.sign_id).where(LessonSign.sign_id == sign.id).limit(1)) or db.scalar(select(ReviewSchedule.sign_id).where(ReviewSchedule.sign_id == sign.id).limit(1)):
         raise HTTPException(status_code=409, detail='Không thể xóa ký hiệu đang có dữ liệu liên quan.')
+    resource_label = sign.label
     db.delete(sign)
-    commit_or_conflict(db, 'Không thể xóa ký hiệu.')
+    commit_change_or_conflict(db, _admin, 'deleted', 'sign', sign, resource_label, 'Không thể xóa ký hiệu.')
     return Response(status_code=204)
 
 
@@ -202,7 +221,7 @@ def create_user(payload: UserCreate, db: Db, _admin: AdminWriter):
         role=payload.role,
     )
     db.add(user)
-    commit_or_conflict(db, 'Email này đã được sử dụng.')
+    commit_change_or_conflict(db, _admin, 'created', 'user', user, user.display_name, 'Email này đã được sử dụng.')
     db.refresh(user)
     return user
 
@@ -216,7 +235,7 @@ def update_user(user_id: int, payload: UserUpdate, db: Db, _admin: AdminWriter):
     user.role = payload.role
     if payload.password:
         user.password_hash = hash_password(payload.password)
-    commit_or_conflict(db, 'Không thể cập nhật người dùng.')
+    commit_change_or_conflict(db, _admin, 'updated', 'user', user, user.display_name, 'Không thể cập nhật người dùng.')
     db.refresh(user)
     return user
 
@@ -236,8 +255,9 @@ def delete_user(user_id: int, db: Db, admin: AdminWriter):
     )
     if blockers:
         raise HTTPException(status_code=409, detail='Không thể xóa người dùng đang có dữ liệu học tập.')
+    resource_label = user.display_name
     db.delete(user)
-    commit_or_conflict(db, 'Không thể xóa người dùng.')
+    commit_change_or_conflict(db, admin, 'deleted', 'user', user, resource_label, 'Không thể xóa người dùng.')
     return Response(status_code=204)
 
 

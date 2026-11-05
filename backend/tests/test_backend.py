@@ -146,6 +146,28 @@ def test_learner_cannot_access_admin_api(client):
     assert client.get('/api/v1/admin/users').status_code == 403
 
 
+def test_admin_audit_logs_record_content_changes(client):
+    assert client.get('/api/v1/admin/audit-logs').status_code == 401
+    login = client.post('/api/v1/auth/login', json={'email': 'admin@example.com', 'password': 'correct-horse-battery-staple'})
+    csrf_headers = {'X-CSRF-Token': login.json()['csrf_token']}
+    payload = {'slug': 'audit-course', 'title': 'Audit course', 'description': '', 'difficulty': 'Basic', 'is_published': False}
+    created = client.post('/api/v1/admin/courses', json=payload, headers=csrf_headers)
+    assert created.status_code == 201
+    course_id = created.json()['id']
+    updated = client.put(f'/api/v1/admin/courses/{course_id}', json={**payload, 'title': 'Updated audit course'}, headers=csrf_headers)
+    assert updated.status_code == 200
+    assert client.delete(f'/api/v1/admin/courses/{course_id}', headers=csrf_headers).status_code == 204
+
+    logs = client.get('/api/v1/admin/audit-logs').json()
+    assert [(item['action'], item['resource_type'], item['resource_label']) for item in logs] == [
+        ('deleted', 'course', 'Updated audit course'),
+        ('updated', 'course', 'Updated audit course'),
+        ('created', 'course', 'Audit course'),
+    ]
+    assert all(item['actor_name'] == 'Admin' for item in logs)
+    assert 'password' not in str(logs).lower()
+
+
 def test_registration_creates_learner_and_preserves_existing_account(client, monkeypatch):
     payload = {'email': ' New@Example.com ', 'display_name': '  New learner  ', 'password': 'a-strong-password'}
     from collections import defaultdict

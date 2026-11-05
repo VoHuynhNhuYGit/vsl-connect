@@ -92,13 +92,15 @@ export function LoginPage() {
               </span>
             </div>
 
-            <GoogleAccountCard
-              isGoogleLinked={Boolean(session.user.is_google_linked)}
-              csrfToken={session.csrf_token}
-              onStatusChange={(linked) => {
-                setSession((prev) => (prev ? { ...prev, user: { ...prev.user, is_google_linked: linked } } : null));
-              }}
-            />
+            {session.user.role !== 'admin' && (
+              <GoogleAccountCard
+                isGoogleLinked={Boolean(session.user.is_google_linked)}
+                csrfToken={session.csrf_token}
+                onStatusChange={(linked) => {
+                  setSession((prev) => (prev ? { ...prev, user: { ...prev.user, is_google_linked: linked } } : null));
+                }}
+              />
+            )}
 
             <button
               type="button"
