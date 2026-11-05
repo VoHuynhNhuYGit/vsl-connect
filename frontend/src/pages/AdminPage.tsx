@@ -84,6 +84,7 @@ export function AdminPage() {
   const [tab, setTab] = useState<Tab>(tabFromUrl);
   const [createTarget, setCreateTarget] = useState<CreateTarget | null>(createTargetFromUrl);
   const [query, setQuery] = useState('');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     getSession().then(setSession).catch((error: unknown) => {
@@ -144,14 +145,16 @@ export function AdminPage() {
       onQueryChange={setQuery}
       onSearch={search}
       onSelectSuggestion={selectSearchItem}
+      onGoHome={() => selectTab('overview')}
+      onSignOut={() => signOut(session.csrf_token)}
     />
     <div className="admin-workspace mx-auto max-w-[1680px] px-4 py-5 sm:px-6 lg:px-7 lg:py-6">
       {message && <p role="alert" className="mb-4 rounded-xl bg-error-container px-4 py-3 text-body-sm text-error">{message}</p>}
-      <div className="grid gap-5 lg:grid-cols-[15.75rem_minmax(0,1fr)]">
+      <div className={`grid gap-5 ${sidebarCollapsed ? 'lg:grid-cols-[5.25rem_minmax(0,1fr)]' : 'lg:grid-cols-[15.75rem_minmax(0,1fr)]'}`}>
         <aside className="h-fit lg:sticky lg:top-5">
-          <div className="mb-4 flex h-20 items-center gap-3 rounded-[26px] bg-surface-container-lowest px-5 shadow-card">
-            <Icon name="menu" className="text-[27px] text-on-surface" />
-            <span className="text-headline-lg">Quản trị</span>
+          <div className={`mb-4 flex h-20 items-center gap-3 rounded-[26px] bg-surface-container-lowest px-5 shadow-card ${sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''}`}>
+            <button type="button" onClick={() => setSidebarCollapsed((collapsed) => !collapsed)} aria-expanded={!sidebarCollapsed} aria-label={sidebarCollapsed ? 'Mở rộng danh sách chức năng' : 'Thu gọn danh sách chức năng'} className="rounded-lg p-1 text-on-surface outline-none transition-colors hover:bg-surface-container focus-visible:ring-2 focus-visible:ring-primary"><Icon name="menu" className="text-[27px]" /></button>
+            <span className={`bg-gradient-to-r from-primary via-primary to-primary/75 bg-clip-text text-headline-lg text-transparent ${sidebarCollapsed ? 'lg:hidden' : ''}`}>Quản trị</span>
           </div>
           <nav className="admin-sidebar relative rounded-[24px] bg-transparent p-1" aria-label="Điều hướng quản trị">
             <div className="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-2 lg:overflow-visible">
@@ -160,8 +163,8 @@ export function AdminPage() {
                 type="button"
                 onClick={() => selectTab(item.id)}
                 aria-current={tab === item.id ? 'page' : undefined}
-                className={`relative flex h-14 shrink-0 items-center gap-3 rounded-xl px-4 pr-12 text-left text-label-md transition-all duration-300 lg:w-full ${tab === item.id ? 'bg-primary text-white shadow-glow' : 'bg-surface-container-lowest text-on-surface hover:bg-secondary-container hover:text-on-secondary-container'}`}
-              ><span className={`flex h-8 w-8 items-center justify-center rounded-full border ${tab === item.id ? 'border-white/70 bg-white/15' : 'border-primary/50 text-primary'}`}><Icon name={item.icon} className="text-[20px]" /></span><span>{item.label}</span><span aria-hidden="true" className={`absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 rounded-full border-2 border-surface-app bg-secondary transition-colors duration-300 lg:-right-3 ${tab === item.id ? 'bg-primary lg:opacity-0' : ''}`} /></button>)}
+                className={`relative flex h-14 shrink-0 items-center gap-3 rounded-xl px-4 pr-12 text-left text-label-md transition-all duration-300 ${sidebarCollapsed ? 'lg:w-14 lg:justify-center lg:px-0 lg:pr-0' : 'lg:w-full'} ${tab === item.id ? 'bg-primary text-white shadow-glow' : 'bg-surface-container-lowest text-on-surface hover:bg-secondary-container hover:text-on-secondary-container'}`}
+              ><span className={`flex h-8 w-8 items-center justify-center rounded-full border ${tab === item.id ? 'border-white/70 bg-white/15' : 'border-primary/50 text-primary'}`}><Icon name={item.icon} className="text-[20px]" /></span><span className={sidebarCollapsed ? 'lg:sr-only' : ''}>{item.label}</span><span aria-hidden="true" className={`absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 rounded-full border-2 border-surface-app bg-secondary transition-colors duration-300 lg:-right-3 ${tab === item.id ? 'bg-primary lg:opacity-0' : ''}`} /></button>)}
             </div>
             <span
               aria-hidden="true"
@@ -172,9 +175,6 @@ export function AdminPage() {
         </aside>
 
         <main className="min-w-0">
-          <div className="mb-5 flex justify-end">
-            <button type="button" onClick={() => signOut(session.csrf_token)} className="inline-flex items-center gap-2 rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-label-md text-on-surface transition-colors hover:bg-surface-container-low"><Icon name="logout" className="text-[18px]" /><span className="hidden sm:inline">Đăng xuất</span></button>
-          </div>
           <div key={tab} className="admin-view-panel">
             {tab === 'overview' && <Overview userName={session.user.display_name} onSelect={selectTab} onQuickAction={(nextTab) => selectTab(nextTab, { openCreate: isCreateTarget(nextTab) })} />}
             {tab === 'courses' && <CourseManager csrfToken={session.csrf_token} openCreate={createTarget === 'courses'} onDialogClosed={closeCreateDialog} />}
@@ -191,9 +191,10 @@ export function AdminPage() {
   </div>;
 }
 
-function AdminHeader({ displayName, query, onQueryChange, onSearch, onSelectSuggestion }: { displayName: string; query: string; onQueryChange: (value: string) => void; onSearch: (event: FormEvent<HTMLFormElement>) => void; onSelectSuggestion: (item: SearchItem) => void }) {
+function AdminHeader({ displayName, query, onQueryChange, onSearch, onSelectSuggestion, onGoHome, onSignOut }: { displayName: string; query: string; onQueryChange: (value: string) => void; onSearch: (event: FormEvent<HTMLFormElement>) => void; onSelectSuggestion: (item: SearchItem) => void; onGoHome: () => void; onSignOut: () => void }) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const suggestions = findSearchItems(query);
 
   function selectSuggestion(item: SearchItem) {
@@ -212,9 +213,9 @@ function AdminHeader({ displayName, query, onQueryChange, onSearch, onSelectSugg
 
   return <header className="sticky top-0 z-40 border-b border-white/80 bg-surface-container-lowest/90 shadow-[0_1px_16px_rgba(5,150,105,0.06)] backdrop-blur-xl">
     <div className="mx-auto flex h-20 max-w-[1680px] items-center gap-4 px-4 sm:px-6 lg:px-7">
-      <div className="flex shrink-0 items-center gap-2.5"><img src={vslLogo} alt="VSL Connect" className="h-12 w-12 object-contain" /><span className="hidden leading-tight sm:block"><strong className="block text-[19px] tracking-[-0.035em]">VSL Connect</strong><small className="text-label-sm text-on-surface-variant">Quản trị</small></span></div>
+      <button type="button" onClick={onGoHome} className="flex shrink-0 items-center gap-2.5 rounded-xl text-left outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-primary" aria-label="Về trang tổng quan quản trị"><img src={vslLogo} alt="VSL Connect" className="h-12 w-12 object-contain" /><span className="hidden leading-tight sm:block"><strong className="block text-[19px] tracking-[-0.035em]">VSL Connect</strong><small className="text-label-sm text-on-surface-variant">Quản trị</small></span></button>
       <form onSubmit={onSearch} className="relative z-50 hidden max-w-[27rem] flex-1 md:block"><Icon name="search" className="pointer-events-none absolute left-4 top-[1.4rem] -translate-y-1/2 text-[24px] text-on-surface" /><input type="search" role="combobox" aria-autocomplete="list" aria-expanded={showSuggestions && suggestions.length > 0} aria-controls="admin-search-suggestions" aria-activedescendant={showSuggestions && suggestions[activeIndex] ? `admin-search-${suggestions[activeIndex].id}` : undefined} value={query} onFocus={() => { if (suggestions.length) setShowSuggestions(true); }} onBlur={() => setShowSuggestions(false)} onKeyDown={handleKeyDown} onChange={(event) => { onQueryChange(event.target.value); setShowSuggestions(true); setActiveIndex(0); }} placeholder="Tìm chức năng hoặc nhập “thêm...”" className="h-11 w-full rounded-full border-0 bg-secondary-container/50 py-2 pl-12 pr-4 text-body-md text-on-surface outline-none placeholder:text-on-surface-variant focus:ring-2 focus:ring-primary" />{showSuggestions && suggestions.length > 0 && <ul id="admin-search-suggestions" role="listbox" className="absolute left-0 right-0 top-[calc(100%+0.5rem)] overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest p-1.5 shadow-modal">{suggestions.map((item, index) => <li key={item.id} id={`admin-search-${item.id}`} role="option" aria-selected={index === activeIndex}><button type="button" onMouseDown={(event) => { event.preventDefault(); selectSuggestion(item); }} className={`flex min-h-0 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${index === activeIndex ? 'bg-secondary-container text-on-secondary-container' : 'text-on-surface hover:bg-surface-container-low'}`}><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-container text-primary"><Icon name={item.icon} className="text-[18px]" /></span><span className="min-w-0"><span className="block text-label-md">{item.label}</span><span className="block truncate text-label-sm font-normal text-on-surface-variant">{item.description}</span></span>{item.openCreate && <span className="ml-auto rounded-full bg-surface-container px-2 py-1 text-label-sm text-on-surface-variant">Tạo mới</span>}</button></li>)}</ul>}</form>
-      <div className="ml-auto flex items-center gap-2.5"><span title="Thông báo" className="relative hidden h-11 w-11 items-center justify-center rounded-full bg-surface-container text-on-surface sm:inline-flex"><Icon name="notifications" className="text-[23px]" /><span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-surface-container-lowest" /></span><ThemeToggle /><span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary-container text-primary"><Icon name="person" className="text-[25px]" /></span><span className="hidden max-w-32 truncate text-label-md sm:block">{displayName}</span><Icon name="keyboard_arrow_down" className="hidden text-[20px] sm:block" /></div>
+      <div className="ml-auto flex items-center gap-2.5"><span title="Thông báo" className="relative hidden h-11 w-11 items-center justify-center rounded-full bg-surface-container text-on-surface sm:inline-flex"><Icon name="notifications" className="text-[23px]" /><span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-surface-container-lowest" /></span><ThemeToggle /><div className="relative"><button type="button" onClick={() => setUserMenuOpen((open) => !open)} aria-haspopup="menu" aria-expanded={userMenuOpen} aria-controls="admin-user-menu" className="flex items-center gap-2 rounded-xl px-1.5 py-1 text-left outline-none transition-colors hover:bg-surface-container-low focus-visible:ring-2 focus-visible:ring-primary"><span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary-container text-primary"><Icon name="person" className="text-[25px]" /></span><span className="hidden max-w-32 truncate text-label-md sm:block">{displayName}</span><Icon name="keyboard_arrow_down" className={`hidden text-[20px] transition-transform sm:block ${userMenuOpen ? 'rotate-180' : ''}`} /></button>{userMenuOpen && <div id="admin-user-menu" role="menu" className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-48 overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest p-1.5 shadow-modal"><button type="button" role="menuitem" onClick={() => { setUserMenuOpen(false); onSignOut(); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-label-md text-error transition-colors hover:bg-error-container"><Icon name="logout" className="text-[19px]" />Đăng xuất</button></div>}</div></div>
     </div>
   </header>;
 }
