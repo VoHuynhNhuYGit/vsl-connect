@@ -1,56 +1,118 @@
 import { Link } from 'react-router-dom';
+import heroLaptop from '../assets/vsl-hero-laptop.png';
 import { Icon } from '../components/ui/Icon';
 
-const shortcuts = [
-  { title: 'Lộ trình học', description: 'Khám phá các khóa học và xây nền tảng từng bước.', icon: 'route', to: '/lo-trinh-hoc-tap', tone: 'bg-emerald-100 text-emerald-800 ring-emerald-300 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-emerald-300/15' },
-  { title: 'Từ điển ký hiệu', description: 'Tra cứu ký hiệu nhanh theo từ khóa và chủ đề.', icon: 'menu_book', to: '/tu-dien-ky-hieu', tone: 'bg-sky-100 text-sky-800 ring-sky-300 dark:bg-sky-400/10 dark:text-sky-300 dark:ring-sky-300/15' },
-  { title: 'Ôn tập', description: 'Củng cố những kiến thức bạn đã học.', icon: 'style', to: '/on-tap', tone: 'bg-violet-100 text-violet-800 ring-violet-300 dark:bg-violet-400/10 dark:text-violet-300 dark:ring-violet-300/15' },
+const highlights = [
+  { icon: 'account_tree', title: 'Lộ trình rõ ràng', description: 'Học từ cơ bản đến nâng cao' },
+  { icon: 'smart_display', title: 'Bài học trực quan', description: 'Video minh họa dễ hiểu' },
+  { icon: 'menu_book', title: 'Từ điển phong phú', description: 'Tra cứu nhanh, chính xác' },
+  { icon: 'videocam', title: 'Giao tiếp trực tuyến', description: 'Kết nối và thực hành cùng nhau' },
+];
+
+const journeys = [
+  {
+    icon: 'school',
+    title: 'Lộ trình học',
+    description: 'Học theo từng cấp độ',
+    to: '/lo-trinh-hoc-tap',
+    iconClass: 'bg-emerald-100 text-emerald-700',
+    cardClass: 'from-emerald-50 to-teal-50/60 border-emerald-100',
+  },
+  {
+    icon: 'auto_stories',
+    title: 'Từ điển ký hiệu',
+    description: 'Tra cứu ký hiệu nhanh',
+    to: '/tu-dien-ky-hieu',
+    iconClass: 'bg-sky-100 text-sky-700',
+    cardClass: 'from-sky-50 to-blue-50/60 border-sky-100',
+  },
+  {
+    icon: 'track_changes',
+    title: 'Luyện tập',
+    description: 'Củng cố và nâng cao kỹ năng',
+    to: '/luyen-tap',
+    iconClass: 'bg-orange-100 text-orange-700',
+    cardClass: 'from-orange-50 to-rose-50/60 border-orange-100',
+  },
+  {
+    icon: 'assignment_turned_in',
+    title: 'Ôn tập',
+    description: 'Kiểm tra kiến thức đã học',
+    to: '/on-tap',
+    iconClass: 'bg-violet-100 text-violet-700',
+    cardClass: 'from-violet-50 to-fuchsia-50/60 border-violet-100',
+  },
 ];
 
 export function HomePage() {
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-4 py-7 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
-      <section className="group relative isolate overflow-hidden rounded-[28px] border border-white/10 bg-gradient-to-br from-teal-800 via-emerald-900 to-slate-950 px-6 py-10 text-white shadow-[0_24px_80px_-28px_rgba(16,185,129,0.45)] sm:px-10 sm:py-14 lg:min-h-[360px] lg:px-14 lg:py-16">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute -right-12 -top-36 h-96 w-96 rounded-full bg-emerald-400/20 blur-[90px]" />
-          <div className="absolute -bottom-48 left-[38%] h-80 w-80 rounded-full bg-teal-400/10 blur-[85px]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,255,255,0.09),transparent_52%)]" />
-          <div className="absolute inset-0 opacity-[0.14] [background-image:linear-gradient(rgba(255,255,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.12)_1px,transparent_1px)] [background-size:44px_44px] [mask-image:linear-gradient(to_right,black,transparent_75%)]" />
+    <div className="overflow-hidden bg-white pb-16 dark:bg-slate-950 sm:pb-20">
+      <section className="relative isolate overflow-hidden border-b border-emerald-100 bg-[#f2fff9] dark:border-emerald-950/70 dark:bg-slate-950">
+        <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute -left-24 top-8 h-72 w-72 rounded-full bg-emerald-200/55 blur-3xl dark:bg-emerald-700/15" />
+          <div className="absolute right-[11%] top-[-10rem] h-[31rem] w-[31rem] rounded-full border border-emerald-200/70 bg-emerald-100/35 dark:border-emerald-400/10 dark:bg-emerald-500/5" />
+          <div className="absolute -bottom-44 right-[-5rem] h-80 w-[44rem] rounded-[50%] bg-gradient-to-r from-emerald-100/70 via-teal-100/50 to-transparent blur-2xl dark:from-emerald-500/5 dark:via-teal-400/5" />
         </div>
 
-        <div className="relative z-10 max-w-2xl">
-          <p className="inline-flex items-center gap-2 rounded-full border border-emerald-100/20 bg-white/[0.07] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-100">
-            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,.9)]" />VSL Connect
-          </p>
-          <h1 className="mt-5 max-w-xl text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-[44px] lg:leading-[1.15]">Học ký hiệu, kết nối dễ dàng hơn.</h1>
-          <p className="mt-4 max-w-lg text-base leading-relaxed text-emerald-50/90 sm:text-lg">Bắt đầu hành trình học ngôn ngữ ký hiệu Việt Nam bằng trải nghiệm trực quan, gần gũi và linh hoạt.</p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link to="/lo-trinh-hoc-tap" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-emerald-950 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-50 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-emerald-900 active:scale-[0.98]">Khám phá khóa học <Icon name="arrow_forward" className="text-[19px] transition-transform group-hover:translate-x-0.5" /></Link>
-            <Link to="/tu-dien-ky-hieu" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white active:scale-[0.98]">Tra từ điển <Icon name="manage_search" className="text-[19px]" /></Link>
+        <div className="mx-auto grid min-h-[470px] max-w-[1440px] items-center gap-8 px-5 py-12 sm:px-8 sm:py-14 lg:grid-cols-[minmax(0,0.9fr)_minmax(32rem,1.1fr)] lg:gap-2 lg:px-12 lg:py-10 xl:px-16">
+          <div className="relative z-10 max-w-[39rem] lg:py-8">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-white/75 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.08em] text-emerald-800 shadow-sm dark:border-emerald-500/30 dark:bg-slate-900/70 dark:text-emerald-300">
+              <Icon name="play_arrow" className="text-[16px]" /> VSL Connect
+            </span>
+            <h1 className="mt-5 max-w-[620px] text-[clamp(2.35rem,5vw,4.7rem)] font-bold leading-[0.98] tracking-[-0.055em] text-slate-950 dark:text-white">
+              Học ký hiệu, <span className="text-emerald-600 dark:text-emerald-400">kết nối dễ dàng hơn.</span>
+            </h1>
+            <p className="mt-5 max-w-xl text-base leading-7 text-slate-600 dark:text-slate-300 sm:text-lg sm:leading-8">
+              Nền tảng học và giao tiếp bằng ngôn ngữ ký hiệu Việt Nam trực quan, linh hoạt và dành cho mọi người.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link to="/lo-trinh-hoc-tap" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white shadow-[0_10px_20px_-12px_rgba(5,150,105,0.9)] transition duration-200 hover:-translate-y-0.5 hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 active:translate-y-0">
+                <Icon name="play_circle" className="text-[20px]" /> Bắt đầu học ngay
+              </Link>
+              <Link to="/tu-dien-ky-hieu" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-emerald-600 bg-white/70 px-5 py-3 text-sm font-bold text-emerald-800 transition duration-200 hover:-translate-y-0.5 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 active:translate-y-0 dark:border-emerald-400 dark:bg-slate-900/50 dark:text-emerald-300 dark:hover:bg-emerald-400/10">
+                <Icon name="menu_book" className="text-[20px]" /> Khám phá từ điển
+              </Link>
+            </div>
           </div>
-        </div>
 
-        <div aria-hidden="true" className="pointer-events-none absolute bottom-2 right-8 hidden h-72 w-72 items-center justify-center lg:flex xl:right-16">
-          <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(52,211,153,0.18)_0%,rgba(16,185,129,0.08)_35%,transparent_72%)] blur-2xl" />
-          <div className="absolute h-56 w-56 rounded-full border border-white/10 bg-white/[0.025] shadow-[0_0_90px_rgba(52,211,153,0.14)]" />
-          <div className="absolute h-44 w-44 rounded-full border border-white/10" />
-          <Icon name="sign_language" className="animate-float relative text-[176px] text-emerald-50/75 drop-shadow-[0_12px_28px_rgba(0,0,0,.32)] transition duration-500 group-hover:scale-105 group-hover:text-white" />
-          <span className="absolute right-3 top-9 h-2 w-2 rounded-full bg-emerald-200 shadow-[0_0_18px_rgba(167,243,208,.9)]" />
-          <span className="absolute bottom-10 left-4 h-1.5 w-1.5 rounded-full bg-teal-100/80" />
+          <div className="relative mx-auto flex w-full max-w-[720px] items-center justify-center self-end lg:self-center">
+            <div aria-hidden="true" className="absolute inset-x-[10%] bottom-[13%] h-20 rounded-[50%] bg-emerald-500/15 blur-2xl dark:bg-emerald-400/10" />
+            <img src={heroLaptop} alt="Bài học ngôn ngữ ký hiệu trên laptop" className="relative w-full max-w-[720px] select-none object-contain drop-shadow-[0_24px_30px_rgba(15,118,110,0.16)] motion-safe:animate-[gentle-float_7s_ease-in-out_infinite]" />
+          </div>
         </div>
       </section>
 
-      <section className="mt-10 sm:mt-12" aria-labelledby="home-explore">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700 dark:text-emerald-300">Bắt đầu hành trình</p><h2 id="home-explore" className="mt-2 text-2xl font-bold tracking-tight text-on-surface sm:text-[26px]">Bắt đầu từ đây</h2></div>
-          <p className="hidden max-w-sm text-right text-sm leading-relaxed text-gray-600 dark:text-gray-400 sm:block">Chọn một hoạt động để khám phá và luyện tập ngôn ngữ ký hiệu.</p>
+      <section className="relative z-10 mx-auto -mt-5 w-[calc(100%-2.5rem)] max-w-[1280px] rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-[0_12px_30px_-24px_rgba(15,23,42,0.42)] dark:border-slate-800 dark:bg-slate-900 sm:w-[calc(100%-4rem)] sm:px-5 sm:py-4">
+        <div className="grid divide-y divide-slate-100 dark:divide-slate-800 md:grid-cols-2 md:divide-x md:divide-y-0 xl:grid-cols-4">
+          {highlights.map((item) => (
+            <div key={item.title} className="flex items-center gap-3 px-3 py-3.5 sm:px-4">
+              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300">
+                <Icon name={item.icon} className="text-[22px]" />
+              </span>
+              <span><strong className="block text-sm font-bold text-slate-900 dark:text-white">{item.title}</strong><small className="mt-0.5 block text-xs text-slate-500 dark:text-slate-400">{item.description}</small></span>
+            </div>
+          ))}
         </div>
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {shortcuts.map((item, index) => <Link key={item.to} to={item.to} className="group relative flex min-h-40 items-start gap-4 overflow-hidden rounded-2xl border border-surface-border bg-surface-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/40 hover:shadow-lg hover:shadow-emerald-950/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 sm:p-6">
-            <span aria-hidden="true" className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ring-1 transition duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 ${item.tone}`}><Icon name={item.icon} className="text-[25px]" /></span>
-            <span className="min-w-0 flex-1"><span className="flex items-center gap-2 text-base font-semibold text-on-surface">{item.title}<span className="text-xs font-medium text-gray-500">0{index + 1}</span></span><span className="mt-2 block max-w-xs text-sm leading-relaxed text-gray-600 dark:text-gray-400">{item.description}</span><span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">Khám phá <Icon name="arrow_forward" className="text-[16px] transition-transform duration-200 group-hover:translate-x-1" /></span></span>
-            <span aria-hidden="true" className="absolute -bottom-10 -right-8 h-28 w-28 rounded-full bg-emerald-400/[0.035] blur-2xl transition group-hover:bg-emerald-300/[0.09]" />
-          </Link>)}
+      </section>
+
+      <section className="mx-auto mt-14 max-w-[1440px] px-5 sm:mt-16 sm:px-8 lg:px-12 xl:px-16">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="flex items-center gap-2 text-sm font-bold text-emerald-700 dark:text-emerald-300"><span className="h-4 w-1 rounded-full bg-emerald-500" />Bắt đầu hành trình</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-[-0.035em] text-slate-950 dark:text-white sm:text-4xl">Khám phá ngay</h2>
+          </div>
+          <p className="max-w-md text-sm leading-6 text-slate-500 dark:text-slate-400">Chọn một hoạt động phù hợp với mục tiêu học tập của bạn hôm nay.</p>
+        </div>
+
+        <div className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {journeys.map((item) => (
+            <Link key={item.to} to={item.to} className={`group relative min-h-[176px] overflow-hidden rounded-2xl border bg-gradient-to-br p-5 transition duration-200 hover:-translate-y-1 hover:shadow-[0_14px_28px_-22px_rgba(15,23,42,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 ${item.cardClass}`}>
+              <span className={`inline-flex h-12 w-12 items-center justify-center rounded-xl shadow-sm ${item.iconClass}`}><Icon name={item.icon} className="text-[27px]" /></span>
+              <h3 className="mt-5 text-lg font-bold tracking-[-0.02em] text-slate-900">{item.title}</h3>
+              <p className="mt-1 text-sm text-slate-600">{item.description}</p>
+              <span aria-hidden="true" className="absolute bottom-5 right-5 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-800 shadow-sm transition duration-200 group-hover:translate-x-0.5 group-hover:bg-emerald-600 group-hover:text-white"><Icon name="arrow_forward" className="text-[19px]" /></span>
+            </Link>
+          ))}
         </div>
       </section>
     </div>

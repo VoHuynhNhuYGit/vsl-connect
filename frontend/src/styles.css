@@ -8,19 +8,19 @@
   :root {
     font-family: 'Be Vietnam Pro', Inter, ui-sans-serif, system-ui, sans-serif;
     color-scheme: light;
-    --surface-app: 249 250 251;
+    --surface-app: 255 255 255;
     --surface-card: 255 255 255;
-    --surface-elevated: 243 244 246;
-    --surface-low: 243 244 246;
-    --surface-high: 229 231 235;
-    --surface-highest: 209 213 219;
-    --surface-border: 209 213 219;
-    --text-primary: 17 24 39;
-    --text-secondary: 55 65 81;
-    --outline: 107 114 128;
-    --outline-variant: 209 213 219;
-    --secondary-container: 209 250 229;
-    --on-secondary-container: 6 78 59;
+    --surface-elevated: 247 252 250;
+    --surface-low: 240 253 247;
+    --surface-high: 226 246 237;
+    --surface-highest: 209 232 222;
+    --surface-border: 226 232 240;
+    --text-primary: 15 23 42;
+    --text-secondary: 71 85 105;
+    --outline: 100 116 139;
+    --outline-variant: 203 213 225;
+    --secondary-container: 220 252 231;
+    --on-secondary-container: 6 95 70;
     --error-container: 254 226 226;
     --error: 185 28 28;
     color: rgb(var(--text-primary));
@@ -49,7 +49,7 @@
   }
 
   * { box-sizing: border-box; }
-  body { margin: 0; min-width: 320px; min-height: 100vh; background: rgb(var(--surface-app)); color: rgb(var(--text-primary)); }
+  body { margin: 0; min-width: 320px; min-height: 100vh; background: rgb(var(--surface-app)); color: rgb(var(--text-primary)); -webkit-font-smoothing: antialiased; }
   button, a, input, select, textarea { font: inherit; }
   input::placeholder, textarea::placeholder { color: rgb(var(--text-secondary)); opacity: 1; }
   input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
@@ -62,6 +62,11 @@
     outline-offset: 2px;
   }
   ::selection { color: #FFFFFF; background: #047857; }
+}
+
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
