@@ -1,6 +1,5 @@
 import { FormEvent, useState } from 'react';
 import { Icon } from '../ui/Icon';
-import { GoogleAction, GoogleError, GoogleSuccess } from '../auth/GoogleActions';
 import { type AuthSession, login } from '../../services/adminApi';
 
 type Props = { onSuccess: (session: AuthSession) => void };
@@ -25,16 +24,13 @@ export function AdminSignIn({ onSuccess }: Props) {
   }
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-10rem)] max-w-md items-center px-4 py-10">
+    <div className="admin-workspace mx-auto flex min-h-[calc(100vh-10rem)] max-w-lg items-center px-5 py-10">
       <form onSubmit={submit} className="w-full rounded-3xl border border-surface-container bg-surface-container-lowest p-6 shadow-lift sm:p-8">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary-container text-on-secondary-container">
           <Icon name="admin_panel_settings" className="text-[26px]" />
         </div>
         <p className="mt-5 text-label-sm uppercase tracking-[0.14em] text-primary">VSL Connect</p>
         <h1 className="mt-2 text-headline-xl">Đăng nhập quản trị</h1>
-        <p className="mt-2 text-body-sm text-on-surface-variant">Sử dụng tài khoản đã được cấp quyền quản trị để tiếp tục.</p>
-        <GoogleSuccess />
-        <GoogleError />
         {error && <p role="alert" className="mt-5 rounded-xl bg-error-container px-4 py-3 text-body-sm text-error">{error}</p>}
         <label className="mt-6 block text-label-md">
           Email
@@ -67,14 +63,6 @@ export function AdminSignIn({ onSuccess }: Props) {
           {submitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
         </button>
 
-        <div className="relative my-6 flex items-center justify-center">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-surface-container" />
-          </div>
-          <span className="relative bg-surface-container-lowest px-3 text-label-sm text-on-surface-variant">hoặc</span>
-        </div>
-
-        <GoogleAction mode="admin" />
       </form>
     </div>
   );

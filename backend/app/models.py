@@ -22,6 +22,19 @@ class User(Base):
         return bool(self.google_sub)
 
 
+class AdminAuditLog(Base):
+    __tablename__ = 'admin_audit_logs'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    actor_id: Mapped[int] = mapped_column(Integer, index=True)
+    actor_name: Mapped[str] = mapped_column(String(120))
+    action: Mapped[str] = mapped_column(String(16))
+    resource_type: Mapped[str] = mapped_column(String(32), index=True)
+    resource_id: Mapped[int] = mapped_column(Integer)
+    resource_label: Mapped[str] = mapped_column(String(200))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
+    __table_args__ = (CheckConstraint("action IN ('created', 'updated', 'deleted')", name='ck_admin_audit_action'),)
+
+
 class Course(Base):
     __tablename__ = 'courses'
     id: Mapped[int] = mapped_column(primary_key=True)

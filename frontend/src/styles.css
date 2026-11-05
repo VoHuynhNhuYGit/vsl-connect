@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
 
 @tailwind base;
 @tailwind components;
@@ -6,21 +6,85 @@
 
 @layer base {
   :root {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    color: #091d2b;
-    background: #f3f7f8;
+    font-family: 'Be Vietnam Pro', Inter, ui-sans-serif, system-ui, sans-serif;
+    color-scheme: light;
+    --surface-app: 255 255 255;
+    --surface-card: 255 255 255;
+    --surface-elevated: 247 252 250;
+    --surface-low: 240 253 247;
+    --surface-high: 226 246 237;
+    --surface-highest: 209 232 222;
+    --surface-border: 226 232 240;
+    --text-primary: 15 23 42;
+    --text-secondary: 71 85 105;
+    --outline: 100 116 139;
+    --outline-variant: 203 213 225;
+    --secondary-container: 220 252 231;
+    --on-secondary-container: 6 95 70;
+    --error-container: 254 226 226;
+    --error: 185 28 28;
+    color: rgb(var(--text-primary));
+    background: rgb(var(--surface-app));
     font-synthesis: none;
     text-rendering: optimizeLegibility;
   }
 
+  :root.dark {
+    color-scheme: dark;
+    --surface-app: 9 13 22;
+    --surface-card: 17 24 39;
+    --surface-elevated: 31 41 55;
+    --surface-low: 23 32 51;
+    --surface-high: 38 52 73;
+    --surface-highest: 51 65 85;
+    --surface-border: 55 65 81;
+    --text-primary: 249 250 251;
+    --text-secondary: 209 213 219;
+    --outline: 156 163 175;
+    --outline-variant: 75 85 99;
+    --secondary-container: 6 78 59;
+    --on-secondary-container: 167 243 208;
+    --error-container: 127 29 29;
+    --error: 248 113 113;
+  }
+
   * { box-sizing: border-box; }
-  body { margin: 0; min-width: 320px; min-height: 100vh; background: #f3f7f8; }
+  body { margin: 0; min-width: 320px; min-height: 100vh; background: rgb(var(--surface-app)); color: rgb(var(--text-primary)); -webkit-font-smoothing: antialiased; }
   button, a, input, select, textarea { font: inherit; }
-  input::placeholder { color: #52696d; opacity: 1; }
+  input::placeholder, textarea::placeholder { color: rgb(var(--text-secondary)); opacity: 1; }
+  input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
+    -webkit-text-fill-color: rgb(var(--text-primary));
+    -webkit-box-shadow: 0 0 0 1000px rgb(var(--surface-elevated)) inset;
+    caret-color: #059669;
+  }
   button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-    outline: 3px solid #166664;
+    outline: 3px solid #10B981;
     outline-offset: 2px;
   }
+  ::selection { color: #FFFFFF; background: #047857; }
+}
+
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes admin-view-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+:root.admin-reduced-motion *,
+:root.admin-reduced-motion *::before,
+:root.admin-reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
 }
 
 @layer components {
@@ -51,4 +115,58 @@
   .text-label-md { font-size: 13px; line-height: 18px; font-weight: 600; }
   .text-label-sm { font-size: 12px; line-height: 16px; font-weight: 600; }
   .text-code-sm { font-family: 'Space Mono', monospace; font-size: 12px; line-height: 16px; }
+
+  .admin-app {
+    background:
+      radial-gradient(circle at 78% 12%, rgb(167 243 208 / 0.62), transparent 24rem),
+      radial-gradient(circle at 4% 82%, rgb(209 250 229 / 0.82), transparent 28rem),
+      rgb(var(--surface-low));
+  }
+
+  :root.dark .admin-app {
+    background:
+      radial-gradient(circle at 78% 12%, rgb(6 78 59 / 0.55), transparent 24rem),
+      radial-gradient(circle at 4% 82%, rgb(6 78 59 / 0.35), transparent 28rem),
+      rgb(var(--surface-app));
+  }
+
+  .admin-hero {
+    background: linear-gradient(105deg, rgb(var(--surface-card)) 0%, rgb(236 253 245 / 0.92) 100%);
+  }
+
+  .admin-sidebar-active-dot {
+    position: absolute;
+    z-index: 10;
+    top: 1.125rem;
+    right: -0.75rem;
+    height: 1.75rem;
+    width: 1.75rem;
+    border: 2px solid rgb(var(--surface-app));
+    border-radius: 9999px;
+    background: #047857;
+    box-shadow: 0 0 0 4px rgb(209 250 229), 0 6px 14px rgb(4 120 87 / 0.25);
+    transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .admin-view-panel { animation: admin-view-enter 260ms ease-out both; }
+
+  :root.dark .admin-hero {
+    background: linear-gradient(105deg, rgb(var(--surface-card)) 0%, rgb(6 78 59 / 0.32) 100%);
+  }
+
+  .admin-workspace .text-body-sm { font-size: 15px; line-height: 22px; }
+  .admin-workspace .text-label-md { font-size: 14px; line-height: 20px; }
+  .admin-workspace input:not([type='checkbox']), .admin-workspace select, .admin-workspace textarea { font-size: 15px; }
+  .admin-workspace input:not([type='checkbox']), .admin-workspace select { min-height: 48px; }
+  .admin-workspace button { min-height: 44px; }
+  .admin-workspace table th, .admin-workspace table td { padding-top: 1.125rem; padding-bottom: 1.125rem; }
+  .admin-workspace table button[aria-label] { min-width: 44px; }
+  .admin-workspace section > .mt-1.text-body-sm.text-on-surface-variant,
+  .admin-workspace section > div > div > .mt-1.text-body-sm.text-on-surface-variant { display: none; }
+
+  :root[data-admin-density='compact'] .admin-workspace table th,
+  :root[data-admin-density='compact'] .admin-workspace table td {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
 }

@@ -24,24 +24,13 @@ function AdminRedirect() {
 export default function App() {
   const hostname = window.location.hostname.toLowerCase();
   if (hostname === 'admin.localhost') {
-    const mainUrl = new URL(window.location.href);
-    mainUrl.hostname = 'localhost';
-    mainUrl.pathname = '/';
-    mainUrl.search = '';
-    mainUrl.hash = '';
     return (
-      <>
-        <header className="border-b border-surface-container bg-surface-container-lowest">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-            <span className="text-headline-sm">VSL Connect · Quản trị</span>
-            <a className="text-label-md text-primary hover:underline" href={mainUrl.href}>Về trang chính</a>
-          </div>
-        </header>
+      <div className="admin-app min-h-screen">
         <Routes>
           <Route path="/" element={<AdminPage />} />
           <Route path="*" element={<Navigate to={{ pathname: '/', search: window.location.search }} replace />} />
         </Routes>
-      </>
+      </div>
     );
   }
   return (

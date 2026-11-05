@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { FilesetResolver, HandLandmarker, type HandLandmarkerResult } from '@mediapipe/tasks-vision';
 
-const WASM_URL = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.2.2/wasm';
+const WASM_URL = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm';
 const MODEL_URL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
-const PREDICT_URL = '/api/v1/gesture/predict';
+const PREDICT_URL = 'http://localhost:8000/api/v1/gesture/predict';
 const WINDOW_SIZE = 60;
 const THROTTLE_FRAMES = 5;
 
-export type GesturePrediction = { label_id: string; label_name: string; confidence: number };
+export type GesturePrediction = { label_id: number; label_name: string; confidence: number };
 
 export function extract126Landmarks(results: HandLandmarkerResult): number[] {
   const values = Array<number>(126).fill(0.0);

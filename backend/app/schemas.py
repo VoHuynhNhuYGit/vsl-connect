@@ -167,3 +167,15 @@ class AdminOverviewOut(BaseModel):
     lessons: int
     signs: int
     users: int
+
+
+class AdminAuditLogOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    actor_id: int
+    actor_name: str
+    action: Literal['created', 'updated', 'deleted']
+    resource_type: str
+    resource_id: int
+    resource_label: str
+    created_at: datetime

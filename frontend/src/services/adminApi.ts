@@ -46,6 +46,17 @@ export type AdminSign = {
   is_published: boolean;
 };
 
+export type AdminAuditLog = {
+  id: number;
+  actor_id: number;
+  actor_name: string;
+  action: 'created' | 'updated' | 'deleted';
+  resource_type: string;
+  resource_id: number;
+  resource_label: string;
+  created_at: string;
+};
+
 export class ApiError extends Error {
   constructor(public readonly status: number, message: string) {
     super(message);
