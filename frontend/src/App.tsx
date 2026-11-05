@@ -1,15 +1,15 @@
+import { useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from './components/layout/AppShell';
-import { HomePage } from './pages/HomePage';
-import { LearningPathPage } from './pages/LearningPathPage';
+import { AdminPage } from './pages/AdminPage';
+import { CommunicationPage } from './pages/CommunicationPage';
 import { CoursePage } from './pages/CoursePage';
 import { DictionaryPage } from './pages/DictionaryPage';
+import { HomePage } from './pages/HomePage';
+import { LearningPathPage } from './pages/LearningPathPage';
 import { LessonPage } from './pages/LessonPage';
-import { ReviewPage } from './pages/ReviewPage';
-import { CommunicationPage } from './pages/CommunicationPage';
-import { AdminPage } from './pages/AdminPage';
 import { LoginPage } from './pages/LoginPage';
-import { useEffect } from 'react';
+import { ReviewPage } from './pages/ReviewPage';
 
 function AdminRedirect() {
   useEffect(() => {
@@ -23,6 +23,7 @@ function AdminRedirect() {
 
 export default function App() {
   const hostname = window.location.hostname.toLowerCase();
+
   if (hostname === 'admin.localhost') {
     const mainUrl = new URL(window.location.href);
     mainUrl.hostname = 'localhost';
@@ -44,6 +45,7 @@ export default function App() {
       </>
     );
   }
+
   return (
     <Routes>
       <Route element={<AppShell />}>
@@ -54,10 +56,10 @@ export default function App() {
         <Route path="luyen-tap" element={<LessonPage />} />
         <Route path="on-tap" element={<ReviewPage />} />
         <Route path="giao-tiep" element={<CommunicationPage />} />
-        <Route path="admin" element={hostname === 'localhost' || hostname === '127.0.0.1' ? <AdminRedirect /> : <AdminPage />} />
-        <Route path="dang-nhap" element={<LoginPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
+      <Route path="dang-nhap" element={<LoginPage />} />
+      <Route path="admin" element={hostname === 'localhost' || hostname === '127.0.0.1' ? <AdminRedirect /> : <AdminPage />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
