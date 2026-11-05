@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import vslLogo from '../../assets/vsl-connect-logo.png';
 import { useAdminResource, type AuthSession } from '../../services/adminApi';
 import { ThemeToggle } from '../common/ThemeToggle';
 import { Icon } from '../ui/Icon';
@@ -33,9 +34,7 @@ export function TopNav() {
     <header className="sticky top-0 z-50 border-b border-slate-200/90 bg-white/95 text-slate-950 shadow-[0_5px_20px_-18px_rgba(15,23,42,0.35)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90 dark:text-white">
       <div className="mx-auto flex min-h-[76px] max-w-[1440px] items-center gap-3 px-4 sm:px-6 lg:px-8 xl:px-12">
         <Link to="/" aria-label="VSL Connect — Trang chủ" className="group inline-flex shrink-0 items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-[0_7px_16px_-10px_rgba(5,150,105,0.95)] transition-transform duration-200 group-hover:scale-[1.04]">
-            <Icon name="play_arrow" className="translate-x-px text-[26px]" />
-          </span>
+          <img src={vslLogo} alt="" className="h-11 w-11 object-contain transition-transform duration-200 group-hover:scale-[1.04]" />
           <span className="hidden text-[21px] font-bold tracking-[-0.045em] text-slate-950 dark:text-white sm:block">VSL <span className="text-emerald-600 dark:text-emerald-400">Connect</span></span>
         </Link>
 
