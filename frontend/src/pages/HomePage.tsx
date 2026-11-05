@@ -59,7 +59,7 @@ export function HomePage() {
             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-white/75 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.08em] text-emerald-800 shadow-sm dark:border-emerald-500/30 dark:bg-slate-900/70 dark:text-emerald-300">
               <Icon name="play_arrow" className="text-[16px]" /> VSL Connect
             </span>
-            <h1 className="mt-5 max-w-[620px] text-[clamp(2.35rem,5vw,4.7rem)] font-bold leading-[0.98] tracking-[-0.055em] text-slate-950 dark:text-white">
+            <h1 className="mt-5 max-w-[620px] text-[clamp(2.35rem,5vw,4.7rem)] font-bold leading-[1.08] tracking-[-0.035em] text-slate-950 dark:text-white">
               Học ký hiệu, <span className="text-emerald-600 dark:text-emerald-400">kết nối dễ dàng hơn.</span>
             </h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-slate-600 dark:text-slate-300 sm:text-lg sm:leading-8">
