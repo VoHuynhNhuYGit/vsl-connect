@@ -1,5 +1,5 @@
 fastapi==0.159.1
-uvicorn==0.54.0
+uvicorn==0.34.0
 SQLAlchemy==2.0.52
 alembic==1.20.1
 PyMySQL[rsa]==1.2.3
@@ -8,4 +8,6 @@ numpy==1.26.4
 mediapipe==0.10.21
 opencv-contrib-python==4.11.0.86
 Pillow==12.3.0
-torch==2.5.1
+python-multipart==0.0.20
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.5.1+cpu

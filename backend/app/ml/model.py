@@ -1,8 +1,11 @@
 import json
+import logging
 from pathlib import Path
 import numpy as np
 import torch
 import torch.nn as nn
+
+logger = logging.getLogger(__name__)
 
 class GestureLSTM(nn.Module):
     def __init__(self, input_size=126, hidden_size=128, num_layers=2, num_classes=100, dropout=0.2):
@@ -55,22 +58,50 @@ class GestureClassifier:
         self.num_layers = checkpoint.get("num_layers", 2)
         self.num_classes = len(self.labels)
 
+        expected_feature_shape = (self.input_size,)
+        if self.mean.shape != expected_feature_shape or self.std.shape != expected_feature_shape:
+            raise ValueError(
+                f"normalization.npz must contain mean/std shaped {expected_feature_shape}; "
+                f"received mean={self.mean.shape}, std={self.std.shape}."
+            )
+        if not np.isfinite(self.mean).all() or not np.isfinite(self.std).all() or np.any(self.std <= 0):
+            raise ValueError("normalization.npz contains invalid mean/std values.")
+        if any(str(index) not in self.labels for index in range(self.num_classes)):
+            raise ValueError("label_map.json must use consecutive numeric label ids.")
+
+        state_dict = checkpoint["model_state_dict"]
+        classifier_weight = state_dict.get("classifier.1.weight")
+        if classifier_weight is None or classifier_weight.shape != (self.num_classes, self.hidden_size):
+            raise ValueError("Checkpoint classifier shape does not match label_map.json or hidden_size.")
+
         self.model = GestureLSTM(
             input_size=self.input_size,
             hidden_size=self.hidden_size,
             num_layers=self.num_layers,
             num_classes=self.num_classes
         )
-        self.model.load_state_dict(checkpoint["model_state_dict"])
+        self.model.load_state_dict(state_dict)
         self.model.to(self.device)
         self.model.eval()
+        logger.info(
+            "Loaded gesture classifier seq_len=%s input_size=%s hidden_size=%s layers=%s classes=%s",
+            self.seq_len,
+            self.input_size,
+            self.hidden_size,
+            self.num_layers,
+            self.num_classes,
+        )
 
     def preprocess(self, sequence: np.ndarray) -> torch.Tensor:
         """
         Chuẩn hóa chuỗi landmarks đầu vào (seq_len, 126)
         """
-        # (X - mean) / (std + eps)
+        if sequence.shape != (self.seq_len, self.input_size) or not np.isfinite(sequence).all():
+            raise ValueError("Sequence must be finite and match the configured model input shape.")
+        # Preserve the training formula: (X - mean) / (std + eps)
         norm_sequence = (sequence - self.mean) / (self.std + 1e-8)
+        if not np.isfinite(norm_sequence).all():
+            raise ValueError("Normalization produced non-finite values.")
         # Thêm batch dimension -> (1, 60, 126)
         tensor = torch.tensor(norm_sequence, dtype=torch.float32).unsqueeze(0)
         return tensor.to(self.device)
