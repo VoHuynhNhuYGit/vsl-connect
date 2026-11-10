@@ -99,7 +99,7 @@ export function TextToSpeechPanel({ suggestedText = '' }: TextToSpeechPanelProps
   }
 
   return (
-    <section aria-labelledby="tts-title" className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-6">
+    <section aria-labelledby="tts-title" className="rounded-2xl border border-gray-200 bg-surface-card p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900 sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 id="tts-title" className="text-xl font-semibold text-gray-900 dark:text-white">Văn bản thành giọng nói</h2>
@@ -122,7 +122,7 @@ export function TextToSpeechPanel({ suggestedText = '' }: TextToSpeechPanelProps
           onChange={(event) => { setText(event.target.value); setMessage(''); }}
           rows={5}
           placeholder="Nhập nội dung tiếng Việt tại đây..."
-          className="w-full resize-y rounded-xl border border-gray-200 bg-white px-4 py-3 text-base leading-7 text-gray-900 placeholder:text-gray-500 transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
+          className="w-full resize-y rounded-xl border border-gray-200 bg-surface-card px-4 py-3 text-base leading-7 text-gray-900 placeholder:text-gray-500 transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
           aria-describedby="tts-status"
         />
       </div>
@@ -146,10 +146,10 @@ export function TextToSpeechPanel({ suggestedText = '' }: TextToSpeechPanelProps
           disabled={!isSupported || isSpeaking}
           className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-emerald-900/10 transition hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100 dark:focus-visible:ring-offset-slate-900 sm:min-w-48"
         >
-          {isSpeaking ? <><span aria-hidden="true" className="flex h-4 items-center gap-0.5">{[0, 1, 2, 3].map((bar) => <span key={bar} className="h-2 w-1 animate-pulse rounded-full bg-white" style={{ animationDelay: `${bar * 120}ms` }} />)}</span>Đang đọc...</> : <><Icon name="volume_up" className="text-[20px]" />Phát âm thanh</>}
+          {isSpeaking ? <><span aria-hidden="true" className="flex h-4 items-center gap-0.5">{[0, 1, 2, 3].map((bar) => <span key={bar} className="h-2 w-1 animate-pulse rounded-full bg-surface-card" style={{ animationDelay: `${bar * 120}ms` }} />)}</span>Đang đọc...</> : <><Icon name="volume_up" className="text-[20px]" />Phát âm thanh</>}
         </button>
         {isSpeaking && <button type="button" onClick={() => stopSpeech()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-800 transition hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 active:scale-[0.98] dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200 dark:hover:bg-red-500/20"><Icon name="stop" className="text-[18px]" />Dừng lại</button>}
-        <button type="button" onClick={clearText} disabled={!text && !isSpeaking} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-200 dark:hover:bg-slate-800 sm:ml-auto"><Icon name="delete" className="text-[18px]" />Xóa</button>
+        <button type="button" onClick={clearText} disabled={!text && !isSpeaking} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-surface-card px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100 dark:border-slate-700 dark:bg-slate-900 dark:text-gray-200 dark:hover:bg-slate-800 sm:ml-auto"><Icon name="delete" className="text-[18px]" />Xóa</button>
       </div>
 
       <div id="tts-status" role="status" aria-live="polite" className="mt-4 min-h-5 text-sm">

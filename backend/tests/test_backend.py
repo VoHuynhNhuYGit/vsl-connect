@@ -406,3 +406,81 @@ def test_google_id_token_nonce_and_email_verification(monkeypatch):
     monkeypatch.setattr('app.google_auth.id_token.verify_oauth2_token', lambda *args: {'nonce': 'wrong', 'email_verified': True, 'sub': 'id', 'email': 'email@example.com'})
     with pytest.raises(ValueError):
         verify_google_code('code', 'verifier', 'expected')
+
+# Avatar uploads are exercised against the fixture's disposable SQLite database.
+def avatar_fixture_bytes(format='PNG', size=(400, 250)):
+    from io import BytesIO
+    from PIL import Image
+    output = BytesIO()
+    image = Image.new('RGB', size, (45, 130, 110))
+    exif = Image.Exif()
+    exif[0x010F] = 'Private camera metadata'
+    image.save(output, format=format, exif=exif)
+    return output.getvalue()
+
+
+def avatar_login(client):
+    response = client.post('/api/v1/auth/login', json={'email': 'learner@example.com', 'password': 'correct-horse-battery-staple'})
+    assert response.status_code == 200
+    return {'X-CSRF-Token': response.json()['csrf_token']}
+
+
+def test_avatar_requires_session_csrf_and_owner_access(client):
+    data = avatar_fixture_bytes()
+    assert client.put('/api/v1/profile/avatar', content=data, headers={'Content-Type': 'image/png'}).status_code == 401
+    assert client.get('/api/v1/profile/avatar/2').status_code == 401
+    headers = avatar_login(client)
+    assert client.put('/api/v1/profile/avatar', content=data, headers={'Content-Type': 'image/png'}).status_code == 403
+    assert client.delete('/api/v1/profile/avatar').status_code == 403
+    assert client.get('/api/v1/profile/avatar/1').status_code == 403
+    assert client.get('/api/v1/profile/avatar/2').status_code == 404
+    assert client.get('/api/v1/auth/me').json()['user']['avatar_url'] is None
+
+
+def test_avatar_is_normalized_persistent_and_replaceable(client):
+    from io import BytesIO
+    from PIL import Image
+    headers = avatar_login(client)
+    uploaded = client.put('/api/v1/profile/avatar', content=avatar_fixture_bytes('JPEG'), headers={**headers, 'Content-Type': 'image/jpeg'})
+    assert uploaded.status_code == 200
+    user = uploaded.json()
+    assert user['id'] == 2 and user['role'] == 'learner'
+    assert user['avatar_url'].startswith('/api/v1/profile/avatar/2?v=')
+    assert 'avatar_image' not in user and 'password_hash' not in user
+    image_response = client.get(user['avatar_url'])
+    assert image_response.status_code == 200
+    assert image_response.headers['content-type'] == 'image/webp'
+    assert image_response.headers['cache-control'] == 'no-store'
+    assert image_response.headers['x-content-type-options'] == 'nosniff'
+    assert len(image_response.content) <= 60 * 1024
+    with Image.open(BytesIO(image_response.content)) as image:
+        assert image.size == (256, 256)
+        assert image.format == 'WEBP'
+        assert not image.getexif()
+    assert client.get('/api/v1/auth/me').json()['user']['avatar_url'] == user['avatar_url']
+    # A fresh session sees the same saved thumbnail.
+    headers = avatar_login(client)
+    assert client.get('/api/v1/auth/me').json()['user']['avatar_url'] == user['avatar_url']
+    replaced = client.put('/api/v1/profile/avatar', content=avatar_fixture_bytes(), headers={**headers, 'Content-Type': 'image/png'})
+    assert replaced.status_code == 200
+    assert replaced.json()['avatar_url'] != user['avatar_url']
+    removed = client.delete('/api/v1/profile/avatar', headers=headers)
+    assert removed.status_code == 200 and removed.json()['avatar_url'] is None
+    assert client.get('/api/v1/profile/avatar/2').status_code == 404
+    with Session(get_engine()) as db:
+        assert db.get(User, 2).avatar_image is None
+        assert db.get(User, 1).avatar_version is None
+
+
+def test_avatar_rejects_invalid_formats_size_and_pixels(client, monkeypatch):
+    import app.profile as profile
+    headers = avatar_login(client)
+    assert client.put('/api/v1/profile/avatar', content=b'', headers={**headers, 'Content-Type': 'image/png'}).status_code == 400
+    assert client.put('/api/v1/profile/avatar', content=b'<svg/>', headers={**headers, 'Content-Type': 'image/svg+xml'}).status_code == 415
+    assert client.put('/api/v1/profile/avatar', content=b'not an image', headers={**headers, 'Content-Type': 'image/png'}).status_code == 422
+    assert client.put('/api/v1/profile/avatar', content=avatar_fixture_bytes(), headers={**headers, 'Content-Type': 'image/jpeg'}).status_code == 415
+    assert client.put('/api/v1/profile/avatar', content=b'0' * (profile.MAX_UPLOAD_BYTES + 1), headers={**headers, 'Content-Type': 'image/png'}).status_code == 413
+    assert client.put('/api/v1/profile/avatar', content=avatar_fixture_bytes(size=(16, 16)), headers={**headers, 'Content-Type': 'image/png'}).status_code == 422
+    monkeypatch.setattr(profile, 'MAX_AVATAR_PIXELS', 1000)
+    assert client.put('/api/v1/profile/avatar', content=avatar_fixture_bytes(), headers={**headers, 'Content-Type': 'image/png'}).status_code == 422
+    assert client.get('/api/v1/auth/me').json()['user']['avatar_url'] is None

@@ -38,7 +38,7 @@ export const AICameraCard: React.FC = () => {
   }, []);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 w-full flex flex-col gap-4">
+    <div className="bg-surface-card rounded-xl shadow-sm border border-gray-100 p-5 w-full flex flex-col gap-4">
       <div className="flex gap-4 items-start">
         <div className="w-12 h-12 bg-teal-100 text-teal-600 rounded-xl flex items-center justify-center shrink-0">
           <Camera size={24} />

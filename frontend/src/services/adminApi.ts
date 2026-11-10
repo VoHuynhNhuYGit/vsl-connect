@@ -8,6 +8,7 @@ export type AdminUser = {
   display_name: string;
   role: Role;
   is_google_linked?: boolean;
+  avatar_url?: string | null;
   created_at: string;
 };
 
@@ -82,9 +83,30 @@ export async function apiRequest<T>(path: string, { method = 'GET', body, csrfTo
 }
 
 export const getSession = () => apiRequest<AuthSession>('/auth/me');
-export const login = (email: string, password: string) => apiRequest<AuthSession>('/auth/login', { method: 'POST', body: { email, password } });
+const SESSION_EVENT = 'vsl-session-changed';
+function notifySessionChanged() { window.dispatchEvent(new Event(SESSION_EVENT)); }
+export async function login(email: string, password: string) {
+  const session = await apiRequest<AuthSession>('/auth/login', { method: 'POST', body: { email, password } });
+  notifySessionChanged();
+  return session;
+}
 export const register = (display_name: string, email: string, password: string) => apiRequest<{ detail: string }>('/auth/register', { method: 'POST', body: { display_name, email, password } });
-export const logout = (csrfToken: string) => apiRequest<void>('/auth/logout', { method: 'POST', csrfToken });
+export async function logout(csrfToken: string) {
+  await apiRequest<void>('/auth/logout', { method: 'POST', csrfToken });
+  notifySessionChanged();
+}
+export async function uploadAvatar(image: Blob, csrfToken: string, signal?: AbortSignal): Promise<AdminUser> {
+  const response = await fetch('/api/v1/profile/avatar', { method: 'PUT', credentials: 'same-origin', headers: { 'Content-Type': image.type, 'X-CSRF-Token': csrfToken }, body: image, signal });
+  const payload = await response.json().catch(() => null);
+  if (!response.ok) throw new ApiError(response.status, typeof payload?.detail === 'string' ? payload.detail : 'Không thể lưu ảnh đại diện. Vui lòng thử lại.');
+  notifySessionChanged();
+  return payload as AdminUser;
+}
+export async function removeAvatar(csrfToken: string): Promise<AdminUser> {
+  const user = await apiRequest<AdminUser>('/profile/avatar', { method: 'DELETE', csrfToken });
+  notifySessionChanged();
+  return user;
+}
 export const unlinkGoogle = (csrfToken: string) => apiRequest<{ detail: string }>('/auth/google/unlink', { method: 'POST', csrfToken });
 
 type ResourceState<T> = { data: T | null; loading: boolean; error: string | null; refresh: () => void };
@@ -97,13 +119,19 @@ export function useAdminResource<T>(path: string, enabled = true): ResourceState
   const refresh = useCallback(() => setAttempt((value) => value + 1), []);
 
   useEffect(() => {
+    if (!enabled || path !== '/auth/me') return;
+    window.addEventListener(SESSION_EVENT, refresh);
+    return () => window.removeEventListener(SESSION_EVENT, refresh);
+  }, [enabled, path, refresh]);
+
+  useEffect(() => {
     if (!enabled) return;
     const controller = new AbortController();
     setLoading(true);
     setError(null);
     apiRequest<T>(path)
       .then((result) => { if (!controller.signal.aborted) setData(result); })
-      .catch((requestError: unknown) => { if (!controller.signal.aborted) setError(requestError instanceof Error ? requestError.message : 'Không thể tải dữ liệu.'); })
+      .catch((requestError: unknown) => { if (!controller.signal.aborted) { if (path === '/auth/me') setData(null); setError(requestError instanceof Error ? requestError.message : 'Không thể tải dữ liệu.'); } })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [attempt, enabled, path]);

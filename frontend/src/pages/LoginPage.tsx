@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { GoogleAction, GoogleAccountCard, GoogleError, GoogleSuccess } from '../components/auth/GoogleActions';
+import { GoogleAction, GoogleError, GoogleSuccess } from '../components/auth/GoogleActions';
+import { AccountProfile } from '../features/account/AccountProfile';
 import { ApiError, type AuthSession, getSession, login, logout, register } from '../services/adminApi';
 
 export function LoginPage() {
@@ -73,44 +74,18 @@ export function LoginPage() {
     );
   }
 
+  if (session) return <AccountProfile session={session} onSessionChange={setSession} onSignOut={signOut} error={error} />;
+
   return (
     <div className="mx-auto max-w-md px-4 py-12">
       <section className="rounded-3xl border border-surface-container bg-surface-container-lowest p-6 shadow-lift sm:p-8">
-        <h1 className="text-headline-xl">{session ? 'Tài khoản của bạn' : registering ? 'Đăng ký tài khoản' : 'Đăng nhập'}</h1>
+        <h1 className="text-headline-xl">{registering ? 'Đăng ký tài khoản' : 'Đăng nhập'}</h1>
         <GoogleSuccess />
         <GoogleError />
         {error && <p role="alert" className="mt-4 rounded-xl bg-error-container p-3 text-body-sm text-error">{error}</p>}
         {success && <p role="status" className="mt-4 rounded-xl bg-secondary-container p-3 text-body-sm text-on-secondary-container">{success}</p>}
 
-        {session ? (
-          <>
-            <div className="mt-5 rounded-2xl bg-surface-container-low p-4">
-              <p className="text-headline-sm text-on-surface">{session.user.display_name}</p>
-              <p className="mt-1 text-body-sm text-on-surface-variant">{session.user.email}</p>
-              <span className="mt-2 inline-block rounded-md bg-secondary-container px-2.5 py-0.5 text-label-sm text-on-secondary-container">
-                {session.user.role === 'admin' ? 'Quản trị viên' : 'Học viên'}
-              </span>
-            </div>
-
-            {session.user.role !== 'admin' && (
-              <GoogleAccountCard
-                isGoogleLinked={Boolean(session.user.is_google_linked)}
-                csrfToken={session.csrf_token}
-                onStatusChange={(linked) => {
-                  setSession((prev) => (prev ? { ...prev, user: { ...prev.user, is_google_linked: linked } } : null));
-                }}
-              />
-            )}
-
-            <button
-              type="button"
-              onClick={signOut}
-              className="mt-6 w-full rounded-xl bg-primary p-3 text-label-md text-on-primary shadow-card transition-colors hover:bg-primary-container"
-            >
-              Đăng xuất
-            </button>
-          </>
-        ) : (
+        {(
           <form onSubmit={submit}>
             {registering && (
               <label className="mt-6 block text-label-md">

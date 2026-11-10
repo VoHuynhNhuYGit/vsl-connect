@@ -4,6 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f6f9ff" />
+    <script>
+      // Apply saved appearance before the first paint; React owns later updates.
+      try {
+        const savedTheme = localStorage.getItem('vsl-connect-site-theme');
+        document.documentElement.dataset.siteTheme = ['default', 'patterns', 'puppets', 'dongho', 'heritage'].includes(savedTheme) ? savedTheme : 'default';
+        const savedMode = localStorage.getItem('vsl-connect-theme');
+        document.documentElement.dataset.backgroundMotion = localStorage.getItem('vsl-connect-background-motion') === 'off' ? 'off' : 'on';
+        document.documentElement.classList.toggle('dark', savedMode === 'dark' || (savedMode !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches));
+      } catch { document.documentElement.dataset.siteTheme = 'default'; }
+    </script>
     <title>VSL Connect - Ngôn ngữ Ký hiệu Việt Nam</title>
   </head>
   <body>

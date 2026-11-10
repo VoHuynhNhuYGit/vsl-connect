@@ -79,7 +79,7 @@ export const GroupChatTTS: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-xl shadow-sm border border-gray-100">
+    <div className="flex flex-col h-full bg-surface-card rounded-xl shadow-sm border border-gray-100">
       <div className="flex justify-between items-center p-4 border-b border-gray-50">
         <h3 className="text-lg font-bold text-gray-800">Trò chuyện nhóm</h3>
         <span className="text-xs text-gray-400 font-medium">{messages.length} tin nhắn</span>
@@ -91,14 +91,14 @@ export const GroupChatTTS: React.FC = () => {
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${msg.isSelf ? 'bg-teal-800 text-white' : 'bg-teal-100 text-teal-700'}`}>
               {msg.sender}
             </div>
-            <div className={`max-w-[75%] px-4 py-2 text-sm shadow-sm ${msg.isSelf ? 'bg-teal-50 border border-teal-100 rounded-2xl rounded-tr-sm text-teal-800' : 'bg-white border border-gray-100 rounded-2xl rounded-tl-sm text-gray-700'}`}>
+            <div className={`max-w-[75%] px-4 py-2 text-sm shadow-sm ${msg.isSelf ? 'bg-teal-50 border border-teal-100 rounded-2xl rounded-tr-sm text-teal-800' : 'bg-surface-card border border-gray-100 rounded-2xl rounded-tl-sm text-gray-700'}`}>
               {msg.text}
             </div>
           </div>
         ))}
       </div>
 
-      <div className="p-4 border-t border-gray-50 bg-white rounded-b-xl">
+      <div className="p-4 border-t border-gray-50 bg-surface-card rounded-b-xl">
         <div className="flex items-center gap-2">
           <input
             type="text"

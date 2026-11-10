@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, false, func, text
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint, false, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -13,6 +13,8 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255))
     google_sub: Mapped[str | None] = mapped_column(String(255), unique=True, index=True)
     display_name: Mapped[str] = mapped_column(String(120))
+    avatar_image: Mapped[bytes | None] = mapped_column(LargeBinary(length=65535), deferred=True)
+    avatar_version: Mapped[str | None] = mapped_column(String(32))
     role: Mapped[str] = mapped_column(String(20), server_default='learner')
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     __table_args__ = (CheckConstraint("role IN ('learner', 'admin')", name='ck_users_role'),)
@@ -20,6 +22,10 @@ class User(Base):
     @property
     def is_google_linked(self) -> bool:
         return bool(self.google_sub)
+
+    @property
+    def avatar_url(self) -> str | None:
+        return f'/api/v1/profile/avatar/{self.id}?v={self.avatar_version}' if self.avatar_version else None
 
 
 class AdminAuditLog(Base):

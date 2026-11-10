@@ -1,3 +1,7 @@
+// Keep existing utility classes on the same theme palette across every route.
+const themeColor = (name) => `color-mix(in srgb, var(--${name}) calc(<alpha-value> * 100%), transparent)`;
+const accentScale = Object.fromEntries([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map(shade => [shade, themeColor(`accent-${shade}`)]));
+const neutralScale = Object.fromEntries([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map(shade => [shade, themeColor(`neutral-${shade}`)]));
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: 'class',
@@ -5,6 +9,10 @@ export default {
   theme: {
     extend: {
       colors: {
+        emerald: accentScale,
+        teal: accentScale,
+        slate: neutralScale,
+        gray: neutralScale,
         // --- 1. HỆ TOKEN MỚI TỪ DESIGN.MD (Dark & Emerald UI) ---
         surface: {
           app: 'rgb(var(--surface-app) / <alpha-value>)',
@@ -13,9 +21,9 @@ export default {
           border: 'rgb(var(--surface-border) / <alpha-value>)',
         },
         brand: {
-          50: '#ECFDF5',
-          500: '#10B981',       // Emerald chính cho button, active state
-          600: '#059669',       // Hover state
+          50: themeColor('accent-50'),
+          500: themeColor('accent-500'),
+          600: themeColor('accent-600'),
         },
         // Role badges token
         role: {
@@ -32,14 +40,14 @@ export default {
         'surface-container-highest': 'rgb(var(--surface-highest) / <alpha-value>)',
         'on-surface': 'rgb(var(--text-primary) / <alpha-value>)',
         'on-surface-variant': 'rgb(var(--text-secondary) / <alpha-value>)',
-        primary: '#047857',
+        primary: themeColor('accent-600'),
         'on-primary': '#FFFFFF',
-        'primary-container': '#059669',
-        'primary-fixed': '#A7F3D0',
+        'primary-container': themeColor('accent-700'),
+        'primary-fixed': themeColor('accent-200'),
         'secondary-container': 'rgb(var(--secondary-container) / <alpha-value>)',
         'on-secondary-container': 'rgb(var(--on-secondary-container) / <alpha-value>)',
-        secondary: '#34D399',
-        'secondary-fixed': '#ECFDF5',
+        secondary: 'var(--theme-secondary)',
+        'secondary-fixed': themeColor('accent-50'),
         tertiary: '#465957',
         'tertiary-container': '#6b7775',
         'inverse-surface': '#090D16',
@@ -52,6 +60,9 @@ export default {
       fontFamily: {
         sans: ['Be Vietnam Pro', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         mono: ['Space Mono', 'monospace'],
+      },
+      textColor: {
+        primary: 'var(--text-accent)',
       },
       boxShadow: {
         card: '0 1px 8px rgba(0, 0, 0, 0.04)',

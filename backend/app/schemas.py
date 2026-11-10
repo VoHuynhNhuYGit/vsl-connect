@@ -103,6 +103,7 @@ class UserOut(BaseModel):
     display_name: str
     role: Literal['learner', 'admin']
     is_google_linked: bool = False
+    avatar_url: str | None = None
     created_at: datetime
 
 
