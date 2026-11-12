@@ -1,0 +1,9 @@
+# Đông Hồ artwork
+
+The Đông Hồ theme uses `frontend/src/assets/dongho-village.webp`, an original illustration generated with the built-in image generation tool, inspired by the user's references of children riding a buffalo and a pig with lotus flowers. It is decorative artwork, not a reproduction of a historical print. The optimized asset is 1200 × 800 with alpha transparency, about 336 KiB.
+
+`DongHoArtwork.tsx` composes the illustration with a paper medallion, bamboo and petals. It is shared by the homepage, theme selector and feature banners. CSS motion respects the existing background-motion preference, admin reduced-motion mode and `prefers-reduced-motion`. Theme-selector previews remain still.
+
+## Generation prompt
+
+Create a polished transparent-background website illustration inspired by Vietnamese Dong Ho folk woodblock prints. Wide landscape composition, two distinct figures together: on left a joyful Vietnamese child in red and green traditional clothes riding a black water buffalo, playing a bamboo flute, bamboo grove behind; on right a cheerful child with traditional hair tufts and red bib riding a peach pink pig with traditional green-yellow yin-yang swirls, holding a large pink lotus bouquet with green leaves. Authentic charming hand-carved black ink outlines, flat vermilion, leaf green, ochre yellow, peach pink, subtle woodblock pigment texture. Elegant balanced composition, ample clear space between the two animals, all limbs and flowers contained within frame, clear silhouettes legible at 500 pixels. Small grasses and lotus below. NO words, letters, labels, border, white rectangle, photographic background, drop shadows, gradients or 3D. Actual alpha transparency surrounding all figures. This is a decorative art asset for a Vietnamese learning website, not a screenshot.

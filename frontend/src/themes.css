@@ -7,7 +7,7 @@
   --theme-paper: #fff8f3;
   --theme-ink: #342333;
   --theme-pattern: repeating-linear-gradient(45deg, transparent 0 8px, currentColor 8px 9px, transparent 9px 16px);
-  --display-font: 'Noto Serif', Georgia, 'Times New Roman', serif;
+  --display-font: 'Be Vietnam Pro', Inter, ui-sans-serif, system-ui, sans-serif;
   --theme-radius: 1.25rem;
 }
 :root[data-site-theme='puppets'] {
@@ -35,7 +35,6 @@
   --theme-paper: #fff8e9;
   --theme-ink: #382d26;
   --theme-pattern: repeating-linear-gradient(90deg, currentColor 0 10px, transparent 10px 14px, currentColor 14px 16px, transparent 16px 24px);
-  --display-font: 'Be Vietnam Pro', sans-serif;
   --theme-radius: .875rem;
 }
 :root {
@@ -134,7 +133,7 @@ input:-webkit-autofill { caret-color: var(--theme-accent); }
 }
 .site-shell h3 { line-height: 1.5; letter-spacing: 0; }
 .site-shell main p, .theme-dialog p { line-height: 1.8; text-wrap: pretty; }
-.site-shell .font-serif, .theme-dialog .font-serif { font-family: 'Noto Serif', Georgia, serif; }
+.site-shell .font-serif, .theme-dialog .font-serif { font-family: var(--display-font); }
 .site-shell .theme-hero h1 { font-size: clamp(2.25rem, 4.2vw, 4.25rem); line-height: 1.3; padding-block: .1em; }
 .site-header nav a { letter-spacing: 0; line-height: 1.5; }
 .site-header > div > a > span { letter-spacing: -.02em; }
@@ -176,8 +175,119 @@ input:-webkit-autofill { caret-color: var(--theme-accent); }
 :root[data-site-theme='puppets'] .ambient-orbit--two { bottom: -65px; }
 :root[data-site-theme='dongho'] .ambient-motif { width: 36px; height: 55px; border-radius: 80% 0 80% 0; box-shadow: none; background: color-mix(in srgb, var(--theme-secondary) 9%, transparent); }
 :root[data-site-theme='dongho'] .ambient-spark { border-radius: 1px; transform: rotate(45deg); }
-:root[data-site-theme='heritage'] .ambient-motif { width: 44px; height: 58px; border-radius: 50% 50% 0 0; border-width: 2px; box-shadow: inset 0 0 0 5px rgb(var(--surface-app)); }
+/* Rối nước: lacquer-red theatre framed by jade water and reflected gold. */
+:root[data-site-theme='puppets'] .theme-hero-art {
+  padding: 1.25rem .5rem .25rem;
+  border: 1px solid color-mix(in srgb, var(--theme-gold) 55%, transparent);
+  border-radius: 2.5rem 2.5rem 5rem 5rem / 2.5rem 2.5rem 2rem 2rem;
+  background: radial-gradient(ellipse at 50% 28%, #e9b54d12, transparent 58%), linear-gradient(180deg, rgb(var(--surface-card)), rgb(var(--surface-low)));
+  box-shadow: inset 0 0 0 6px rgb(var(--surface-app)), 0 22px 50px -34px #146b8355;
+}
+:root[data-site-theme='puppets'] .theme-hero-art::before { display: none; }
+:root[data-site-theme='puppets'] .theme-hero-art > svg { animation: none; }
+:root[data-site-theme='puppets'] .theme-hero-caption { margin-inline: 1.5rem; }
+:root[data-site-theme='puppets'] .journey-card { border-bottom: 3px solid color-mix(in srgb, var(--theme-secondary) 65%, rgb(var(--surface-border))); }
+:root[data-site-theme='puppets'] .journey-card:nth-child(even) { border-bottom-color: var(--theme-gold); }
+.puppets-stage-glow { animation: puppets-light 10s ease-in-out infinite alternate; }
+.puppets-ripples { animation: puppets-water 9s ease-in-out infinite alternate; }
+.puppets-reflections { animation: puppets-reflect 6s ease-in-out -2s infinite alternate; }
+.puppets-glint { animation: puppets-light 7s ease-in-out infinite alternate; }
+.puppets-glint--two { animation-delay: -3s; }
+.puppets-glint--three { animation-delay: -5s; }
+:root.dark .puppets-art { --puppets-art-paper: #244a4b; }
+.theme-preview .puppets-art { --puppets-art-paper: #dfefea; }
+.theme-preview .puppets-art * { animation: none; }
+@keyframes puppets-light { from { opacity: .35; } to { opacity: .85; } }
+@keyframes puppets-water { from { transform: translateX(-4px); opacity: .35; } to { transform: translateX(7px); opacity: .7; } }
+@keyframes puppets-reflect { from { transform: translateY(-2px) scaleX(.98); opacity: .25; } to { transform: translateY(2px) scaleX(1.02); opacity: .65; } }
+:root[data-background-motion='off'] .puppets-art *,
+:root.admin-reduced-motion .puppets-art * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .puppets-art * { animation: none !important; } }
+/* Họa sắc Việt: architectural ink, lanterns and soft watercolor paper. */
+:root[data-site-theme='patterns'] .theme-hero-art {
+  padding: 1.25rem .5rem .25rem;
+  border: 1px solid color-mix(in srgb, var(--theme-gold) 50%, transparent);
+  border-radius: 1.5rem 1.5rem 5rem 1.5rem;
+  background: radial-gradient(ellipse at 25% 40%, #e8b84c12, transparent 65%), rgb(var(--surface-card));
+  box-shadow: inset 0 0 0 6px rgb(var(--surface-app)), 0 20px 48px -34px #974a6366;
+}
+:root[data-site-theme='patterns'] .theme-hero-art::before { display: none; }
+:root[data-site-theme='patterns'] .theme-hero-art > svg { animation: none; }
+:root[data-site-theme='patterns'] .theme-hero-caption { margin-right: 2rem; }
+:root[data-site-theme='patterns'] .theme-hero::before { background-image: radial-gradient(#b18064 .5px, transparent .8px); background-size: 7px 8px; opacity: .13; }
+:root[data-site-theme='patterns'] .journey-card { border-bottom: 3px solid color-mix(in srgb, var(--theme-accent) 50%, rgb(var(--surface-border))); }
+:root[data-site-theme='patterns'] .journey-card:nth-child(even) { border-bottom-color: var(--theme-secondary); }
+.patterns-lantern { transform-origin: 0 0; animation: patterns-lantern-sway 7s ease-in-out infinite alternate; }
+.patterns-water { animation: patterns-water-drift 9s ease-in-out infinite alternate; }
+.patterns-blossom { transform-box: fill-box; transform-origin: center; animation: patterns-blossom-drift 13s ease-in-out infinite alternate; }
+.patterns-blossom--two { animation-delay: -6s; animation-duration: 17s; }
+:root.dark .patterns-art { --patterns-art-paper: #eed7b9; }
+.theme-preview .patterns-art { --patterns-art-paper: #faefd9; }
+.theme-preview .patterns-art * { animation: none; }
+@keyframes patterns-lantern-sway { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+@keyframes patterns-water-drift { from { transform: translateX(-3px); opacity: .35; } to { transform: translateX(7px); opacity: .7; } }
+@keyframes patterns-blossom-drift { from { transform: translate(-2px, -10px) rotate(-20deg); opacity: .3; } to { transform: translate(8px, 12px) rotate(25deg); opacity: .7; } }
+:root[data-background-motion='off'] .patterns-art *,
+:root.admin-reduced-motion .patterns-art * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .patterns-art * { animation: none !important; } }
+/* Đông Hồ: a warm print on điệp paper, with independently moving details. */
+:root[data-site-theme='dongho'] .theme-hero-art {
+  padding: 1.25rem .5rem .25rem;
+  border: 1px solid color-mix(in srgb, var(--theme-gold) 45%, transparent);
+  border-radius: 48% 48% 1rem 1rem / 20% 20% 1rem 1rem;
+  background: radial-gradient(ellipse at 50% 35%, #e7c97924, transparent 70%), rgb(var(--surface-card));
+  box-shadow: inset 0 0 0 6px rgb(var(--surface-app)), 0 18px 45px -30px #74501f66;
+}
+:root[data-site-theme='dongho'] .theme-hero-art::before { display: none; }
+:root[data-site-theme='dongho'] .theme-hero-art > svg { animation: none; }
+:root[data-site-theme='dongho'] .theme-hero::before { background-size: 6px 7px; opacity: .16; }
+:root[data-site-theme='dongho'] .journey-card { border-top: 3px solid var(--theme-gold); }
+:root[data-site-theme='dongho'] .journey-card:nth-child(even) { border-top-color: var(--theme-secondary); }
+.dongho-scene { animation: dongho-float 8s ease-in-out infinite alternate; transform-origin: center; }
+.dongho-bamboo { animation: dongho-sway 10s ease-in-out infinite alternate; transform-origin: 90px 340px; }
+.dongho-petal { animation: dongho-petal 12s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+.dongho-petal--two { animation-delay: -5s; animation-duration: 15s; }
+.dongho-petal--three { animation-delay: -9s; animation-duration: 17s; }
+:root.dark .dongho-art { --dongho-art-paper: #d2b777; }
+.theme-preview .dongho-art { --dongho-art-paper: #f4e6bd; }
+.theme-preview .dongho-art * { animation: none; }
+@keyframes dongho-float { from { transform: translateY(2px) rotate(-.4deg); } to { transform: translateY(-5px) rotate(.4deg); } }
+@keyframes dongho-sway { from { transform: rotate(-2deg); } to { transform: rotate(2deg); } }
+@keyframes dongho-petal { from { transform: translate(-4px, -8px) rotate(-12deg); opacity: .35; } to { transform: translate(10px, 12px) rotate(20deg); opacity: .75; } }
+:root[data-background-motion='off'] .dongho-art *,
+:root.admin-reduced-motion .dongho-art * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .dongho-art * { animation: none !important; } }
+:root[data-site-theme='heritage'] .ambient-motif { width: 110px; height: 48px; border: 0; border-radius: 0; box-shadow: none; background: color-mix(in srgb, #597b50 9%, transparent); clip-path: polygon(0 100%, 30% 20%, 45% 56%, 70% 0, 100% 100%); }
 :root[data-site-theme='heritage'] .ambient-spark { width: 9px; height: 9px; clip-path: polygon(50% 0, 62% 35%, 100% 38%, 70% 60%, 80% 100%, 50% 76%, 20% 100%, 30% 60%, 0 38%, 38% 35%); }
+/* Dấu ấn Việt Nam: sunlit terraces, limestone bays and a quiet city lake. */
+:root[data-site-theme='heritage'] .theme-hero-art {
+  padding: 1.25rem .5rem .25rem;
+  border: 1px solid color-mix(in srgb, var(--theme-gold) 55%, transparent);
+  border-radius: 1.5rem 4rem 1.5rem 4rem;
+  background: radial-gradient(ellipse at 30% 20%, #edc16a18, transparent 60%), linear-gradient(160deg, rgb(var(--surface-card)), rgb(var(--surface-low)));
+  box-shadow: inset 0 0 0 6px rgb(var(--surface-app)), 0 22px 50px -34px #486d7655;
+}
+:root[data-site-theme='heritage'] .theme-hero-art::before { display: none; }
+:root[data-site-theme='heritage'] .theme-hero-art > svg { animation: none; }
+:root[data-site-theme='heritage'] .theme-hero-caption { margin-inline: 1.75rem; }
+:root[data-site-theme='heritage'] .journey-card { border-bottom: 3px solid var(--theme-gold); }
+:root[data-site-theme='heritage'] .journey-card:nth-child(even) { border-bottom-color: #597b50; }
+.heritage-sunlight { animation: heritage-light 12s ease-in-out infinite alternate; }
+.heritage-cloud { animation: heritage-cloud-drift 18s ease-in-out infinite alternate; }
+.heritage-cloud--two { animation-delay: -8s; animation-duration: 23s; }
+.heritage-ripples { animation: heritage-water 10s ease-in-out infinite alternate; }
+.heritage-reflection { animation: heritage-light 8s ease-in-out -3s infinite alternate; }
+.heritage-leaves { transform-origin: 558px 102px; animation: heritage-leaf-sway 9s ease-in-out infinite alternate; }
+:root.dark .heritage-art { --heritage-art-paper: #344744; --heritage-cloud-color: #b8cac7; }
+.theme-preview .heritage-art { --heritage-art-paper: #f3ebd3; --heritage-cloud-color: #fffaf0; }
+.theme-preview .heritage-art * { animation: none; }
+@keyframes heritage-light { from { opacity: .35; } to { opacity: .8; } }
+@keyframes heritage-cloud-drift { from { transform: translateX(-5px); } to { transform: translateX(12px); } }
+@keyframes heritage-water { from { transform: translateX(-4px); opacity: .3; } to { transform: translateX(7px); opacity: .65; } }
+@keyframes heritage-leaf-sway { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
+:root[data-background-motion='off'] .heritage-art *,
+:root.admin-reduced-motion .heritage-art * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .heritage-art * { animation: none !important; } }
 .theme-hero-art::before { animation: ambient-breathe 20s ease-in-out infinite alternate; }
 .theme-banner-art svg { animation: ambient-art 16s ease-in-out infinite alternate; }
 @keyframes ambient-drift { from { transform: translate3d(-12px, -10px, 0) scale(.96); } to { transform: translate3d(34px, 28px, 0) scale(1.08); } }
@@ -215,7 +325,6 @@ input:-webkit-autofill { caret-color: var(--theme-accent); }
 :root[data-site-theme='default'] {
   --theme-accent: #059669; --theme-secondary: #14b8a6; --theme-gold: #10b981;
   --theme-paper: #ffffff; --theme-ink: #0f172a;
-  --display-font: 'Be Vietnam Pro', Inter, ui-sans-serif, system-ui, sans-serif;
   --theme-radius: .75rem;
   --accent-50: #ecfdf5; --accent-100: #d1fae5; --accent-200: #a7f3d0;
   --accent-300: #6ee7b7; --accent-400: #34d399; --accent-500: #10b981;
@@ -246,8 +355,6 @@ input:-webkit-autofill { caret-color: var(--theme-accent); }
 :root[data-site-theme='default'] .theme-banner-art > svg,
 :root[data-site-theme='default'] .theme-banner-art > img { display: none; }
 :root[data-site-theme='default'] .theme-banner-art > div { display: block; }
-:root[data-site-theme='default'] .site-shell .font-serif,
-:root[data-site-theme='default'] .theme-dialog .font-serif { font-family: var(--display-font); }
 .theme-choice--default { display: grid; grid-template-columns: minmax(0, 140px) minmax(0, 1fr); }
 .theme-choice--default .theme-preview { height: 100%; min-height: 112px; }
 .theme-choice--default .theme-preview > span:first-child,

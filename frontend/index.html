@@ -7,8 +7,8 @@
     <script>
       // Apply saved appearance before the first paint; React owns later updates.
       try {
-        const savedTheme = localStorage.getItem('vsl-connect-site-theme');
-        document.documentElement.dataset.siteTheme = ['default', 'patterns', 'puppets', 'dongho', 'heritage'].includes(savedTheme) ? savedTheme : 'default';
+        // A stored preference is applied only after the server confirms a session.
+        document.documentElement.dataset.siteTheme = 'default';
         const savedMode = localStorage.getItem('vsl-connect-theme');
         document.documentElement.dataset.backgroundMotion = localStorage.getItem('vsl-connect-background-motion') === 'off' ? 'off' : 'on';
         document.documentElement.classList.toggle('dark', savedMode === 'dark' || (savedMode !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches));

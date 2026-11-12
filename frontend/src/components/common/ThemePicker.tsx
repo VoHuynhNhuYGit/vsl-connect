@@ -6,8 +6,9 @@ import { Icon } from '../ui/Icon';
 import { ThemeArtwork } from './ThemeArtwork';
 
 export function ThemeChoices({ compact = false }: { compact?: boolean }) {
-  const { siteTheme, setSiteTheme } = useTheme();
+  const { siteTheme, setSiteTheme, canCustomize } = useTheme();
   const group = useId();
+  if (!canCustomize) return null;
   return <div className={`theme-choices grid gap-4 ${compact ? 'grid-cols-1 sm:grid-cols-2' : 'sm:grid-cols-2 xl:grid-cols-4'}`} role="group" aria-label="Chọn chủ đề giao diện">
     {siteThemes.map((item) => <label key={item.id} className={`theme-choice ${item.id === 'default' ? `theme-choice--default ${compact ? 'sm:col-span-2' : 'sm:col-span-2 xl:col-span-4'}` : ''} group relative block cursor-pointer overflow-hidden rounded-2xl border-2 transition hover:-translate-y-1 ${siteTheme === item.id ? 'border-primary shadow-lift' : 'border-surface-border hover:border-primary'}`}>
       <input type="radio" name={group} value={item.id} checked={siteTheme === item.id} onChange={() => setSiteTheme(item.id)} className="peer sr-only" />
@@ -24,18 +25,21 @@ export function ThemeChoices({ compact = false }: { compact?: boolean }) {
 }
 
 export function ThemePicker() {
-  const { siteTheme, theme, setTheme, backgroundMotion, setBackgroundMotion } = useTheme();
+  const { siteTheme, theme, setTheme, canCustomize, backgroundMotion, setBackgroundMotion } = useTheme();
   const [open, setOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const activeTheme = siteThemes.find(item => item.id === siteTheme)!;
   useEffect(() => {
-    if (!open) return;
+    if (!open || !canCustomize) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     dialog.current?.showModal();
     return () => { document.body.style.overflow = previousOverflow; };
-  }, [open]);
+  }, [open, canCustomize]);
+  useEffect(() => { if (!canCustomize) setOpen(false); }, [canCustomize]);
+
+  if (!canCustomize) return null;
 
   return <>
     <button type="button" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-label={`Chọn giao diện. Đang dùng ${activeTheme.name}`} title="Chọn giao diện" className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border border-surface-border bg-surface-card px-3 text-sm font-semibold text-on-surface transition hover:border-primary hover:text-primary">

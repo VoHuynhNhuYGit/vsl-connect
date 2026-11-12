@@ -65,6 +65,15 @@ export class ApiError extends Error {
 }
 
 type RequestOptions = { method?: 'GET' | 'POST' | 'PUT' | 'DELETE'; body?: unknown; csrfToken?: string };
+const SESSION_EVENT = 'vsl-session-changed';
+const AUTH_CHANGE_KEY = 'vsl-connect-auth-change';
+
+function notifySessionChanged(session?: AuthSession | null) {
+  window.dispatchEvent(new CustomEvent(SESSION_EVENT, { detail: { session } }));
+  if (session !== undefined) {
+    try { localStorage.setItem(AUTH_CHANGE_KEY, `${Date.now()}-${Math.random()}`); } catch { /* Same-tab notifications still work. */ }
+  }
+}
 
 export async function apiRequest<T>(path: string, { method = 'GET', body, csrfToken }: RequestOptions = {}): Promise<T> {
   const headers: Record<string, string> = {};
@@ -78,26 +87,26 @@ export async function apiRequest<T>(path: string, { method = 'GET', body, csrfTo
   });
   if (response.status === 204) return undefined as T;
   const payload = await response.json().catch(() => null) as { detail?: unknown } | null;
+  if (response.status === 401 && path !== '/auth/me') notifySessionChanged(null);
   if (!response.ok) throw new ApiError(response.status, typeof payload?.detail === 'string' ? payload.detail : 'Dữ liệu chưa hợp lệ hoặc không thể hoàn tất yêu cầu.');
   return payload as T;
 }
 
 export const getSession = () => apiRequest<AuthSession>('/auth/me');
-const SESSION_EVENT = 'vsl-session-changed';
-function notifySessionChanged() { window.dispatchEvent(new Event(SESSION_EVENT)); }
 export async function login(email: string, password: string) {
   const session = await apiRequest<AuthSession>('/auth/login', { method: 'POST', body: { email, password } });
-  notifySessionChanged();
+  notifySessionChanged(session);
   return session;
 }
 export const register = (display_name: string, email: string, password: string) => apiRequest<{ detail: string }>('/auth/register', { method: 'POST', body: { display_name, email, password } });
 export async function logout(csrfToken: string) {
   await apiRequest<void>('/auth/logout', { method: 'POST', csrfToken });
-  notifySessionChanged();
+  notifySessionChanged(null);
 }
 export async function uploadAvatar(image: Blob, csrfToken: string, signal?: AbortSignal): Promise<AdminUser> {
   const response = await fetch('/api/v1/profile/avatar', { method: 'PUT', credentials: 'same-origin', headers: { 'Content-Type': image.type, 'X-CSRF-Token': csrfToken }, body: image, signal });
   const payload = await response.json().catch(() => null);
+  if (response.status === 401) notifySessionChanged(null);
   if (!response.ok) throw new ApiError(response.status, typeof payload?.detail === 'string' ? payload.detail : 'Không thể lưu ảnh đại diện. Vui lòng thử lại.');
   notifySessionChanged();
   return payload as AdminUser;
@@ -120,8 +129,22 @@ export function useAdminResource<T>(path: string, enabled = true): ResourceState
 
   useEffect(() => {
     if (!enabled || path !== '/auth/me') return;
-    window.addEventListener(SESSION_EVENT, refresh);
-    return () => window.removeEventListener(SESSION_EVENT, refresh);
+    function onSessionChange(event: Event) {
+      const session = (event as CustomEvent<{ session?: AuthSession | null }>).detail?.session;
+      if (session !== undefined) setData(session as T | null);
+      refresh();
+    }
+    function onAuthStorage(event: StorageEvent) {
+      if (event.key !== AUTH_CHANGE_KEY) return;
+      setData(null);
+      refresh();
+    }
+    window.addEventListener(SESSION_EVENT, onSessionChange);
+    window.addEventListener('storage', onAuthStorage);
+    return () => {
+      window.removeEventListener(SESSION_EVENT, onSessionChange);
+      window.removeEventListener('storage', onAuthStorage);
+    };
   }, [enabled, path, refresh]);
 
   useEffect(() => {

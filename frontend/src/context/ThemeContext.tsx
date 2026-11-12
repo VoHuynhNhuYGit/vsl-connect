@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
 import { isSiteTheme, type SiteTheme } from '../config/themes';
+import { useAdminResource, type AuthSession } from '../services/adminApi';
 
 export type Theme = 'light' | 'dark';
 
@@ -8,6 +9,7 @@ type ThemeContextValue = {
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
   siteTheme: SiteTheme;
+  canCustomize: boolean;
   setSiteTheme: (theme: SiteTheme) => void;
   backgroundMotion: boolean;
   setBackgroundMotion: (enabled: boolean) => void;
@@ -30,17 +32,23 @@ function getInitialTheme(): Theme {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
+  const session = useAdminResource<AuthSession>('/auth/me');
+  const canCustomize = Boolean(session.data?.user);
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const [backgroundMotion, setBackgroundMotion] = useState(() => {
     try { return localStorage.getItem(MOTION_STORAGE_KEY) !== 'off'; } catch { return true; }
   });
-  const [siteTheme, setSiteTheme] = useState<SiteTheme>(() => {
+  const [preferredSiteTheme, setPreferredSiteTheme] = useState<SiteTheme>(() => {
     try {
       const saved = localStorage.getItem(SITE_STORAGE_KEY);
       if (isSiteTheme(saved)) return saved;
     } catch { /* Use the default when storage is unavailable. */ }
     return 'default';
   });
+  const siteTheme = canCustomize ? preferredSiteTheme : 'default';
+  const setSiteTheme = (nextTheme: SiteTheme) => {
+    if (canCustomize && isSiteTheme(nextTheme)) setPreferredSiteTheme(nextTheme);
+  };
 
   useLayoutEffect(() => {
     const root = document.documentElement;
@@ -55,8 +63,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useLayoutEffect(() => {
     document.documentElement.dataset.siteTheme = siteTheme;
-    try { localStorage.setItem(SITE_STORAGE_KEY, siteTheme); } catch { /* Keep the selection in memory. */ }
-  }, [siteTheme]);
+    if (canCustomize) {
+      try { localStorage.setItem(SITE_STORAGE_KEY, preferredSiteTheme); } catch { /* Keep the selection in memory. */ }
+    }
+  }, [siteTheme, canCustomize, preferredSiteTheme]);
 
   useLayoutEffect(() => {
     document.documentElement.dataset.backgroundMotion = backgroundMotion ? 'on' : 'off';
@@ -65,7 +75,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     function syncTheme(event: StorageEvent) {
-      if (event.key === SITE_STORAGE_KEY) setSiteTheme(isSiteTheme(event.newValue) ? event.newValue : 'default');
+      if (event.key === SITE_STORAGE_KEY) setPreferredSiteTheme(isSiteTheme(event.newValue) ? event.newValue : 'default');
       if (event.key === STORAGE_KEY && (event.newValue === 'light' || event.newValue === 'dark')) setTheme(event.newValue);
       if (event.key === MOTION_STORAGE_KEY) setBackgroundMotion(event.newValue !== 'off');
     }
@@ -73,9 +83,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('storage', syncTheme);
   }, []);
 
+  useEffect(() => {
+    const verifySession = () => { if (document.visibilityState === 'visible') session.refresh(); };
+    window.addEventListener('focus', verifySession);
+    document.addEventListener('visibilitychange', verifySession);
+    return () => {
+      window.removeEventListener('focus', verifySession);
+      document.removeEventListener('visibilitychange', verifySession);
+    };
+  }, [session.refresh]);
+
   const toggleTheme = () => setTheme((current) => current === 'dark' ? 'light' : 'dark');
 
-  return <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, siteTheme, setSiteTheme, backgroundMotion, setBackgroundMotion }}>{children}</ThemeContext.Provider>;
+  return <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, siteTheme, setSiteTheme, canCustomize, backgroundMotion, setBackgroundMotion }}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {
