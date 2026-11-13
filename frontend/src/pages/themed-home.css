@@ -1,0 +1,125 @@
+/* Layouts share content and original artwork, but each has its own composition. */
+.theme-symbol { display: inline-block; width: 1em; height: 1.1em; flex-shrink: 0; vertical-align: middle; overflow: visible; }
+.theme-symbol-accent { color: var(--theme-secondary); fill: currentColor; }
+.theme-symbol--puppets .theme-symbol-accent { fill: none; }
+.cultural-home { position: relative; isolation: isolate; padding: clamp(1.25rem, 4vw, 3.5rem); }
+.cultural-home-grid { position: relative; z-index: 1; display: grid; gap: 2.5rem; max-width: 1360px; margin: auto; }
+.cultural-intro { grid-area: intro; min-width: 0; align-self: center; }
+.cultural-intro > .theme-eyebrow { display: flex; align-items: center; gap: .8rem; }
+.cultural-edition { display: grid; place-items: center; width: 2rem; height: 2rem; border: 1px solid currentColor; font-size: .75rem; letter-spacing: 0; }
+.site-shell .cultural-intro h1 { margin-block: 1.25rem; max-width: 18ch; font-size: clamp(2rem, 3.6vw, 3.8rem); font-weight: 600; line-height: 1.3; }
+.cultural-description { max-width: 52ch; font-size: .95rem; color: rgb(var(--text-secondary)); }
+.cultural-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.75rem; }
+.cultural-actions a { display: inline-flex; align-items: center; justify-content: center; gap: .65rem; min-height: 48px; padding: .8rem 1.15rem; font-size: .8rem; font-weight: 600; border: 1px solid var(--theme-accent); border-radius: .75rem; transition: transform .2s; }
+.cultural-actions a:hover { transform: translateY(-3px); }
+.cultural-primary { background: var(--theme-accent); color: white; }
+.cultural-secondary { background: rgb(var(--surface-card)); color: var(--text-accent); }
+.cultural-actions .theme-symbol { font-size: 21px; }
+.cultural-footnote { display: flex; align-items: center; gap: .7rem; margin-top: 1.5rem; font-size: .7rem; color: rgb(var(--text-secondary)); }
+.cultural-footnote .theme-symbol { font-size: 24px; color: var(--text-accent); }
+.cultural-art { grid-area: art; min-width: 0; margin: 0; align-self: center; }
+.cultural-art-label, .cultural-art figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .6rem; padding: 1rem .5rem; }
+.cultural-art-label { font-size: .65rem; letter-spacing: .08em; color: var(--text-accent); border-bottom: 1px solid rgb(var(--surface-border)); }
+.cultural-artwork { display: block; width: 100%; height: auto; }
+.cultural-art figcaption { border-top: 1px solid rgb(var(--surface-border)); font-size: .7rem; color: rgb(var(--text-secondary)); }
+.cultural-art figcaption strong { color: rgb(var(--text-primary)); font-size: 1.1rem; font-weight: 600; }
+.cultural-explore { grid-area: explore; min-width: 0; }
+.cultural-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; }
+.cultural-section-heading h2 { font-size: clamp(1.35rem, 2vw, 1.8rem); margin-top: .4rem; font-weight: 600; }
+.cultural-section-heading > p { max-width: 30ch; color: rgb(var(--text-secondary)); font-size: .8rem; }
+.cultural-journeys { display: grid; gap: 1rem; }
+.cultural-journey { position: relative; display: flex; align-items: center; gap: 1rem; min-width: 0; padding: 1.25rem; border: 1px solid rgb(var(--surface-border)); background: rgb(var(--surface-card)); transition: border-color .2s, transform .2s, box-shadow .2s; }
+.cultural-journey:hover { border-color: var(--theme-accent); transform: translateY(-3px); box-shadow: 0 10px 25px -20px var(--theme-ink); }
+.cultural-journey-number { font-size: .7rem; color: rgb(var(--text-secondary)); }
+.cultural-icon { display: grid; place-items: center; width: 52px; height: 52px; flex-shrink: 0; color: var(--text-accent); background: rgb(var(--secondary-container)); }
+.cultural-icon .theme-symbol { font-size: 29px; }
+.cultural-journey-copy { min-width: 0; flex: 1; }
+.cultural-journey h3 { font-size: .95rem; font-weight: 600; }
+.cultural-journey-copy > span { display: block; color: rgb(var(--text-secondary)); font-size: .75rem; margin-top: .3rem; }
+.cultural-journey-arrow { color: var(--text-accent); font-size: 20px; flex-shrink: 0; }
+
+/* Họa sắc: an asymmetric editorial spread, with artwork leading the page. */
+.cultural-home--patterns .cultural-home-grid { grid-template-columns: 1.05fr 1fr; grid-template-areas: 'art intro' 'explore explore'; column-gap: 4rem; }
+.cultural-home--patterns .cultural-intro { border-left: 1px solid rgb(var(--surface-border)); padding-left: 2.5rem; }
+.cultural-home--patterns .cultural-edition { border-radius: 50%; }
+.cultural-home--patterns .cultural-journeys { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.cultural-home--patterns .cultural-journey { grid-column: span 2; border-radius: 1.5rem .4rem 1.5rem .4rem; flex-wrap: wrap; padding: 1.5rem; }
+.cultural-home--patterns .cultural-journey:nth-child(-n+2) { grid-column: span 3; }
+.cultural-home--patterns .cultural-journey-number { position: absolute; right: 1.25rem; top: 1rem; }
+.cultural-home--patterns .cultural-icon { border-radius: 50% 50% 20% 50%; }
+.cultural-home--patterns .cultural-journey-copy { flex-basis: calc(100% - 40px); }
+.cultural-home--patterns .cultural-actions a { border-radius: 2rem 2rem 2rem .4rem; }
+
+/* Rối nước: a central stage, followed by a compact activity dock. */
+.cultural-home--puppets .cultural-home-grid { grid-template-columns: 1.2fr 1fr; grid-template-areas: 'intro intro' 'art explore'; gap: 2rem; }
+.cultural-home--puppets .cultural-intro { text-align: center; padding: 1.5rem; justify-self: center; max-width: 900px; }
+.cultural-home--puppets .cultural-intro > .theme-eyebrow, .cultural-home--puppets .cultural-actions, .cultural-home--puppets .cultural-footnote { justify-content: center; }
+.cultural-home--puppets .cultural-intro h1, .cultural-home--puppets .cultural-description { margin-inline: auto; }
+.site-shell .cultural-home--puppets .cultural-intro h1 { max-width: 25ch; }
+.cultural-home--puppets .cultural-edition { border-radius: 50% 50% 40% 40%; }
+.cultural-home--puppets .cultural-journeys { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 1.25rem; border: 1px solid rgb(var(--surface-border)); border-radius: 2rem; background: rgb(var(--surface-low)); }
+.cultural-home--puppets .cultural-journey:last-child { grid-column: 1 / -1; }
+.cultural-home--puppets .cultural-journey { flex-direction: column; text-align: center; gap: .75rem; border-radius: 1.25rem; }
+.cultural-home--puppets .cultural-icon { width: 64px; height: 64px; border-radius: 50%; border-bottom: 3px solid var(--theme-secondary); }
+.cultural-home--puppets .cultural-journey-number { position: absolute; left: .8rem; top: .6rem; }
+.cultural-home--puppets .cultural-journey-arrow { align-self: flex-end; }
+.cultural-home--puppets .cultural-actions a { border-radius: 2rem; }
+
+/* Đông Hồ: a print-inspired spread with a column of numbered study entries. */
+.cultural-home--dongho .cultural-home-grid { grid-template-columns: 1.1fr 1fr; grid-template-areas: 'intro intro' 'art explore'; border-top: 4px double var(--theme-accent); padding-top: 2rem; }
+.cultural-home--dongho .cultural-intro { display: grid; grid-template-columns: 1.2fr 1fr; column-gap: 3rem; border-bottom: 1px solid rgb(var(--surface-border)); padding-bottom: 2rem; }
+.cultural-home--dongho .cultural-intro > .theme-eyebrow { grid-column: 1 / -1; }
+.site-shell .cultural-home--dongho .cultural-intro h1 { grid-row: span 3; max-width: 19ch; margin-bottom: 0; }
+.cultural-home--dongho .cultural-description { margin-top: 1.25rem; }
+.cultural-home--dongho .cultural-actions { margin-top: 1rem; }
+.cultural-home--dongho .cultural-footnote { margin-top: 1rem; }
+.cultural-home--dongho .cultural-section-heading { display: block; }
+.cultural-home--dongho .cultural-section-heading > p { max-width: none; margin-top: .65rem; }
+.cultural-home--dongho .cultural-journeys { gap: 0; border-block: 3px double var(--theme-accent); }
+.cultural-home--dongho .cultural-journey { border: 0; border-bottom: 1px solid rgb(var(--surface-border)); background: transparent; padding: 1rem .25rem; }
+.cultural-home--dongho .cultural-journey:last-child { border-bottom: 0; }
+.cultural-home--dongho .cultural-icon { background: transparent; border: 1px solid var(--theme-accent); box-shadow: 3px 3px 0 rgb(var(--secondary-container)); }
+.cultural-home--dongho .cultural-actions a { border-radius: 0; }
+
+/* Dấu ấn: a travel-journal composition with a persistent desktop navigation rail. */
+.cultural-home--heritage .cultural-home-grid { grid-template-columns: 1fr 1.3fr; grid-template-areas: 'intro art' 'explore explore'; }
+.cultural-home--heritage .cultural-art { padding: .75rem 1.25rem; border: 1px solid rgb(var(--surface-border)); border-radius: 1.5rem; background: rgb(var(--surface-card)); transform: rotate(1deg); }
+.cultural-home--heritage .cultural-edition { border-radius: .4rem; background: var(--theme-accent); color: white; }
+.cultural-home--heritage .cultural-journeys { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cultural-home--heritage .cultural-journey { border-radius: 1rem; }
+.cultural-home--heritage .cultural-journey:first-child { grid-row: span 2; flex-wrap: wrap; align-content: center; background: rgb(var(--secondary-container)); padding: 2rem; }
+.cultural-home--heritage .cultural-journey:first-child .cultural-journey-copy { flex-basis: 100%; }
+.cultural-home--heritage .cultural-journey:first-child h3 { font-size: 1.4rem; }
+.cultural-home--heritage .cultural-icon { border-radius: .75rem; background: rgb(var(--surface-low)); }
+
+@media (max-width: 1000px) {
+  .cultural-home--patterns .cultural-home-grid { column-gap: 2rem; }
+  .cultural-home--patterns .cultural-intro { padding-left: 1.5rem; }
+  .cultural-home--puppets .cultural-intro { padding: 1.25rem; }
+}
+@media (max-width: 760px) {
+  .cultural-home .cultural-home-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'intro' 'art' 'explore'; gap: 1.75rem; }
+  .cultural-home--patterns .cultural-intro { border-left: 0; padding: 0; }
+  .cultural-home--patterns .cultural-journeys { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cultural-home--patterns .cultural-journey, .cultural-home--patterns .cultural-journey:nth-child(-n+2) { grid-column: auto; }
+  .cultural-home--patterns .cultural-journey:first-child { grid-column: 1 / -1; }
+  .cultural-home--dongho .cultural-intro { display: block; }
+  .site-shell .cultural-intro h1 { max-width: 22ch; font-size: clamp(2rem, 6vw, 3rem); }
+  .cultural-section-heading { display: block; }
+  .cultural-section-heading > p { max-width: none; margin-top: .75rem; }
+  .cultural-home--heritage .cultural-art { transform: none; }
+  .cultural-artwork { max-width: 600px; margin-inline: auto; }
+}
+@media (max-width: 480px) {
+  .cultural-actions { flex-direction: column; }
+  .cultural-home--patterns .cultural-journeys, .cultural-home--heritage .cultural-journeys { grid-template-columns: minmax(0, 1fr); }
+  .cultural-home--puppets .cultural-journeys { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: .75rem; gap: .75rem; }
+  .cultural-home--puppets .cultural-journey { padding: .8rem; }
+  .cultural-home--puppets .cultural-journey:last-child { grid-column: 1 / -1; }
+  .cultural-home--heritage .cultural-journey:first-child { grid-row: auto; padding: 1.25rem; }
+  .cultural-art-label { letter-spacing: .03em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cultural-actions a, .cultural-journey { transition: none; }
+  .cultural-actions a:hover, .cultural-journey:hover { transform: none; }
+}

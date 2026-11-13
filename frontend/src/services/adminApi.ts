@@ -6,6 +6,10 @@ export type AdminUser = {
   id: number;
   email: string;
   display_name: string;
+  gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say' | null;
+  phone_number?: string | null;
+  google_email?: string | null;
+  password_enabled?: boolean;
   role: Role;
   is_google_linked?: boolean;
   avatar_url?: string | null;
@@ -116,7 +120,22 @@ export async function removeAvatar(csrfToken: string): Promise<AdminUser> {
   notifySessionChanged();
   return user;
 }
-export const unlinkGoogle = (csrfToken: string) => apiRequest<{ detail: string }>('/auth/google/unlink', { method: 'POST', csrfToken });
+export const unlinkGoogle = (csrfToken: string, currentPassword: string) => apiRequest<{ detail: string }>('/auth/google/unlink', { method: 'POST', csrfToken, body: { current_password: currentPassword } });
+export async function saveProfile(body: { display_name: string; gender: AdminUser['gender']; phone_number: string | null }, csrfToken: string) {
+  const user = await apiRequest<AdminUser>('/profile', { method: 'PUT', body, csrfToken });
+  notifySessionChanged();
+  return user;
+}
+export async function changePassword(body: { current_password?: string; new_password: string; code?: string }, csrfToken: string) {
+  const session = await apiRequest<AuthSession>('/profile/password', { method: 'POST', body, csrfToken });
+  notifySessionChanged(session);
+  return session;
+}
+export async function verifyGoogle(body: { code: string; google_code?: string }, csrfToken: string) {
+  const session = await apiRequest<AuthSession>('/auth/google/verify', { method: 'POST', body, csrfToken });
+  notifySessionChanged(session);
+  return session;
+}
 
 type ResourceState<T> = { data: T | null; loading: boolean; error: string | null; refresh: () => void };
 

@@ -45,7 +45,7 @@ export function CommunicationPage() {
   return (
     <div className="overflow-hidden bg-surface-card pb-14 dark:bg-slate-950 sm:pb-18">
       <FeaturePageBanner eyebrow="Công cụ giao tiếp" title="Giao tiếp dễ dàng hơn" description="Chọn chủ đề, học từ vựng qua video ký hiệu và sử dụng giọng nói tiếng Việt khi cần." icon="forum" />
-      <div className="mx-auto grid max-w-[1440px] gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[242px_minmax(0,1fr)] lg:px-12 lg:py-10 xl:px-16">
+      <div className="feature-workspace mx-auto grid max-w-[1440px] gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[242px_minmax(0,1fr)] lg:px-12 lg:py-10 xl:px-16">
         <aside className="lg:sticky lg:top-24 lg:h-fit">
           <div className="rounded-xl border border-slate-200 bg-surface-card p-3 shadow-[0_14px_28px_-24px_rgba(15,23,42,0.5)] dark:border-slate-800 dark:bg-slate-900">
             <div className="px-2 pb-3 pt-1"><p className="text-sm font-bold text-slate-950 dark:text-white">Chủ đề giao tiếp</p><p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">Chọn tình huống để tìm từ vựng nhanh hơn.</p></div>

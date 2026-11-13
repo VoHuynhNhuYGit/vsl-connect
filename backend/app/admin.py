@@ -235,6 +235,7 @@ def update_user(user_id: int, payload: UserUpdate, db: Db, _admin: AdminWriter):
     user.role = payload.role
     if payload.password:
         user.password_hash = hash_password(payload.password)
+        user.password_enabled = True
     commit_change_or_conflict(db, _admin, 'updated', 'user', user, user.display_name, 'Không thể cập nhật người dùng.')
     db.refresh(user)
     return user

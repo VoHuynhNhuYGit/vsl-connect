@@ -14,7 +14,7 @@ import { useEffect } from 'react';
 function AdminRedirect() {
   useEffect(() => {
     const url = new URL(window.location.href);
-    url.hostname = 'admin.localhost';
+    url.hostname = '127.0.0.1';
     url.pathname = '/';
     window.location.replace(url.href);
   }, []);
@@ -23,7 +23,8 @@ function AdminRedirect() {
 
 export default function App() {
   const hostname = window.location.hostname.toLowerCase();
-  if (hostname === 'admin.localhost') {
+  if (hostname === 'admin.localhost') return <AdminRedirect />;
+  if (hostname === '127.0.0.1') {
     return (
       <div className="admin-app min-h-screen">
         <Routes>

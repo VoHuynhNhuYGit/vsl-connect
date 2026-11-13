@@ -6,6 +6,7 @@ import { ThemeToggle } from '../common/ThemeToggle';
 import { ThemePicker } from '../common/ThemePicker';
 import { UserAvatar } from '../common/UserAvatar';
 import { Icon } from '../ui/Icon';
+import { ThemeIcon } from '../ui/ThemeIcon';
 
 const navItems = [
   { label: 'Trang chủ', to: '/', icon: 'home', end: true },
@@ -24,7 +25,7 @@ export function TopNav() {
   const displayName = user?.display_name || 'Học viên';
   const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname.toLowerCase());
   const adminUrl = new URL(window.location.href);
-  adminUrl.hostname = 'admin.localhost';
+  adminUrl.hostname = '127.0.0.1';
   adminUrl.pathname = '/';
   adminUrl.search = '';
   adminUrl.hash = '';
@@ -33,18 +34,18 @@ export function TopNav() {
 
   return (
     <header className="site-header sticky top-0 z-50 border-b border-slate-200/90 bg-surface-card/95 text-slate-950 shadow-[0_5px_20px_-18px_rgba(15,23,42,0.35)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90 dark:text-white">
-      <div className="mx-auto flex min-h-[76px] max-w-[1440px] items-center gap-3 px-4 sm:px-6 lg:px-8 xl:px-12">
-        <Link to="/" aria-label="VSL Connect — Trang chủ" className="group inline-flex shrink-0 items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2">
+      <div className="site-header-inner mx-auto flex min-h-[76px] max-w-[1440px] items-center gap-3 px-4 sm:px-6 lg:px-8 xl:px-12">
+        <Link to="/" aria-label="VSL Connect — Trang chủ" className="site-brand group inline-flex shrink-0 items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2">
           <img src={vslLogo} alt="" className="h-11 w-11 object-contain transition-transform duration-200 group-hover:scale-[1.04]" />
           <span className="hidden text-[21px] font-bold tracking-[-0.045em] text-slate-950 dark:text-white sm:block">VSL <span className="text-emerald-600 dark:text-emerald-400">Connect</span></span>
         </Link>
 
         <span aria-hidden="true" className="hidden h-8 w-px bg-slate-200 lg:block dark:bg-slate-800" />
 
-        <nav aria-label="Điều hướng chính" className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 overflow-x-auto xl:flex">
+        <nav aria-label="Điều hướng chính" className="site-desktop-nav hidden min-w-0 flex-1 items-center justify-center gap-0.5 overflow-x-auto xl:flex">
           {navItems.map((item) => (
             <NavLink key={item.to} to={item.to} end={item.end} className={linkClass}>
-              <Icon name={item.icon} className="text-[19px]" /><span>{item.label}</span>
+              <ThemeIcon name={item.icon} className="text-[19px]" /><span>{item.label}</span>
             </NavLink>
           ))}
           {isAdmin && (isLocal
@@ -52,7 +53,7 @@ export function TopNav() {
             : <NavLink to="/admin" className={linkClass}><Icon name="admin_panel_settings" className="text-[19px]" />Quản trị</NavLink>)}
         </nav>
 
-        <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
+        <div className="site-header-actions ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
           <ThemePicker />
           <ThemeToggle />
           {user ? (
@@ -73,7 +74,7 @@ export function TopNav() {
       <nav aria-label="Điều hướng chính trên thiết bị nhỏ" className={`${menuOpen ? 'grid' : 'hidden'} grid-cols-2 gap-1 border-t border-slate-200 px-4 py-3 dark:border-slate-800 sm:grid-cols-3 sm:px-6 xl:hidden`}>
         {navItems.map((item) => (
           <NavLink key={item.to} to={item.to} end={item.end} onClick={() => setMenuOpen(false)} className={linkClass}>
-            <Icon name={item.icon} className="text-[19px]" /><span>{item.label}</span>
+            <ThemeIcon name={item.icon} className="text-[19px]" /><span>{item.label}</span>
           </NavLink>
         ))}
         {isAdmin && (isLocal

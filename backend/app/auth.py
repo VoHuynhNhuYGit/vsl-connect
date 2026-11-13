@@ -94,7 +94,7 @@ def login(credentials: LoginInput, request: Request, response: Response, db: Db)
         raise HTTPException(status_code=429, detail='Thử lại sau vài phút.')
 
     user = db.scalar(select(User).where(User.email == credentials.email.strip().lower()))
-    if not user or not verify_password(credentials.password, user.password_hash):
+    if not user or not user.password_enabled or not verify_password(credentials.password, user.password_hash):
         attempts.append(now)
         _login_attempts[client_key] = attempts
         raise HTTPException(status_code=401, detail='Email hoặc mật khẩu không chính xác.')

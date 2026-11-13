@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint, false, func, text
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint, false, func, text, true as sa_true
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -13,6 +13,10 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255))
     google_sub: Mapped[str | None] = mapped_column(String(255), unique=True, index=True)
     display_name: Mapped[str] = mapped_column(String(120))
+    gender: Mapped[str | None] = mapped_column(String(20))
+    phone_number: Mapped[str | None] = mapped_column(String(20))
+    google_email: Mapped[str | None] = mapped_column(String(320))
+    password_enabled: Mapped[bool] = mapped_column(Boolean, default=True, server_default=sa_true())
     avatar_image: Mapped[bytes | None] = mapped_column(LargeBinary(length=65535), deferred=True)
     avatar_version: Mapped[str | None] = mapped_column(String(32))
     role: Mapped[str] = mapped_column(String(20), server_default='learner')
@@ -26,6 +30,23 @@ class User(Base):
     @property
     def avatar_url(self) -> str | None:
         return f'/api/v1/profile/avatar/{self.id}?v={self.avatar_version}' if self.avatar_version else None
+
+
+class AccountVerification(Base):
+    __tablename__ = 'account_verifications'
+    token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[int | None] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'), index=True)
+    purpose: Mapped[str] = mapped_column(String(24))
+    recipient_hash: Mapped[str] = mapped_column(String(64), index=True)
+    payload: Mapped[str] = mapped_column(Text)
+    code_hash: Mapped[str] = mapped_column(String(64))
+    second_code_hash: Mapped[str | None] = mapped_column(String(64))
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(DateTime, index=True)
+    sent_at: Mapped[datetime] = mapped_column(DateTime)
+    send_count: Mapped[int] = mapped_column(Integer, default=1)
+    consumed: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class AdminAuditLog(Base):

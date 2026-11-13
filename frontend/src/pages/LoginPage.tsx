@@ -1,10 +1,12 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { GoogleAction, GoogleError, GoogleSuccess } from '../components/auth/GoogleActions';
 import { AccountProfile } from '../features/account/AccountProfile';
+import { GoogleVerification } from '../features/account/GoogleVerification';
 import { ApiError, type AuthSession, getSession, login, logout, register } from '../services/adminApi';
 
 export function LoginPage() {
   const [session, setSession] = useState<AuthSession | null>(null);
+  const [googlePending, setGooglePending] = useState(() => new URLSearchParams(window.location.search).get('google_pending') === '1');
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -74,6 +76,7 @@ export function LoginPage() {
     );
   }
 
+  if (googlePending) return <div className="mx-auto max-w-xl px-5 py-10"><GoogleVerification onVerified={updated => { setSession(updated); setGooglePending(false); }} onCancel={() => setGooglePending(false)} /></div>;
   if (session) return <AccountProfile session={session} onSessionChange={setSession} onSignOut={signOut} error={error} />;
 
   return (
