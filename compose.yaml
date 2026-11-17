@@ -21,6 +21,12 @@ services:
     image: vsl-connect-backend:local
     build: ./backend
     environment: &backend_environment
+      TIDB_HOST: ${TIDB_HOST:-}
+      TIDB_PORT: ${TIDB_PORT:-4000}
+      TIDB_USER: ${TIDB_USER:-}
+      TIDB_PASSWORD: ${TIDB_PASSWORD:-}
+      TIDB_DB_NAME: ${TIDB_DB_NAME:-}
+      TIDB_CA_PATH: ${TIDB_CA_PATH:-}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-http://localhost:8080/api/v1/auth/google/callback}

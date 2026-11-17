@@ -33,24 +33,22 @@ export function HomePage() {
       <section className="cultural-intro" aria-labelledby="home-title">
         <p className="theme-eyebrow"><span className="cultural-edition">{current.number}</span>{note.label}</p>
         <h1 id="home-title">{note.title}</h1>
-        <p className="cultural-description">Học cách lắng nghe bằng ánh mắt, kể chuyện bằng đôi tay. Khám phá ngôn ngữ ký hiệu Việt Nam, theo nhịp riêng của bạn.</p>
+        <p className="cultural-description">Học cách lắng nghe bằng ánh mắt, kể chuyện bằng đôi tay — theo nhịp riêng của bạn.</p>
         <div className="cultural-actions">
           <Link to="/lo-trinh-hoc-tap" className="cultural-primary">Bắt đầu hành trình<Icon name="arrow_forward" /></Link>
           <Link to="/tu-dien-ky-hieu" className="cultural-secondary"><ThemeIcon name="auto_stories" />Khám phá từ điển</Link>
         </div>
-        <p className="cultural-footnote"><ThemeIcon name="sign_language" />Ngôn ngữ ký hiệu Việt Nam · VSL Connect</p>
       </section>
       <figure className="cultural-art">
-        <div className="cultural-art-label"><span>{current.tag}</span><span aria-hidden="true">{current.number} / 04</span></div>
         <ThemeArtwork theme={siteTheme} className="cultural-artwork" />
         <figcaption><strong>{current.name}</strong><span>{current.motif}</span></figcaption>
       </figure>
       <section className="cultural-explore" aria-labelledby="explore-title">
-        <div className="cultural-section-heading"><div><p className="theme-eyebrow">CHỌN NHỊP HỌC CỦA BẠN</p><h2 id="explore-title">{note.action}</h2></div><p>{note.detail}</p></div>
+        <div className="cultural-section-heading"><h2 id="explore-title">{note.action}</h2><span>Chọn để bắt đầu<Icon name="arrow_forward" /></span></div>
         <div className="cultural-journeys">{journeys.map((item, index) => <Link key={item.to} to={item.to} className="cultural-journey">
           <span className="cultural-journey-number" aria-hidden="true">0{index + 1}</span>
           <span className="cultural-icon"><ThemeIcon name={item.icon} /></span>
-          <span className="cultural-journey-copy"><h3>{item.title}</h3><span>{item.description}</span></span>
+          <span className="cultural-journey-copy"><h3>{item.title}</h3><span className="sr-only">{item.description}</span></span>
           <Icon name="arrow_outward" className="cultural-journey-arrow" />
         </Link>)}</div>
       </section>
