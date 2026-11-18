@@ -1,5 +1,8 @@
+import re
+from pathlib import Path
 from typing import Annotated
 
+import numpy as np
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy import select, text
@@ -98,3 +101,110 @@ def get_sign(sign_id: int, db: Db):
     if not sign:
         raise HTTPException(status_code=404, detail='Không tìm thấy ký hiệu.')
     return sign
+
+
+def parse_time_seconds(time_str: str) -> float:
+    parts = time_str.strip().split(':')
+    if len(parts) == 3:
+        return float(parts[0]) * 3600 + float(parts[1]) * 60 + float(parts[2])
+    elif len(parts) == 2:
+        return float(parts[0]) * 60 + float(parts[1])
+    return float(parts[0])
+
+
+def resolve_keypoints_file(filename: str) -> Path | None:
+    candidates = [
+        Path('/app/seed_data/data/keypoints') / filename,
+        Path(__file__).resolve().parent.parent / 'seed_data' / 'data' / 'keypoints' / filename,
+        Path('backend/seed_data/data/keypoints') / filename,
+        Path('seed_data/data/keypoints') / filename,
+    ]
+    for c in candidates:
+        if c.is_file():
+            return c
+    return None
+
+
+@app.get('/api/v1/lessons/{lesson_id}/keypoints')
+@app.get('/api/lessons/{lesson_id}/keypoints')
+def get_lesson_keypoints(lesson_id: int, db: Db, full: bool = False):
+    lesson = db.scalar(select(Lesson).where(Lesson.id == lesson_id))
+    if not lesson:
+        raise HTTPException(status_code=404, detail='Không tìm thấy bài học.')
+
+    fn_match = re.search(r'(SENT\w+\.npy)', lesson.video_url or '') or re.search(r'(SENT\w+)', lesson.description or '')
+    if not fn_match:
+        raise HTTPException(status_code=404, detail='Bài học không có file tọa độ keypoints.')
+
+    filename = fn_match.group(1)
+    if not filename.endswith('.npy'):
+        filename += '.npy'
+
+    file_path = resolve_keypoints_file(filename)
+    if not file_path:
+        raise HTTPException(status_code=404, detail=f'Không tìm thấy file tọa độ {filename}.')
+
+    try:
+        data = np.load(file_path, mmap_mode='r')
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail='Không thể đọc file keypoints.') from exc
+
+    total_frames = int(data.shape[0])
+    fps = 30.0
+
+    time_match = re.search(r'Thời gian(?: minh họa)?:\s*([0-9:.]+)\s*(?:->|-)\s*([0-9:.]+)', lesson.description or '')
+
+    if time_match and not full:
+        start_ts = time_match.group(1)
+        end_ts = time_match.group(2)
+        try:
+            start_sec = parse_time_seconds(start_ts)
+            end_sec = parse_time_seconds(end_ts)
+            start_frame = max(0, min(int(round(start_sec * fps)), total_frames - 1))
+            end_frame = max(start_frame + 1, min(int(round(end_sec * fps)), total_frames))
+        except (ValueError, IndexError):
+            start_frame = 0
+            end_frame = total_frames
+            start_ts = "00:00:00.000"
+            end_ts = f"00:00:{total_frames / fps:06.3f}"
+    else:
+        start_frame = 0
+        end_frame = total_frames
+        start_ts = "00:00:00.000"
+        end_ts = f"00:00:{total_frames / fps:06.3f}"
+
+    sliced = data[start_frame:end_frame]
+    num_frames = int(sliced.shape[0])
+
+    frames_json = []
+    for frame in sliced:
+        body = [[round(float(frame[i * 3]), 4), round(float(frame[i * 3 + 1]), 4), round(float(frame[i * 3 + 2]), 4)] for i in range(25)]
+        face = [[round(float(frame[75 + i * 3]), 4), round(float(frame[75 + i * 3 + 1]), 4), round(float(frame[75 + i * 3 + 2]), 4)] for i in range(70)]
+        left_hand = [[round(float(frame[285 + i * 3]), 4), round(float(frame[285 + i * 3 + 1]), 4), round(float(frame[285 + i * 3 + 2]), 4)] for i in range(21)]
+        right_hand = [[round(float(frame[348 + i * 3]), 4), round(float(frame[348 + i * 3 + 1]), 4), round(float(frame[348 + i * 3 + 2]), 4)] for i in range(21)]
+
+        frames_json.append({
+            "body": body,
+            "face": face,
+            "left_hand": left_hand,
+            "right_hand": right_hand,
+        })
+
+    return {
+        "lesson_id": lesson.id,
+        "title": lesson.title,
+        "fps": int(fps),
+        "start_time": start_ts,
+        "end_time": end_ts,
+        "start_frame": start_frame,
+        "end_frame": end_frame,
+        "total_video_frames": total_frames,
+        "num_frames": num_frames,
+        "keypoint_format": {
+            "body_count": 25,
+            "face_count": 70,
+            "left_hand_count": 21,
+            "right_hand_count": 21
+        },
+        "frames": frames_json,
+    }
