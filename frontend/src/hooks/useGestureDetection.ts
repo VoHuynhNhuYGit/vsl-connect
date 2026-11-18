@@ -1,13 +1,20 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { DrawingUtils, FilesetResolver, HandLandmarker, type HandLandmarkerResult } from '@mediapipe/tasks-vision';
 import { gestureDetectionConfig, type GestureInputSource } from '../config/gestureDetection';
+import {
+  resampleKeypointsSequence,
+  calculateLandmarkDisplacement,
+  EMPTY_FEATURES,
+} from '../utils/gestureInterpolation';
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '');
 const PREDICT_URL = `${API_BASE_URL}/api/v1/gesture/predict`;
-const EMPTY_FEATURES = 126;
+const PREDICT_VIDEO_URL = `${API_BASE_URL}/api/v1/gesture/predict/video`;
 
-export type GesturePrediction = { label_id: string; label_name: string; confidence: number };
-export type DetectionPhase = 'idle' | 'no-hand' | 'outside-guide' | 'unstable' | 'collecting' | 'ready' | 'error';
+export { resampleKeypointsSequence };
+export type TopPrediction = { label_id: string; label_name: string; confidence: number };
+export type GesturePrediction = { label_id: string; label_name: string; confidence: number; top3?: TopPrediction[] };
+export type DetectionPhase = 'idle' | 'no-hand' | 'outside-guide' | 'unstable' | 'collecting' | 'predicting' | 'ready' | 'error';
 export type HandDebugInfo = {
   label: 'Left' | 'Right' | 'Unknown';
   landmarkCount: number;
@@ -72,9 +79,10 @@ function hasFiniteLandmarks(landmarks: readonly Landmark[]) {
 }
 
 /**
- * Feature order is deliberately fixed to the legacy/training pipeline:
- * 21 * (x, y, z) for Left followed by 21 * (x, y, z) for Right. Missing hands
- * remain zero-filled, exactly as in the pre-existing OpenCV extractor.
+ * Thứ tự đặc trưng khớp 100% với pipeline huấn luyện mô hình:
+ * - 21 điểm x 3 tọa độ (x, y, z) cho bàn tay Trái (indices 0..62)
+ * - 21 điểm x 3 tọa độ (x, y, z) cho bàn tay Phải (indices 63..125)
+ * Tuyệt đối không lật tọa độ X của keypoints để giữ nguyên vẹn không gian huấn luyện.
  */
 export function extract126Landmarks(results: HandLandmarkerResult): number[] {
   const values = Array<number>(EMPTY_FEATURES).fill(0);
@@ -139,43 +147,49 @@ function assessFrameQuality(
 ): FrameQuality {
   const width = source.width;
   const height = source.height;
-  if (!width || !height) {
-    return { width, height, brightness: null, contrast: null, sharpness: null, handSpan, handCropped, warning: 'Chưa nhận được khung hình hợp lệ.' };
-  }
-
-  const sampleWidth = 160;
-  const sampleHeight = Math.max(1, Math.round((height / width) * sampleWidth));
-  if (sample.width !== sampleWidth || sample.height !== sampleHeight) {
-    sample.width = sampleWidth;
-    sample.height = sampleHeight;
-  }
+  sample.width = 64;
+  sample.height = 48;
   const context = sample.getContext('2d', { willReadFrequently: true });
   if (!context) {
     return { width, height, brightness: null, contrast: null, sharpness: null, handSpan, handCropped, warning: null };
   }
-  context.drawImage(source, 0, 0, sampleWidth, sampleHeight);
-  const pixels = context.getImageData(0, 0, sampleWidth, sampleHeight).data;
-  let total = 0;
-  let totalSquare = 0;
-  let gradient = 0;
-  let count = 0;
-  for (let y = 0; y < sampleHeight; y += 1) {
-    for (let x = 0; x < sampleWidth; x += 1) {
-      const index = (y * sampleWidth + x) * 4;
-      const luma = pixels[index] * 0.2126 + pixels[index + 1] * 0.7152 + pixels[index + 2] * 0.0722;
-      total += luma;
-      totalSquare += luma * luma;
-      count += 1;
-      if (x > 0) {
-        const previous = index - 4;
-        const previousLuma = pixels[previous] * 0.2126 + pixels[previous + 1] * 0.7152 + pixels[previous + 2] * 0.0722;
-        gradient += Math.abs(luma - previousLuma);
-      }
+  context.drawImage(source, 0, 0, sample.width, sample.height);
+  const image = context.getImageData(0, 0, sample.width, sample.height);
+  const data = image.data;
+  let totalLuminance = 0;
+  const luminances: number[] = [];
+
+  for (let index = 0; index < data.length; index += 4) {
+    const luminance = 0.299 * data[index] + 0.587 * data[index + 1] + 0.114 * data[index + 2];
+    luminances.push(luminance);
+    totalLuminance += luminance;
+  }
+
+  const pixelCount = luminances.length;
+  const brightness = pixelCount ? totalLuminance / pixelCount : 0;
+  const variance = pixelCount
+    ? luminances.reduce((total, value) => total + (value - brightness) ** 2, 0) / pixelCount
+    : 0;
+  const contrast = Math.sqrt(variance);
+
+  let laplacianSum = 0;
+  const sampleWidth = sample.width;
+  for (let y = 1; y < sample.height - 1; y++) {
+    for (let x = 1; x < sampleWidth - 1; x++) {
+      const center = luminances[y * sampleWidth + x];
+      const delta = (
+        luminances[(y - 1) * sampleWidth + x]
+        + luminances[(y + 1) * sampleWidth + x]
+        + luminances[y * sampleWidth + (x - 1)]
+        + luminances[y * sampleWidth + (x + 1)]
+        - 4 * center
+      );
+      laplacianSum += Math.abs(delta);
     }
   }
-  const brightness = total / count;
-  const contrast = Math.sqrt(Math.max(0, totalSquare / count - brightness * brightness));
-  const sharpness = gradient / Math.max(1, count - sampleHeight);
+  const innerPixels = (sample.width - 2) * (sample.height - 2);
+  const sharpness = innerPixels ? laplacianSum / innerPixels : 0;
+
   const quality = gestureDetectionConfig.quality;
   let warning: string | null = null;
   if (width < quality.minFrameWidth || height < quality.minFrameHeight) warning = 'Độ phân giải thấp. Hãy dùng camera hoặc video từ 480×360 trở lên.';
@@ -198,18 +212,23 @@ export function useGestureDetection(
   const animationFrameRef = useRef<number | null>(null);
   const processingCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const qualityCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const bufferRef = useRef<number[][]>([]);
-  const requestPendingRef = useRef(false);
+
+  // Bộ gom cử chỉ thông minh (Gesture Sequence Buffer & Debounce)
+  const gestureBufferRef = useRef<number[][]>([]);
+  const isCollectingRef = useRef(false);
+  const consecutiveMissingHandsRef = useRef(0);
+  const stillCountRef = useRef(0);
+  const prevFeaturesRef = useRef<number[] | null>(null);
+  const cooldownUntilRef = useRef(0);
+  const waitingForHandResetRef = useRef(false);
+  const isPredictingRef = useRef(false);
+
+  const currentSourceRef = useRef<GestureInputSource>('camera');
   const requestControllerRef = useRef<AbortController | null>(null);
   const detectingRef = useRef(false);
   const mountedRef = useRef(true);
   const lastVideoTimeRef = useRef(-1);
   const lastTimestampRef = useRef(-1);
-  const missingHandsRef = useRef(0);
-  const stableHandsRef = useRef(0);
-  const detectedFrameCountRef = useRef(0);
-  const sequenceGenerationRef = useRef(0);
-  const predictionHistoryRef = useRef<GesturePrediction[]>([]);
   const qualityFrameRef = useRef(0);
   const qualityRef = useRef<FrameQuality | null>(null);
   const lastFpsAtRef = useRef(0);
@@ -219,6 +238,8 @@ export function useGestureDetection(
   const lastDebugPublishAtRef = useRef(0);
 
   const [prediction, setPrediction] = useState<GesturePrediction | null>(null);
+  const [isPredicting, setIsPredicting] = useState(false);
+  const [recognitionHistory, setRecognitionHistory] = useState<GesturePrediction[]>([]);
   const [isModelReady, setIsModelReady] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
   const [detectedHands, setDetectedHands] = useState(0);
@@ -228,6 +249,10 @@ export function useGestureDetection(
   const [frameQuality, setFrameQuality] = useState<FrameQuality | null>(null);
   const [debugEnabled, setDebugEnabled] = useState<boolean>(gestureDetectionConfig.debug.enabledByDefault);
   const [debugInfo, setDebugInfo] = useState<GestureDebugInfo>(defaultDebugInfo);
+
+  const clearHistory = useCallback(() => {
+    setRecognitionHistory([]);
+  }, []);
 
   const updateDetectedHands = useCallback((nextCount: number) => {
     setDetectedHands((current) => current === nextCount ? current : nextCount);
@@ -279,6 +304,8 @@ export function useGestureDetection(
     if (!context) return;
     context.clearRect(0, 0, canvas.width, canvas.height);
     const drawing = new DrawingUtils(context);
+    const isMirrored = currentSourceRef.current !== 'upload';
+
     results.landmarks.forEach((landmarks, index) => {
       if (!hasFiniteLandmarks(landmarks)) return;
       drawing.drawConnectors(landmarks, HandLandmarker.HAND_CONNECTIONS, { color: '#34d399', lineWidth: 4 });
@@ -290,8 +317,15 @@ export function useGestureDetection(
       context.fillStyle = '#f8fafc';
       context.strokeStyle = '#064e3b';
       context.lineWidth = 4;
-      context.strokeText(label, wrist.x * canvas.width + 8, wrist.y * canvas.height - 8);
-      context.fillText(label, wrist.x * canvas.width + 8, wrist.y * canvas.height - 8);
+      if (isMirrored) {
+        context.translate(wrist.x * canvas.width - 8, wrist.y * canvas.height - 8);
+        context.scale(-1, 1);
+        context.strokeText(label, 0, 0);
+        context.fillText(label, 0, 0);
+      } else {
+        context.strokeText(label, wrist.x * canvas.width + 8, wrist.y * canvas.height - 8);
+        context.fillText(label, wrist.x * canvas.width + 8, wrist.y * canvas.height - 8);
+      }
       context.restore();
     });
   }, [canvasRef]);
@@ -303,8 +337,8 @@ export function useGestureDetection(
     lastDebugPublishAtRef.current = now;
     const video = videoRef.current;
     const landmarkCount = hands.reduce((total, hand) => total + hand.landmarkCount, 0);
-    const currentPrediction = predictionHistoryRef.current[predictionHistoryRef.current.length - 1] ?? null;
-    setDebugInfo({
+    setDebugInfo((prev) => ({
+      ...prev,
       frameWidth: video?.videoWidth ?? 0,
       frameHeight: video?.videoHeight ?? 0,
       fps: fpsRef.current,
@@ -315,21 +349,113 @@ export function useGestureDetection(
       handednessScores: hands.length
         ? hands.map((hand) => `${hand.label}: ${hand.handednessScore === null ? 'N/A' : hand.handednessScore.toFixed(2)}`).join(', ')
         : 'N/A',
-      framesCollected: bufferRef.current.length,
-      inputShape: `(1, ${gestureDetectionConfig.sequence.length}, 126)`,
+      framesCollected: gestureBufferRef.current.length,
       inferenceMs: lastInferenceMsRef.current,
-      prediction: currentPrediction?.label_name ?? null,
-      predictionConfidence: currentPrediction?.confidence ?? null,
-    });
+      prediction: prev.prediction,
+      predictionConfidence: prev.predictionConfidence,
+    }));
   }, [videoRef]);
 
-  const resetSequence = useCallback(() => {
-    sequenceGenerationRef.current += 1;
-    bufferRef.current = [];
-    missingHandsRef.current = 0;
-    stableHandsRef.current = 0;
-    detectedFrameCountRef.current = 0;
-    predictionHistoryRef.current = [];
+  /**
+   * Gửi chuỗi 60 frames đã nội suy đều xuống Backend dự đoán qua POST /api/v1/gesture/predict.
+   * Áp dụng cờ khóa Request Locking (isPredicting) để chống nghẽn và chồng chéo.
+   */
+  const submitSequenceToBackend = useCallback(async (
+    sequence: number[][],
+    currentHands: HandDebugInfo[],
+  ) => {
+    if (isPredictingRef.current) return;
+    isPredictingRef.current = true;
+    setIsPredicting(true);
+    setPhase('predicting');
+
+    requestControllerRef.current?.abort();
+    const controller = new AbortController();
+    requestControllerRef.current = controller;
+    const requestStartedAt = performance.now();
+
+    try {
+      const response = await fetch(PREDICT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sequence }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Inference request failed: ${response.status}`);
+      }
+
+      const result = (await response.json()) as GesturePrediction;
+      const serverTime = Number(response.headers.get('X-Gesture-Inference-Ms'));
+      const inferenceMs = Number.isFinite(serverTime) ? serverTime : performance.now() - requestStartedAt;
+
+      if (!mountedRef.current) return;
+
+      setPrediction(result);
+      if (result.label_id !== '-1') {
+        setRecognitionHistory((prev) => [result, ...prev].slice(0, 10));
+      }
+
+      setDebugInfo((prev) => ({
+        ...prev,
+        prediction: result.label_name,
+        predictionConfidence: result.confidence,
+      }));
+      publishDebug(currentHands, Math.round(inferenceMs));
+
+      // Console log Top-3 xác suất cao nhất
+      if (gestureDetectionConfig.debug.consoleLogging) {
+        const top3Str = result.top3
+          ? result.top3.map((t) => `${t.label_name} (${(t.confidence * 100).toFixed(1)}%)`).join(' | ')
+          : 'N/A';
+        console.info(
+          `[VSL Gesture Recognized] ${result.label_name} (${(result.confidence * 100).toFixed(1)}%) | Top-3: ${top3Str} | Time: ${Math.round(inferenceMs)}ms`
+        );
+      }
+
+      // Trạng thái nghỉ giữa 2 từ (Cooldown ~0.5s) và đợi hạ tay / đổi tư thế
+      cooldownUntilRef.current = performance.now() + gestureDetectionConfig.sequence.interGestureCooldownMs;
+      waitingForHandResetRef.current = true;
+      setPhase('ready');
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      console.error('Gesture inference failed:', error);
+      if (mountedRef.current) {
+        setPhase('error');
+        setDetectionError('Không thể nhận diện ký hiệu từ camera. Hãy kiểm tra kết nối tới backend rồi thử lại.');
+      }
+    } finally {
+      if (requestControllerRef.current === controller) requestControllerRef.current = null;
+      isPredictingRef.current = false;
+      if (mountedRef.current) {
+        setIsPredicting(false);
+      }
+    }
+  }, [publishDebug]);
+
+  /**
+   * Nhận diện file video tải lên qua POST /api/v1/gesture/predict/video (Độc lập 100% với camera).
+   */
+  const predictVideoFile = useCallback(async (file: File): Promise<GesturePrediction | null> => {
+    const formData = new FormData();
+    formData.append('video_file', file);
+    try {
+      const response = await fetch(PREDICT_VIDEO_URL, {
+        method: 'POST',
+        body: formData,
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const result = (await response.json()) as GesturePrediction;
+      setPrediction(result);
+      setPhase('ready');
+      return result;
+    } catch (err) {
+      console.error('Error predicting uploaded video:', err);
+      setPhase('error');
+      setDetectionError('Không thể nhận diện ký hiệu từ video đã chọn.');
+      return null;
+    }
   }, []);
 
   const stopDetection = useCallback((clearPrediction = true, abortRequest = true) => {
@@ -339,21 +465,25 @@ export function useGestureDetection(
     if (abortRequest) {
       requestControllerRef.current?.abort();
       requestControllerRef.current = null;
-      requestPendingRef.current = false;
+      isPredictingRef.current = false;
     }
-    resetSequence();
+    gestureBufferRef.current = [];
+    isCollectingRef.current = false;
+    consecutiveMissingHandsRef.current = 0;
     updateDetectedHands(0);
     setHandInfo([]);
     setPhase('idle');
     if (mountedRef.current) {
       setIsDetecting(false);
+      setIsPredicting(false);
       if (clearPrediction) setPrediction(null);
     }
-  }, [resetSequence, updateDetectedHands]);
+  }, [updateDetectedHands]);
 
   const startDetection = useCallback(async (source: GestureInputSource) => {
     if (detectingRef.current || animationFrameRef.current !== null) return;
     detectingRef.current = true;
+    currentSourceRef.current = source;
     const detectorMode: DetectorMode = source === 'upload' ? 'IMAGE' : 'VIDEO';
     try {
       const initialLandmarker = await getLandmarker(detectorMode);
@@ -365,7 +495,12 @@ export function useGestureDetection(
         return;
       }
 
-      resetSequence();
+      gestureBufferRef.current = [];
+      isCollectingRef.current = false;
+      consecutiveMissingHandsRef.current = 0;
+      stillCountRef.current = 0;
+      prevFeaturesRef.current = null;
+      isPredictingRef.current = false;
       lastVideoTimeRef.current = -1;
       lastTimestampRef.current = -1;
       qualityFrameRef.current = 0;
@@ -373,7 +508,9 @@ export function useGestureDetection(
       fpsFramesRef.current = 0;
       fpsRef.current = 0;
       lastInferenceMsRef.current = null;
-      setPrediction(null);
+      if (source !== 'upload') {
+        setPrediction(null);
+      }
       setDetectionError(null);
       qualityRef.current = null;
       setFrameQuality(null);
@@ -384,10 +521,6 @@ export function useGestureDetection(
         if (!mountedRef.current || !detectingRef.current) return;
         const video = videoRef.current;
         if (video && !video.paused && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA && video.videoWidth && video.videoHeight) {
-          // A CSS transform does not change the pixels passed to MediaPipe. The
-          // legacy training/test pipeline mirrored every frame before detection,
-          // so mirror in an off-screen canvas and draw the visible overlay in
-          // that same coordinate system. No crop or coordinate normalization is added.
           if (video.currentTime !== lastVideoTimeRef.current) {
             lastVideoTimeRef.current = video.currentTime;
             const processingCanvas = processingCanvasRef.current ?? document.createElement('canvas');
@@ -398,9 +531,8 @@ export function useGestureDetection(
             }
             const processingContext = processingCanvas.getContext('2d', { willReadFrequently: true });
             if (processingContext) {
-              processingContext.setTransform(-1, 0, 0, 1, processingCanvas.width, 0);
+              // Vẽ video tự nhiên vào processingCanvas, không lật ngược
               processingContext.drawImage(video, 0, 0, processingCanvas.width, processingCanvas.height);
-              processingContext.setTransform(1, 0, 0, 1, 0, 0);
 
               const timestamp = Math.max(Math.round(video.currentTime * 1000), lastTimestampRef.current + 1);
               lastTimestampRef.current = timestamp;
@@ -414,6 +546,8 @@ export function useGestureDetection(
                 current.length === hands.length
                 && current.every((hand, index) => hand.label === hands[index].label && hand.landmarkCount === hands[index].landmarkCount)
               ) ? current : hands);
+
+              // Vẽ visual feedback landmarks
               drawHandLandmarks(results, hands);
 
               fpsFramesRef.current += 1;
@@ -433,85 +567,104 @@ export function useGestureDetection(
                 setFrameQuality(nextQuality);
               }
 
-              if (hands.length > 0) {
-                missingHandsRef.current = 0;
-                stableHandsRef.current += 1;
-                detectedFrameCountRef.current += 1;
-                const features = extract126Landmarks(results);
-                if (features.length !== EMPTY_FEATURES || !features.every(Number.isFinite)) {
-                  setPhase('error');
-                  setDetectionError('Landmarks không hợp lệ nên không thể gửi tới mô hình.');
-                } else {
-                  bufferRef.current.push(features);
-                  if (bufferRef.current.length > gestureDetectionConfig.sequence.length) bufferRef.current.shift();
-                  if (handInspection.outsideGuide) setPhase('outside-guide');
-                  else if (stableHandsRef.current < gestureDetectionConfig.sequence.minConsecutiveStableFrames) setPhase('unstable');
-                  else if (bufferRef.current.length < gestureDetectionConfig.sequence.length) setPhase('collecting');
-                  else setPhase('ready');
+              // ================================================================
+              // BỘ GOM CỬ CHỈ THÔNG MINH CHO CAMERA REALTIME (DEBOUNCE + LOCK)
+              // ================================================================
+              if (source === 'camera') {
+                // 1. Cờ khóa Request Locking: nếu đang chờ kết quả từ Backend thì không gửi chồng chéo
+                if (isPredictingRef.current) {
+                  publishDebug(hands);
+                  animationFrameRef.current = requestAnimationFrame(processFrame);
+                  return;
+                }
 
-                  if (
-                    bufferRef.current.length === gestureDetectionConfig.sequence.length
-                    && stableHandsRef.current >= gestureDetectionConfig.sequence.minConsecutiveStableFrames
-                    && detectedFrameCountRef.current % gestureDetectionConfig.sequence.inferenceEveryDetectedFrames === 0
-                    && !requestPendingRef.current
-                  ) {
-                    requestPendingRef.current = true;
-                    const controller = new AbortController();
-                    requestControllerRef.current = controller;
-                    const sequence = bufferRef.current.map((frame) => [...frame]);
-                    const sequenceGeneration = sequenceGenerationRef.current;
-                    const requestStartedAt = performance.now();
-                    void fetch(PREDICT_URL, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ sequence }),
-                      signal: controller.signal,
-                    })
-                      .then(async (response) => {
-                        if (!response.ok) throw new Error(`Gesture prediction failed: ${response.status}`);
-                        const result = await response.json() as GesturePrediction;
-                        const serverTime = Number(response.headers.get('X-Gesture-Inference-Ms'));
-                        return { result, inferenceMs: Number.isFinite(serverTime) ? serverTime : performance.now() - requestStartedAt };
-                      })
-                      .then(({ result, inferenceMs }) => {
-                        if (!mountedRef.current || sequenceGeneration !== sequenceGenerationRef.current) return;
-                        const history = [...predictionHistoryRef.current, result].slice(-gestureDetectionConfig.sequence.stablePredictionCount);
-                        predictionHistoryRef.current = history;
-                        const stable = history.length === gestureDetectionConfig.sequence.stablePredictionCount
-                          && history.every((item) => item.label_id === result.label_id);
-                        if (stable && result.confidence >= gestureDetectionConfig.sequence.minimumPredictionConfidence) {
-                          setPrediction(result);
-                        }
-                        publishDebug(hands, Math.round(inferenceMs));
-                        if (debugEnabled && gestureDetectionConfig.debug.consoleLogging) {
-                          console.debug('[VSL gesture]', { phase: 'inference', inputShape: '(1, 60, 126)', inferenceMs: Math.round(inferenceMs), label: result.label_name, confidence: result.confidence });
-                        }
-                      })
-                      .catch((error: unknown) => {
-                        if (error instanceof DOMException && error.name === 'AbortError') return;
-                        console.error('Gesture prediction request failed:', error);
-                        if (mountedRef.current) {
-                          setPhase('error');
-                          setDetectionError('Không thể kết nối dịch vụ nhận diện từ vựng. Hãy kiểm tra backend rồi thử lại.');
-                        }
-                      })
-                      .finally(() => {
-                        if (requestControllerRef.current === controller) requestControllerRef.current = null;
-                        requestPendingRef.current = false;
-                      });
+                // 2. Cooldown nghỉ giữa 2 từ (~0.5s) hoặc chờ người dùng hạ tay / chuẩn bị động tác mới
+                if (now < cooldownUntilRef.current) {
+                  publishDebug(hands);
+                  animationFrameRef.current = requestAnimationFrame(processFrame);
+                  return;
+                }
+
+                // Nếu đang chờ người dùng hạ tay sau từ trước:
+                if (waitingForHandResetRef.current) {
+                  if (hands.length === 0 || now > cooldownUntilRef.current + 800) {
+                    waitingForHandResetRef.current = false;
+                  } else {
+                    // Người dùng chưa hạ tay, tiếp tục chờ
+                    publishDebug(hands);
+                    animationFrameRef.current = requestAnimationFrame(processFrame);
+                    return;
                   }
                 }
-              } else {
-                stableHandsRef.current = 0;
-                missingHandsRef.current += 1;
-                if (missingHandsRef.current > gestureDetectionConfig.sequence.maxConsecutiveMissingFrames) {
-                  resetSequence();
-                  setPrediction(null);
-                  setPhase('no-hand');
+
+                const features = extract126Landmarks(results);
+
+                if (hands.length > 0) {
+                  consecutiveMissingHandsRef.current = 0;
+
+                  if (!isCollectingRef.current) {
+                    // Bắt đầu thu cử chỉ mới khi phát hiện tay
+                    isCollectingRef.current = true;
+                    gestureBufferRef.current = [features];
+                    stillCountRef.current = 0;
+                    prevFeaturesRef.current = features;
+                    setPhase('collecting');
+                  } else {
+                    // Đang ghi nhận chuỗi chuyển động
+                    gestureBufferRef.current.push(features);
+                    setPhase('collecting');
+
+                    // Chốt trần đúng 60 frames:
+                    // Nếu người dùng giữ tay lâu, KHÔNG được gom vượt quá 60 frames — tự động chốt và gửi dự đoán ngay khi đủ 60 frames
+                    if (gestureBufferRef.current.length >= 60) {
+                      const raw = gestureBufferRef.current.slice(0, 60);
+                      gestureBufferRef.current = [];
+                      isCollectingRef.current = false;
+                      stillCountRef.current = 0;
+                      void submitSequenceToBackend(raw, hands);
+                    }
+                  }
                 } else {
-                  setPhase('unstable');
+                  // Mất bàn tay trong frame hiện tại
+                  consecutiveMissingHandsRef.current += 1;
+                  stillCountRef.current = 0;
+                  prevFeaturesRef.current = null;
+
+                  if (isCollectingRef.current) {
+                    // Debounce: Nếu chỉ mất tay 1-4 frames do vung tay nhanh bị mờ:
+                    if (consecutiveMissingHandsRef.current <= gestureDetectionConfig.sequence.maxTemporaryDropFrames) {
+                      // KHÔNG XÓA BUFFER, lặp lại frame cuối để giữ quỹ đạo liền mạch (tối đa 60 frames)
+                      if (gestureBufferRef.current.length > 0 && gestureBufferRef.current.length < 60) {
+                        gestureBufferRef.current.push([...gestureBufferRef.current[gestureBufferRef.current.length - 1]]);
+                      }
+                      setPhase('collecting');
+                    } else if (consecutiveMissingHandsRef.current >= gestureDetectionConfig.sequence.dropHandFrames) {
+                      // Không phát hiện tay liên tiếp từ 8 frames trở lên: người dùng đã hạ tay nghỉ -> Chốt cử chỉ!
+                      const raw = [...gestureBufferRef.current];
+                      gestureBufferRef.current = [];
+                      isCollectingRef.current = false;
+
+                      // Lọc bỏ các frames lặp tạm thời khi hạ tay để chuỗi ký hiệu sạch
+                      const validCount = Math.max(0, raw.length - gestureDetectionConfig.sequence.maxTemporaryDropFrames);
+                      const cleanRaw = validCount >= gestureDetectionConfig.sequence.minGestureFrames
+                        ? raw.slice(0, validCount)
+                        : raw;
+
+                      // Nếu người dùng hạ tay sớm (từ 12 đến dưới 60 frames):
+                      // Nội suy đều (np.linspace / resampleKeypointsSequence) lên đúng 60 frames rồi gửi dự đoán
+                      if (cleanRaw.length >= gestureDetectionConfig.sequence.minGestureFrames) {
+                        const resampled = resampleKeypointsSequence(cleanRaw, 60);
+                        void submitSequenceToBackend(resampled, hands);
+                      } else {
+                        setPhase('no-hand');
+                      }
+                    }
+                  } else {
+                    setPhase('no-hand');
+                  }
                 }
               }
+
               publishDebug(hands);
             }
           }
@@ -524,7 +677,7 @@ export function useGestureDetection(
       setIsDetecting(false);
       throw error;
     }
-  }, [debugEnabled, drawHandLandmarks, getLandmarker, publishDebug, resetSequence, updateDetectedHands, videoRef]);
+  }, [drawHandLandmarks, getLandmarker, publishDebug, submitSequenceToBackend, updateDetectedHands, videoRef]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -538,7 +691,7 @@ export function useGestureDetection(
       landmarkerRef.current?.close();
       landmarkerRef.current = null;
       landmarkerModeRef.current = null;
-      bufferRef.current = [];
+      gestureBufferRef.current = [];
     };
   }, []);
 
@@ -546,9 +699,12 @@ export function useGestureDetection(
     prediction,
     isModelReady,
     isDetecting,
+    isPredicting,
     detectedHands,
     detectionError,
     phase,
+    recognitionHistory,
+    clearHistory,
     handInfo,
     frameQuality,
     debugEnabled,
@@ -556,5 +712,6 @@ export function useGestureDetection(
     debugInfo,
     startDetection,
     stopDetection,
+    predictVideoFile,
   };
 }

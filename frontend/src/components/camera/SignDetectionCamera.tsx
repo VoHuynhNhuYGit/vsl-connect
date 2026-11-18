@@ -59,6 +59,7 @@ export function SignDetectionCamera({ mode = 'video', autoStartCamera = false, d
     debugInfo,
     startDetection,
     stopDetection,
+    predictVideoFile,
   } = useGestureDetection(videoRef, canvasRef);
   const [cameraActive, setCameraActive] = useState(false);
   const [starting, setStarting] = useState(false);
@@ -88,13 +89,13 @@ export function SignDetectionCamera({ mode = 'video', autoStartCamera = false, d
       ? 'Đưa tay vào khung'
       : 'Đang chuẩn bị nhận diện';
   const recognitionResult = detectionError
-      ? 'Chưa thể nhận diện'
-      : signLabel
-        ? `Ký hiệu: ${signLabel}`
-        : detectionPaused
-          ? uploadFinished
-            ? 'Video đã phát xong'
-            : 'Đang tạm dừng'
+    ? 'Chưa thể nhận diện'
+    : signLabel
+      ? `Ký hiệu: ${signLabel}`
+      : detectionPaused
+        ? uploadFinished
+          ? 'Video đã phát xong'
+          : 'Đang tạm dừng'
         : detectedHands > 0
           ? 'Đang đối chiếu từ vựng...'
           : isDetecting
@@ -312,6 +313,7 @@ export function SignDetectionCamera({ mode = 'video', autoStartCamera = false, d
       };
       await video.play();
       await startDetection('upload');
+      void predictVideoFile(file);
     } catch (uploadError) {
       releaseUploadedVideo();
       clearMediaElement();
@@ -485,15 +487,17 @@ export function SignDetectionCamera({ mode = 'video', autoStartCamera = false, d
       */}
 
       <div className="relative aspect-video w-full overflow-hidden bg-gray-950">
-        <video ref={videoRef} autoPlay playsInline muted className={`absolute inset-0 h-full w-full -scale-x-100 object-cover ${cameraActive ? 'block' : 'hidden'}`} aria-label={isUploadedVideo ? 'Video tải lên để nhận diện ký hiệu' : 'Hình ảnh camera của bạn'} />
-        <canvas ref={canvasRef} className={`pointer-events-none absolute inset-0 h-full w-full ${showLandmarks ? '' : 'hidden'}`} aria-hidden="true" />
+        <video ref={videoRef} autoPlay playsInline muted className={`absolute inset-0 h-full w-full ${!isUploadedVideo ? '-scale-x-100' : ''} object-cover ${cameraActive ? 'block' : 'hidden'}`} aria-label={isUploadedVideo ? 'Video tải lên để nhận diện ký hiệu' : 'Hình ảnh camera của bạn'} />
+        <canvas ref={canvasRef} className={`pointer-events-none absolute inset-0 h-full w-full ${!isUploadedVideo ? '-scale-x-100' : ''} ${showLandmarks ? '' : 'hidden'}`} aria-hidden="true" />
         {cameraActive ? <>
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <div className={`flex h-[80%] w-[72%] max-w-2xl flex-col items-center justify-center rounded-3xl border-2 border-dashed bg-black/[0.08] px-4 text-center shadow-[0_0_0_999px_rgba(0,0,0,0.06)] ${phase === 'outside-guide' ? 'border-amber-300' : phase === 'ready' ? 'border-emerald-300' : 'border-white/45'}`}>
-              <Icon name="back_hand" className="text-4xl text-white/80 drop-shadow" />
-              <span className="mt-2 rounded-lg bg-black/45 px-3 py-1.5 text-xs font-medium leading-relaxed text-white/95 sm:text-sm">Đặt tay vào trong khung hình để nhận diện tốt nhất</span>
+          {detectedHands === 0 && (
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-200">
+              <div className="flex h-[80%] w-[72%] max-w-2xl flex-col items-center justify-center rounded-3xl border-2 border-dashed border-white/40 bg-black/[0.08] px-4 text-center shadow-[0_0_0_999px_rgba(0,0,0,0.06)]">
+                <Icon name="back_hand" className="text-4xl text-white/80 drop-shadow" />
+                <span className="mt-2 rounded-lg bg-black/45 px-3 py-1.5 text-xs font-medium leading-relaxed text-white/95 sm:text-sm">Đặt tay vào trong khung hình để nhận diện tốt nhất</span>
+              </div>
             </div>
-          </div>
+          )}
           <div className="absolute left-3 right-3 top-3 flex items-start justify-between gap-3 sm:left-4 sm:right-4 sm:top-4">
             <span className="inline-flex max-w-[58%] items-center gap-2 rounded-full border border-white/15 bg-slate-950/65 px-3 py-1.5 text-xs font-semibold text-white shadow-lg backdrop-blur-md"><span aria-hidden="true" className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" /><span className="truncate">{isUploadedVideo ? uploadedVideoName || 'Video tải lên' : 'Camera trực tiếp'}</span></span>
             <div aria-live="polite" className="min-w-36 max-w-[65%] rounded-xl border border-white/15 bg-slate-950/75 px-3 py-2 text-white shadow-lg backdrop-blur-md sm:min-w-44">
@@ -556,6 +560,18 @@ export function SignDetectionCamera({ mode = 'video', autoStartCamera = false, d
           <div><dt className="text-slate-400">Inference</dt><dd>{debugInfo.inferenceMs === null ? 'Chưa có' : `${debugInfo.inferenceMs} ms`}</dd></div>
           <div><dt className="text-slate-400">Prediction</dt><dd>{debugInfo.prediction ?? 'Chưa có'}{debugInfo.predictionConfidence === null ? '' : ` · ${(debugInfo.predictionConfidence * 100).toFixed(1)}%`}</dd></div>
         </dl>
+        {prediction?.top3 && prediction.top3.length > 0 && (
+          <div className="mt-3 border-t border-slate-800 pt-2.5">
+            <span className="block text-slate-400 mb-1 font-medium">Top-3 Candidates:</span>
+            <div className="flex flex-wrap gap-2">
+              {prediction.top3.map((cand, idx) => (
+                <span key={`${cand.label_id}-${idx}`} className="rounded bg-slate-800 px-2 py-0.5 text-[11px] text-slate-200">
+                  {cand.label_name} ({(cand.confidence * 100).toFixed(1)}%)
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </section>}
 
       <div className={`flex flex-wrap items-center justify-center gap-2 border-t border-gray-100 bg-gray-50/80 p-3 dark:border-slate-800 dark:bg-slate-950/40 sm:gap-3 sm:p-4 ${cameraActive ? '' : 'hidden'}`}>

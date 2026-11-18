@@ -17,13 +17,29 @@ export const gestureDetectionConfig = {
   },
   sequence: {
     length: 60,
-    inferenceEveryDetectedFrames: 5,
-    // Matches the former OpenCV pipeline: tolerate brief detection loss before
-    // discarding a sequence, but never synthesize missing landmark frames.
-    maxConsecutiveMissingFrames: 8,
+    // Số frame tối thiểu để coi là có ký hiệu hợp lệ khi hạ tay sớm (từ 12 frames trở lên)
+    minFramesForGesture: 12,
+    minGestureFrames: 12,
+    // Giới hạn bộ đệm (buffer) tối đa đúng 60 frames: chốt ngay khi đủ 60 frames
+    maxGestureFrames: 60,
+    // Số frame mất dấu tay tối đa được coi là nhiễu mờ vung tay (1-4 frames) vẫn giữ chuỗi
+    maxTemporaryDropFrames: 4,
+    // Số frame mất dấu tay liên tiếp để chốt kết thúc cử chỉ (người dùng hạ tay nghỉ, 8 frames)
+    dropHandFrames: 8,
+    // Trạng thái nghỉ / non-sign: không phát hiện bàn tay trong khoảng 10-15 frame liên tiếp
+    maxConsecutiveMissingFrames: 10,
+    // Thời gian nghỉ giữa 2 từ (cooldown) tính theo ms (~0.5 giây)
+    interGestureCooldownMs: 500,
+    // Ngưỡng vận tốc di chuyển tĩnh
+    stillVelocityThreshold: 0.006,
+    stillFramesRequired: 16,
+    // Hạ nhẹ ngưỡng độ tin cậy (~0.5 - 0.6) để Camera bắt nhạy và ổn định
+    confidenceThreshold: 0.50,
     minConsecutiveStableFrames: 4,
-    minimumPredictionConfidence: 0.75,
-    stablePredictionCount: 2,
+    minimumPredictionConfidence: 0.50,
+    stablePredictionCount: 1,
+    minFramesForRealtimeInference: 12,
+    maxBufferLength: 60,
   },
   quality: {
     minFrameWidth: 480,
