@@ -215,7 +215,18 @@ def google_config(monkeypatch):
     monkeypatch.setenv('GOOGLE_CLIENT_ID', 'test-client-id')
     monkeypatch.setenv('GOOGLE_CLIENT_SECRET', 'test-client-secret')
     monkeypatch.setenv('GOOGLE_REDIRECT_URI', 'http://localhost:8080/api/v1/auth/google/callback')
-    monkeypatch.setenv('GOOGLE_ADMIN_REDIRECT_URI', 'http://admin.localhost:8080/api/v1/auth/google/callback')
+    monkeypatch.setenv('GOOGLE_ADMIN_REDIRECT_URI', 'http://127.0.0.1:8080/api/v1/auth/google/callback')
+    mailbox = []
+    monkeypatch.setattr('app.google_auth.mail_configured', lambda: True)
+    monkeypatch.setattr('app.profile.mail_configured', lambda: True)
+    monkeypatch.setattr('app.verification.send_verification_email', lambda email, code: mailbox.append((email, code)))
+    return mailbox
+
+
+def confirm_google(client, mailbox):
+    pending = client.get('/api/v1/auth/google/pending').json()
+    body = {'code': mailbox[-2][1], 'google_code': mailbox[-1][1]} if pending['google_email'] else {'code': mailbox[-1][1]}
+    return client.post('/api/v1/auth/google/verify', json=body, headers={'X-CSRF-Token': pending['csrf_token']})
 
 
 def start_google(client, path='/api/v1/auth/google/start', headers=None):
@@ -234,7 +245,9 @@ def test_google_new_user_and_state_validation(client, google_config, monkeypatch
     assert client.get('/api/v1/auth/me').status_code == 401
     state = start_google(client)
     response = client.get('/api/v1/auth/google/callback', params={'state': state, 'code': 'test-code'}, follow_redirects=False)
-    assert response.status_code == 303 and response.headers['location'] == '/dang-nhap?google_success=1'
+    assert response.status_code == 303 and response.headers['location'] == '/dang-nhap?google_pending=1'
+    assert client.get('/api/v1/auth/me').status_code == 401
+    assert confirm_google(client, google_config).status_code == 200
     assert client.get('/api/v1/auth/me').json()['user']['role'] == 'learner'
     assert client.get('/api/v1/admin/overview').status_code == 403
     assert start_google(client)
@@ -244,7 +257,7 @@ def test_google_existing_email_requires_explicit_link(client, google_config, mon
     monkeypatch.setattr('app.google_auth.verify_google_code', lambda code, verifier, nonce, admin_origin: {'sub': 'google-admin', 'email': 'admin@example.com', 'name': 'Admin'})
     state = start_google(client, '/api/v1/auth/google/start?return_to=admin')
     response = client.get('/api/v1/auth/google/callback', params={'state': state, 'code': 'test-code'}, follow_redirects=False)
-    assert 'google_error=conflict' in response.headers['location']
+    assert 'google_pending=1' in response.headers['location']
     assert client.get('/api/v1/auth/me').status_code == 401
     login = client.post('/api/v1/auth/login', json={'email': 'admin@example.com', 'password': 'correct-horse-battery-staple'})
     assert login.json()['user']['is_google_linked'] is False
@@ -252,11 +265,15 @@ def test_google_existing_email_requires_explicit_link(client, google_config, mon
     assert client.post('/api/v1/auth/google/link').status_code == 403
     state = start_google(client, '/api/v1/auth/google/link', csrf)
     response = client.get('/api/v1/auth/google/callback', params={'state': state, 'code': 'test-code'}, follow_redirects=False)
-    assert 'google_success=1' in response.headers['location']
+    assert 'google_pending=1' in response.headers['location']
+    assert client.get('/api/v1/auth/me').json()['user']['is_google_linked'] is False
+    assert confirm_google(client, google_config).status_code == 200
     assert client.get('/api/v1/auth/me').json()['user']['is_google_linked'] is True
     assert client.post('/api/v1/auth/logout', headers={'X-CSRF-Token': client.get('/api/v1/auth/me').json()['csrf_token']}).status_code == 204
     state = start_google(client, '/api/v1/auth/google/start?return_to=admin')
     client.get('/api/v1/auth/google/callback', params={'state': state, 'code': 'test-code'}, follow_redirects=False)
+    assert client.get('/api/v1/auth/me').status_code == 401
+    assert confirm_google(client, google_config).status_code == 200
     assert client.get('/api/v1/admin/overview').status_code == 200
 
 
@@ -268,8 +285,14 @@ def test_google_unlink(client, google_config):
     csrf = {'X-CSRF-Token': login.json()['csrf_token']}
     assert login.json()['user']['is_google_linked'] is True
     assert client.post('/api/v1/auth/google/unlink').status_code == 403
-    res = client.post('/api/v1/auth/google/unlink', headers=csrf)
+    assert client.post('/api/v1/auth/google/unlink', headers=csrf).status_code == 400
+    assert google_config == []
+    res = client.post('/api/v1/auth/google/unlink', headers=csrf, json={'current_password': 'correct-horse-battery-staple'})
     assert res.status_code == 200
+    assert client.get('/api/v1/auth/me').json()['user']['is_google_linked'] is True
+    confirmed = confirm_google(client, google_config)
+    assert confirmed.status_code == 200
+    csrf = {'X-CSRF-Token': confirmed.json()['csrf_token']}
     assert client.get('/api/v1/auth/me').json()['user']['is_google_linked'] is False
     assert client.post('/api/v1/auth/google/unlink', headers=csrf).status_code == 400
 
@@ -280,11 +303,13 @@ def test_google_link_rejects_different_email_and_missing_session(client, google_
     csrf = {'X-CSRF-Token': login.json()['csrf_token']}
     state = start_google(client, '/api/v1/auth/google/link', csrf)
     response = client.get('/api/v1/auth/google/callback', params={'state': state, 'code': 'test-code'}, follow_redirects=False)
-    assert 'google_error=conflict' in response.headers['location']
+    assert 'google_pending=1' in response.headers['location']
+    assert len(google_config) == 2
+    assert client.get('/api/v1/auth/me').json()['user']['is_google_linked'] is False
     state = start_google(client, '/api/v1/auth/google/link', csrf)
     assert client.post('/api/v1/auth/logout', headers=csrf).status_code == 204
     response = client.get('/api/v1/auth/google/callback', params={'state': state, 'code': 'test-code'}, follow_redirects=False)
-    assert 'google_error=failed' in response.headers['location']
+    assert 'google_error=session_expired' in response.headers['location']
     with Session(get_engine()) as session:
         assert session.get(User, 1).google_sub is None
 
@@ -300,13 +325,15 @@ def test_google_admin_host_uses_its_own_callback_and_session(client, google_conf
         return {'sub': 'google-admin', 'email': 'admin@example.com', 'name': 'Admin'}
     monkeypatch.setattr('app.google_auth.verify_google_code', verify)
 
-    with TestClient(app, base_url='http://admin.localhost:8080') as admin_client:
+    with TestClient(app, base_url='http://127.0.0.1:8080') as admin_client:
         assert admin_client.get('/api/v1/auth/google/status').json()['configured'] is True
         response = admin_client.get('/api/v1/auth/google/start?return_to=admin')
         params = parse_qs(urlparse(response.json()['url']).query)
-        assert params['redirect_uri'] == ['http://admin.localhost:8080/api/v1/auth/google/callback']
+        assert params['redirect_uri'] == ['http://127.0.0.1:8080/api/v1/auth/google/callback']
         callback = admin_client.get('/api/v1/auth/google/callback', params={'state': params['state'][0], 'code': 'test-code'}, follow_redirects=False)
-        assert callback.headers['location'] == '/?google_success=1'
+        assert callback.headers['location'] == '/?google_pending=1'
+        assert admin_client.get('/api/v1/auth/me').status_code == 401
+        assert confirm_google(admin_client, google_config).status_code == 200
         assert calls == [True]
         assert admin_client.get('/api/v1/admin/overview').status_code == 200
         assert client.get('/api/v1/auth/me').status_code == 401

@@ -1,0 +1,82 @@
+/* Theme-specific navigation and feature headers; the original theme uses its existing layout. */
+:root:not([data-site-theme='default']) .site-header nav a .theme-symbol { font-size: 21px; }
+:root[data-site-theme='patterns'] .site-header { border-top-width: 2px; }
+:root[data-site-theme='patterns'] .site-header nav a { border-radius: 1rem .3rem; }
+:root[data-site-theme='patterns'] .feature-banner-heading { border-left: 3px solid var(--theme-accent); padding-left: 1.5rem; }
+:root[data-site-theme='patterns'] .feature-banner-heading > span { border-radius: 50% 50% 15% 50%; }
+:root[data-site-theme='puppets'] .site-header { border-top: 0; }
+:root[data-site-theme='puppets'] .site-header nav a { border-radius: 2rem; }
+:root[data-site-theme='puppets'] .feature-banner-content { justify-content: center; text-align: center; }
+:root[data-site-theme='puppets'] .feature-banner-heading { flex-direction: column; gap: 1rem; }
+:root[data-site-theme='puppets'] .feature-banner-heading > span { border-radius: 50%; border-bottom: 3px solid var(--theme-secondary); }
+:root[data-site-theme='dongho'] .site-header { border-top: 4px double var(--theme-accent); box-shadow: none; }
+:root[data-site-theme='dongho'] .site-header nav a { border-radius: 0; border-bottom: 2px solid transparent; }
+:root[data-site-theme='dongho'] .site-header nav a[aria-current='page'] { border-bottom-color: var(--theme-accent); }
+:root[data-site-theme='dongho'] .feature-banner-content { border-bottom: 4px double var(--theme-accent); }
+:root[data-site-theme='dongho'] .feature-banner-heading > span { border-radius: 0; border: 1px solid var(--theme-accent); background: transparent; box-shadow: 4px 4px 0 rgb(var(--secondary-container)); }
+:root[data-site-theme='heritage'] .feature-banner-heading { flex-direction: row-reverse; width: 100%; max-width: 850px; justify-content: space-between; }
+:root[data-site-theme='heritage'] .feature-banner-heading > span { border-radius: .7rem; rotate: -6deg; }
+:root:not([data-site-theme='default']) .feature-workspace > aside { min-width: 0; }
+:root[data-site-theme='dongho'] .feature-result-grid > * { border-radius: .2rem; border-top: 3px double var(--theme-accent); box-shadow: none; }
+:root[data-site-theme='patterns'] .feature-result-grid > * { border-radius: 1.75rem .4rem; }
+:root[data-site-theme='puppets'] .feature-result-grid > * { border-radius: 1.75rem; }
+@media (min-width: 1024px) {
+  :root[data-site-theme='patterns'] .feature-workspace { grid-template-columns: minmax(0, 1fr) 242px; }
+  :root[data-site-theme='patterns'] .feature-workspace > aside { grid-column: 2; grid-row: 1; top: 10rem; }
+  :root[data-site-theme='patterns'] .feature-workspace > main { grid-column: 1; grid-row: 1; }
+  :root[data-site-theme='puppets'] .feature-workspace { grid-template-columns: minmax(0, 1fr); }
+  :root[data-site-theme='puppets'] .feature-workspace > aside { position: static; }
+  :root[data-site-theme='puppets'] .feature-workspace > aside > nav { display: flex; gap: 1rem; }
+  :root[data-site-theme='puppets'] .feature-workspace > aside > nav > button { margin: 0; justify-content: center; }
+  :root[data-site-theme='dongho'] .feature-workspace { grid-template-columns: 200px minmax(0, 1fr); }
+  :root[data-site-theme='dongho'] .feature-result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :root[data-site-theme='heritage'] .feature-workspace { grid-template-columns: minmax(0, 1fr); }
+  :root[data-site-theme='heritage'] .feature-workspace > aside { position: static; }
+  :root[data-site-theme='heritage'] .feature-workspace > aside > nav { display: flex; gap: .75rem; }
+  :root[data-site-theme='heritage'] .feature-workspace > aside > nav > button { margin: 0; justify-content: center; }
+  :root[data-site-theme='heritage'] #learning-progress > div { grid-template-columns: minmax(0, 1fr); }
+  :root[data-site-theme='patterns'] .review-game-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :root[data-site-theme='patterns'] .review-mode-card:first-child { grid-row: span 2; }
+  :root[data-site-theme='patterns'] .review-mode-card:first-child .review-game-art { height: auto; min-height: 260px; flex: 1; }
+  :root[data-site-theme='patterns'] .review-mode-card:not(:first-child) { flex-direction: row; }
+  :root[data-site-theme='patterns'] .review-mode-card:not(:first-child) .review-game-art { width: 140px; height: auto; flex-shrink: 0; }
+  :root[data-site-theme='dongho'] .review-game-cards { grid-template-columns: minmax(0, 1fr); }
+  :root[data-site-theme='dongho'] .review-mode-card { flex-direction: row; border-radius: .2rem; border-top: 3px double var(--theme-accent); }
+  :root[data-site-theme='dongho'] .review-game-art { width: 280px; height: auto; flex-shrink: 0; }
+  :root[data-site-theme='heritage'] .review-game-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :root[data-site-theme='heritage'] .review-mode-card:first-child { grid-column: 1 / -1; flex-direction: row; }
+  :root[data-site-theme='heritage'] .review-mode-card:first-child .review-game-art { width: 40%; height: auto; flex-shrink: 0; }
+}
+
+@media (min-width: 1280px) {
+  /* Two-line editorial masthead: brand and controls above the navigation. */
+  :root[data-site-theme='patterns'] .site-header-inner { display: grid; grid-template-columns: 1fr auto; gap: .4rem 1rem; padding-top: .6rem; }
+  :root[data-site-theme='patterns'] .site-desktop-nav { grid-row: 2; grid-column: 1 / -1; justify-content: flex-start; border-top: 1px solid rgb(var(--surface-border)); padding-block: .5rem; gap: 1.25rem; }
+  :root[data-site-theme='patterns'] .site-header-inner > span { display: none; }
+  :root[data-site-theme='patterns'] .site-header-actions { grid-column: 2; grid-row: 1; }
+  /* Floating, contained navigation for the water theatre. */
+  :root[data-site-theme='puppets'] .site-header { margin: 1rem 1.5rem 0; top: .75rem; border: 1px solid rgb(var(--surface-border)); border-radius: 2rem; }
+  :root[data-site-theme='puppets'] .site-header-inner { padding-inline: 1.25rem; }
+  :root[data-site-theme='puppets'] .site-header::after { display: none; }
+  :root[data-site-theme='puppets'] .site-brand > span { font-size: 18px; }
+  :root[data-site-theme='puppets'] .site-desktop-nav a { padding-inline: .65rem; font-size: .8rem; }
+  /* A persistent journal index on the left, preserving the same labelled routes. */
+  :root[data-site-theme='heritage'] .site-shell { padding-left: 224px; }
+  :root[data-site-theme='heritage'] .site-header { position: fixed; left: 0; top: 0; bottom: 0; width: 224px; border: 0; border-right: 1px solid rgb(var(--surface-border)); border-top: 5px solid var(--theme-accent); }
+  :root[data-site-theme='heritage'] .site-header-inner { height: 100%; min-height: 0; display: flex; flex-direction: column; align-items: stretch; gap: 1.5rem; padding: 1.5rem 1rem; }
+  :root[data-site-theme='heritage'] .site-brand { gap: .4rem; }
+  :root[data-site-theme='heritage'] .site-brand > span { font-size: 19px; }
+  :root[data-site-theme='heritage'] .site-brand img { width: 36px; height: 36px; }
+  :root[data-site-theme='heritage'] .site-header-inner > span { display: none; }
+  :root[data-site-theme='heritage'] .site-desktop-nav { flex: 0 1 auto; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: .6rem; overflow: visible; }
+  :root[data-site-theme='heritage'] .site-desktop-nav a { min-height: 52px; padding-inline: 1rem; border-radius: .6rem; }
+  :root[data-site-theme='heritage'] .site-header-actions { margin: auto 0 0; flex-wrap: wrap; gap: .6rem; }
+  :root[data-site-theme='heritage'] .site-header-actions > a { width: 100%; margin-top: .5rem; }
+  :root[data-site-theme='heritage'] .site-header-actions > a > span { max-width: 125px; }
+  :root[data-site-theme='heritage'] .site-header::after { display: none; }
+}
+@media (max-width: 640px) {
+  :root:not([data-site-theme='default']) .feature-banner-heading { gap: 1rem; }
+  :root[data-site-theme='patterns'] .feature-banner-heading { padding-left: 1rem; }
+  :root[data-site-theme='heritage'] .feature-banner-heading > span { width: 48px; height: 48px; }
+}

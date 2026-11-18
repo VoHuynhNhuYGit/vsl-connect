@@ -102,6 +102,10 @@ class UserOut(BaseModel):
     email: str
     display_name: str
     role: Literal['learner', 'admin']
+    gender: Literal['male', 'female', 'other', 'prefer_not_to_say'] | None = None
+    phone_number: str | None = None
+    google_email: str | None = None
+    password_enabled: bool = True
     is_google_linked: bool = False
     avatar_url: str | None = None
     created_at: datetime
@@ -180,3 +184,47 @@ class AdminAuditLogOut(BaseModel):
     resource_id: int
     resource_label: str
     created_at: datetime
+
+
+class ProfileInput(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    display_name: str = Field(min_length=1, max_length=120)
+    gender: Literal['male', 'female', 'other', 'prefer_not_to_say'] | None = None
+    phone_number: str | None = Field(default=None, max_length=32)
+
+    @field_validator('display_name')
+    @classmethod
+    def clean_name(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError('Tên hiển thị không được để trống.')
+        return value
+
+    @field_validator('phone_number')
+    @classmethod
+    def clean_phone(cls, value: str | None) -> str | None:
+        import re
+        if not value or not value.strip():
+            return None
+        value = re.sub(r'[\s().-]', '', value)
+        if not re.fullmatch(r'\+?[0-9]{8,15}', value):
+            raise ValueError('Số điện thoại cần từ 8 đến 15 chữ số, có thể bắt đầu bằng +.')
+        return value
+
+
+class PasswordInput(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    current_password: str | None = Field(default=None, max_length=128)
+    new_password: str = Field(min_length=12, max_length=128)
+    code: str | None = Field(default=None, pattern=r'^[0-9]{6}$')
+
+
+class VerificationInput(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    code: str = Field(pattern=r'^[0-9]{6}$')
+    google_code: str | None = Field(default=None, pattern=r'^[0-9]{6}$')
+
+
+class UnlinkInput(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    current_password: str = Field(min_length=1, max_length=128)

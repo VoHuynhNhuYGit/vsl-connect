@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { apiRequest, unlinkGoogle, useAdminResource } from '../../services/adminApi';
+import { apiRequest, useAdminResource } from '../../services/adminApi';
 import { Icon } from '../ui/Icon';
 
 export function GoogleIcon({ className = 'h-5 w-5' }: { className?: string }) {
@@ -51,14 +51,20 @@ export function GoogleError() {
     setErrorParam(null);
     const url = new URL(window.location.href);
     url.searchParams.delete('google_error');
+    url.searchParams.delete('retry_after');
     window.history.replaceState({}, '', url.pathname + (url.search ? url.search : '') + url.hash);
   }
 
-  const message = errorParam === 'conflict'
-    ? 'Email này đã có tài khoản hoặc tài khoản Google đã được liên kết với người dùng khác. Hãy đăng nhập bằng mật khẩu rồi liên kết Google trong mục tài khoản.'
-    : errorParam === 'invalid'
-      ? 'Phiên đăng nhập Google đã hết hạn hoặc không hợp lệ. Vui lòng thử lại.'
-      : 'Đăng nhập Google không thành công hoặc đã bị hủy. Vui lòng thử lại.';
+  const retryValue = Number(new URLSearchParams(window.location.search).get('retry_after'));
+  const waitMinutes = Number.isFinite(retryValue) && retryValue > 0 ? Math.ceil(Math.min(retryValue, 3600) / 60) : null;
+  const messages: Record<string, string> = {
+    conflict: 'Tài khoản Google hoặc email này đang thuộc một tài khoản khác. Hãy chọn đúng tài khoản Google cần liên kết.',
+    invalid: 'Phiên đăng nhập Google đã hết hạn hoặc không hợp lệ. Vui lòng bắt đầu lại.',
+    rate_limited: `Tài khoản hoặc email đã đạt giới hạn 5 yêu cầu mã trong một giờ. ${waitMinutes ? `Vui lòng thử lại sau khoảng ${waitMinutes} phút.` : 'Vui lòng chờ trước khi yêu cầu mã mới.'}`,
+    session_expired: 'Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại trước khi liên kết Google.',
+    email_unavailable: 'Đã xác minh Google nhưng chưa gửi được mã email. Vui lòng kiểm tra cấu hình SMTP hoặc thử lại sau.',
+  };
+  const message = messages[errorParam] || 'Đăng nhập Google không thành công hoặc đã bị hủy. Vui lòng thử lại.';
 
   return (
     <div role="alert" className="mt-4 flex items-start justify-between rounded-2xl bg-error-container p-3.5 text-error border border-error/20">
@@ -73,8 +79,8 @@ export function GoogleError() {
   );
 }
 
-export function GoogleAction({ mode, csrfToken, className = '' }: { mode: 'login' | 'admin' | 'link'; csrfToken?: string; className?: string }) {
-  const { data, loading, error } = useAdminResource<{ configured: boolean }>('/auth/google/status');
+export function GoogleAction({ mode, csrfToken, className = '', label: customLabel }: { mode: 'login' | 'admin' | 'link'; csrfToken?: string; className?: string; label?: string }) {
+  const { data, loading, error } = useAdminResource<{ configured: boolean; oauth_configured: boolean; email_configured: boolean }>('/auth/google/status');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -108,87 +114,12 @@ export function GoogleAction({ mode, csrfToken, className = '' }: { mode: 'login
         className="flex w-full items-center justify-center gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-label-md shadow-card transition-all hover:bg-surface-container-low hover:shadow-lift active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
       >
         <GoogleIcon className="h-5 w-5 shrink-0" />
-        <span>{busy ? 'Đang chuyển đến Google...' : label}</span>
+        <span>{busy ? 'Đang chuyển đến Google...' : customLabel || label}</span>
       </button>
       {loading && <p className="mt-2 text-center text-body-sm text-on-surface-variant">Đang kiểm tra cấu hình Google...</p>}
-      {!loading && !configured && <p className="mt-2 text-center text-body-sm text-on-surface-variant">Đăng nhập Google chưa được cấu hình trên máy chủ.</p>}
+      {!loading && !configured && <p className="mt-2 text-center text-body-sm text-on-surface-variant">{data?.oauth_configured ? 'Máy chủ chưa cấu hình gửi mã xác thực qua email.' : 'Đăng nhập Google chưa được cấu hình trên máy chủ.'}</p>}
       {error && <p role="alert" className="mt-2 text-center text-body-sm text-error">Không thể kiểm tra cấu hình Google.</p>}
       {message && <p role="alert" className="mt-2 text-center text-body-sm text-error">{message}</p>}
-    </div>
-  );
-}
-
-export function GoogleAccountCard({
-  isGoogleLinked,
-  csrfToken,
-  onStatusChange,
-}: {
-  isGoogleLinked: boolean;
-  csrfToken: string;
-  onStatusChange?: (linked: boolean) => void;
-}) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
-
-  async function handleUnlink() {
-    if (!window.confirm('Bạn có chắc chắn muốn huỷ liên kết tài khoản Google không?')) return;
-    setBusy(true);
-    setError('');
-    setNotice('');
-    try {
-      const res = await unlinkGoogle(csrfToken);
-      setNotice(res.detail || 'Đã huỷ liên kết Google.');
-      onStatusChange?.(false);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Không thể huỷ liên kết Google.');
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <div className="mt-5 rounded-2xl border border-surface-container bg-surface-container-lowest p-4 shadow-card">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-container-low border border-outline-variant/30">
-            <GoogleIcon className="h-5 w-5" />
-          </div>
-          <div>
-            <p className="text-label-md text-on-surface">Tài khoản Google</p>
-            <p className="text-body-sm text-on-surface-variant flex items-center gap-1.5 mt-0.5">
-              {isGoogleLinked ? (
-                <>
-                  <span className="inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
-                  <span className="text-primary font-medium">Đã liên kết</span>
-                </>
-              ) : (
-                <>
-                  <span className="inline-block h-2 w-2 rounded-full bg-amber-500"></span>
-                  <span>Chưa liên kết</span>
-                </>
-              )}
-            </p>
-          </div>
-        </div>
-        {isGoogleLinked && (
-          <button
-            type="button"
-            disabled={busy}
-            onClick={handleUnlink}
-            className="rounded-lg border border-outline-variant px-3 py-1.5 text-label-sm text-on-surface hover:bg-surface-container-low transition-colors disabled:opacity-60"
-          >
-            {busy ? 'Đang huỷ...' : 'Huỷ liên kết'}
-          </button>
-        )}
-      </div>
-
-      {!isGoogleLinked && (
-        <GoogleAction mode="link" csrfToken={csrfToken} />
-      )}
-
-      {notice && <p className="mt-3 text-body-sm text-primary">{notice}</p>}
-      {error && <p role="alert" className="mt-3 text-body-sm text-error">{error}</p>}
     </div>
   );
 }

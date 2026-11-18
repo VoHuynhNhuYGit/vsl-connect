@@ -1,0 +1,111 @@
+/* Compact home compositions keep all five study destinations close to the introduction. */
+.theme-symbol { display: inline-block; width: 1em; height: 1.1em; flex-shrink: 0; vertical-align: middle; overflow: visible; }
+.theme-symbol-accent { color: var(--theme-secondary); fill: currentColor; }
+.theme-symbol--puppets .theme-symbol-accent { fill: none; }
+.cultural-home { position: relative; isolation: isolate; padding: 1.5rem clamp(1.25rem, 3vw, 3rem); }
+.cultural-home-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: 'intro art' 'explore explore'; gap: 1.25rem 2.5rem; max-width: 1280px; margin: auto; }
+.cultural-intro { grid-area: intro; min-width: 0; align-self: center; }
+.cultural-intro > .theme-eyebrow { display: flex; align-items: center; gap: .65rem; }
+.cultural-edition { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; flex-shrink: 0; border: 1px solid currentColor; font-size: .7rem; letter-spacing: 0; }
+.site-shell .cultural-intro h1 { margin-block: .85rem; max-width: 21ch; font-size: clamp(2rem, 3vw, 2.9rem); font-weight: 600; line-height: 1.3; }
+.cultural-description { max-width: 47ch; font-size: .875rem; color: rgb(var(--text-secondary)); }
+.cultural-actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1.25rem; }
+.cultural-actions a { display: inline-flex; align-items: center; justify-content: center; gap: .6rem; min-height: 44px; padding: .65rem 1rem; font-size: .8rem; font-weight: 600; border: 1px solid var(--theme-accent); border-radius: .75rem; transition: transform .2s; }
+.cultural-actions a:hover { transform: translateY(-2px); }
+.cultural-primary { background: var(--theme-accent); color: white; }
+.cultural-secondary { background: rgb(var(--surface-card)); color: var(--text-accent); }
+.cultural-actions .theme-symbol { font-size: 20px; }
+.cultural-art { grid-area: art; min-width: 0; width: 100%; max-width: 500px; margin: 0; justify-self: center; align-self: center; }
+.cultural-artwork { display: block; width: 100%; height: clamp(230px, 26vw, 300px); }
+.cultural-art figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .4rem; padding: .5rem .75rem; font-size: .65rem; color: rgb(var(--text-secondary)); border-top: 1px solid rgb(var(--surface-border)); }
+.cultural-art figcaption strong { color: rgb(var(--text-primary)); font-size: .85rem; font-weight: 600; }
+.cultural-explore { grid-area: explore; min-width: 0; }
+.cultural-section-heading { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: .75rem; }
+.cultural-section-heading h2 { font-size: 1rem; font-weight: 600; }
+.cultural-section-heading > span { display: inline-flex; align-items: center; gap: .4rem; color: rgb(var(--text-secondary)); font-size: .7rem; }
+.cultural-section-heading > span .material-symbols-outlined { font-size: 16px; }
+.cultural-journeys { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .75rem; }
+.cultural-journey { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6rem; min-width: 0; min-height: 110px; padding: .9rem .65rem; border: 1px solid rgb(var(--surface-border)); background: rgb(var(--surface-card)); transition: border-color .2s, transform .2s, box-shadow .2s; }
+.cultural-journey:hover { border-color: var(--theme-accent); transform: translateY(-3px); box-shadow: 0 10px 25px -20px var(--theme-ink); }
+.cultural-journey-number { position: absolute; top: .5rem; left: .65rem; font-size: .6rem; color: rgb(var(--text-secondary)); }
+.cultural-icon { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; color: var(--text-accent); background: rgb(var(--secondary-container)); }
+.cultural-icon .theme-symbol { font-size: 25px; }
+.cultural-journey-copy { min-width: 0; text-align: center; }
+.cultural-journey h3 { font-size: .85rem; font-weight: 600; }
+.cultural-journey-arrow { position: absolute; right: .6rem; top: .5rem; color: var(--text-accent); font-size: 16px; }
+
+/* Each theme retains its visual identity within the compact study frame. */
+.cultural-home--patterns .cultural-home-grid { grid-template-areas: 'art intro' 'explore explore'; }
+.cultural-home--patterns .cultural-intro { border-left: 1px solid rgb(var(--surface-border)); padding-left: 2rem; }
+.cultural-home--patterns .cultural-edition { border-radius: 50%; }
+.cultural-home--patterns .cultural-journey { border-radius: 1.25rem .35rem; }
+.cultural-home--patterns .cultural-icon { border-radius: 50% 50% 20% 50%; }
+.cultural-home--patterns .cultural-actions a { border-radius: 2rem 2rem 2rem .4rem; }
+.cultural-home--puppets .cultural-art { max-width: 470px; }
+.cultural-home--puppets .cultural-edition { border-radius: 50% 50% 40% 40%; }
+.cultural-home--puppets .cultural-journeys { padding: .75rem; border: 1px solid rgb(var(--surface-border)); border-radius: 1.5rem; background: rgb(var(--surface-low)); }
+.cultural-home--puppets .cultural-journey { border-radius: 1rem; min-height: 100px; }
+.cultural-home--puppets .cultural-icon { border-radius: 50%; border-bottom: 3px solid var(--theme-secondary); }
+.cultural-home--puppets .cultural-actions a { border-radius: 2rem; }
+.cultural-home--dongho .cultural-home-grid { border: 3px double var(--theme-accent); padding: 1.25rem; gap: 1rem 2rem; }
+.cultural-home--dongho .cultural-journey { border-radius: .2rem; border-top: 3px double var(--theme-accent); }
+.cultural-home--dongho .cultural-icon { background: transparent; border: 1px solid var(--theme-accent); box-shadow: 3px 3px 0 rgb(var(--secondary-container)); }
+.cultural-home--dongho .cultural-actions a { border-radius: .2rem; }
+.cultural-home--heritage .cultural-art { padding: .5rem .75rem; border: 1px solid rgb(var(--surface-border)); border-radius: 1.25rem; background: rgb(var(--surface-card)); }
+.cultural-home--heritage .cultural-edition { border-radius: .35rem; background: var(--theme-accent); color: white; }
+.cultural-home--heritage .cultural-journey { border-radius: .85rem; }
+.cultural-home--heritage .cultural-icon { border-radius: .65rem; background: rgb(var(--surface-low)); }
+
+/* The home page uses a single top bar so the complete study frame stays in view. */
+:root[data-site-theme] .site-shell--compact-home { padding-left: 0; }
+:root[data-site-theme] .site-shell--compact-home .site-header { position: sticky; top: 0; bottom: auto; left: auto; width: auto; margin: 0; border-radius: 0; border-right: 0; }
+:root[data-site-theme] .site-shell--compact-home .site-header-inner { display: flex; flex-direction: row; align-items: center; height: auto; min-height: 68px; gap: .75rem; padding: .4rem clamp(1rem, 2.5vw, 2.5rem); }
+:root[data-site-theme] .site-shell--compact-home .site-brand { gap: .5rem; }
+:root[data-site-theme] .site-shell--compact-home .site-brand > span { font-size: 18px; }
+:root[data-site-theme] .site-shell--compact-home .site-brand img { width: 36px; height: 36px; }
+:root[data-site-theme] .site-shell--compact-home .site-desktop-nav { flex: 1; flex-direction: row; align-items: center; justify-content: center; gap: .1rem; padding: 0; border-top: 0; overflow-x: auto; }
+:root[data-site-theme] .site-shell--compact-home .site-desktop-nav a { min-height: 40px; padding: .5rem .65rem; font-size: .8rem; }
+:root[data-site-theme] .site-shell--compact-home .site-header-actions { margin: 0 0 0 auto; flex-wrap: nowrap; gap: .4rem; }
+:root[data-site-theme] .site-shell--compact-home .site-header-actions > a { width: auto; margin-top: 0; }
+:root[data-site-theme] .site-shell--compact-home .site-header-actions > a > span { max-width: 96px; }
+:root[data-site-theme] .site-shell--compact-home .site-header-inner > span { display: none; }
+.site-shell--compact-home .site-footer > div { padding-block: 1rem; font-size: .75rem; }
+
+@media (max-width: 1000px) {
+  .cultural-home-grid { gap: 1rem 1.5rem; }
+  .cultural-home--patterns .cultural-intro { padding-left: 1.25rem; }
+  .cultural-actions { gap: .5rem; }
+  .cultural-actions a { padding-inline: .8rem; font-size: .75rem; }
+  .cultural-art figcaption > span { display: none; }
+}
+@media (max-width: 760px) {
+  .cultural-home { padding: 1.25rem; }
+  .cultural-home .cultural-home-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'intro' 'explore' 'art'; gap: 1.25rem; }
+  .cultural-home--patterns .cultural-intro { border-left: 0; padding: 0; }
+  .site-shell .cultural-intro h1 { max-width: 24ch; font-size: clamp(1.8rem, 5.5vw, 2.25rem); }
+  .cultural-description { max-width: 55ch; }
+  .cultural-journeys { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; }
+  .cultural-journey { min-height: 100px; padding: .75rem .4rem; }
+  .cultural-journey h3 { font-size: .8rem; }
+  .cultural-home--dongho .cultural-home-grid { padding: 1rem; }
+  .cultural-artwork { height: 240px; }
+  .cultural-section-heading > span { display: none; }
+}
+@media (max-width: 480px) {
+  .cultural-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .cultural-journeys { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cultural-journey:last-child { grid-column: 1 / -1; flex-direction: row; min-height: 68px; }
+  .cultural-home--puppets .cultural-journeys { padding: .6rem; }
+  .cultural-home--puppets .cultural-journey:last-child { min-height: 68px; }
+  .cultural-home--dongho { padding: 1rem; }
+  .cultural-artwork { height: 210px; }
+}
+@media (min-width: 1024px) and (max-height: 800px) {
+  .cultural-home { padding-block: 1rem; }
+  .cultural-artwork { height: 245px; }
+  .site-shell .cultural-intro h1 { font-size: clamp(2rem, 2.8vw, 2.55rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cultural-actions a, .cultural-journey { transition: none; }
+  .cultural-actions a:hover, .cultural-journey:hover { transform: none; }
+}

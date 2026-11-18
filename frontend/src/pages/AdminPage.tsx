@@ -1,3 +1,4 @@
+import { GoogleVerification } from '../features/account/GoogleVerification';
 import { FormEvent, KeyboardEvent, useEffect, useMemo, useState } from 'react';
 import vslLogo from '../assets/vsl-connect-logo.png';
 import { AdminSignIn } from '../components/admin/AdminSignIn';
@@ -81,6 +82,7 @@ function isCreateTarget(tab: Tab): tab is CreateTarget {
 
 export function AdminPage() {
   const [session, setSession] = useState<AuthSession | null>(null);
+  const [googlePending, setGooglePending] = useState(() => new URLSearchParams(window.location.search).get('google_pending') === '1');
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [tab, setTab] = useState<Tab>(tabFromUrl);
@@ -137,6 +139,7 @@ export function AdminPage() {
   }
 
   if (loading) return <div role="status" className="mx-auto max-w-[1600px] px-5 py-16 text-body-md text-on-surface-variant sm:px-8">Đang tải...</div>;
+  if (googlePending) return <div className="mx-auto max-w-xl px-5 py-10"><GoogleVerification onVerified={updated => { setSession(updated); setGooglePending(false); }} onCancel={() => setGooglePending(false)} /></div>;
   if (!session) return <AdminSignIn onSuccess={setSession} />;
   if (session.user.role !== 'admin') return <div className="mx-auto max-w-xl px-4 py-14 sm:px-6"><section className="rounded-3xl border border-surface-container bg-surface-container-lowest p-8 text-center shadow-card"><span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-error-container text-error"><Icon name="lock" className="text-[28px]" /></span><h1 className="mt-5 text-headline-lg">Chưa có quyền quản trị</h1><button type="button" onClick={() => signOut(session.csrf_token)} className="mt-6 rounded-lg bg-primary px-4 py-2.5 text-label-md text-on-primary">Đăng xuất</button></section></div>;
 
@@ -154,7 +157,7 @@ export function AdminPage() {
     <div className="admin-workspace mx-auto max-w-[1680px] px-4 py-5 sm:px-6 lg:px-7 lg:py-6">
       {message && <p role="alert" className="mb-4 rounded-xl bg-error-container px-4 py-3 text-body-sm text-error">{message}</p>}
       <div className={`grid gap-5 ${sidebarCollapsed ? 'lg:grid-cols-[5.25rem_minmax(0,1fr)]' : 'lg:grid-cols-[15.75rem_minmax(0,1fr)]'}`}>
-        <aside className="h-fit lg:sticky lg:top-5">
+        <aside className="h-fit min-w-0 lg:sticky lg:top-5">
           <div className={`mb-4 flex h-20 items-center gap-3 rounded-[26px] bg-surface-container-lowest px-5 shadow-card ${sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''}`}>
             <button type="button" onClick={() => setSidebarCollapsed((collapsed) => !collapsed)} aria-expanded={!sidebarCollapsed} aria-label={sidebarCollapsed ? 'Mở rộng danh sách chức năng' : 'Thu gọn danh sách chức năng'} className="rounded-lg p-1 text-on-surface outline-none transition-colors hover:bg-surface-container focus-visible:ring-2 focus-visible:ring-primary"><Icon name="menu" className="text-[27px]" /></button>
             <span className={`bg-gradient-to-r from-primary via-primary to-primary/75 bg-clip-text text-headline-lg text-transparent ${sidebarCollapsed ? 'lg:hidden' : ''}`}>Quản trị</span>
